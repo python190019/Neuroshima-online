@@ -1,1 +1,1 @@
-To nie jest readme (esz).
+This is online wersion of Neuroshima hex.
