@@ -1,1 +1,1 @@
-To jest readme
+To nie jest readme (esz).
