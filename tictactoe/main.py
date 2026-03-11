@@ -22,6 +22,7 @@ class TicTacToe(ShowBase):
         self.setBackgroundColor(0.2, 0.2, 0.2, 1)
         self.draw_board()
 
+        self.accept('escape', self.exit_game)
         self.accept('mouse1', self.on_click)
         self.accept('r', self.reset_game)
 
@@ -64,7 +65,7 @@ class TicTacToe(ShowBase):
             return
 
         m = self.mouseWatcherNode.getMouse()
-        mx = m.getX()
+        mx = m.getX() * self.getAspectRatio()
         my = m.getY()
 
         for row in range(self.board_size):
@@ -73,6 +74,8 @@ class TicTacToe(ShowBase):
                 x1, x2, y1, y2 = x - self.half_cell, x + self.half_cell, y - self.half_cell, y + self.half_cell
 
                 if x1 <= mx <= x2 and y1 <= my <= y2:
+                    print(f"Checking cell ({row}, {col}): x1={x1}, x2={x2}, y1={y1}, y2={y2}, click=({mx}, {my})")
+                    
                     if self.board[row][col] is None:
                         self.board[row][col] = self.current_player
                         self.draw_mark(row, col, self.current_player)
@@ -122,6 +125,9 @@ class TicTacToe(ShowBase):
         img.reparentTo(self.grid_node)
 
         self.used.append(img)
+
+    def exit_game(self):
+        self.userExit()
 
 game = TicTacToe()
 game.run()
