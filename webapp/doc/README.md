@@ -20,11 +20,13 @@ Aplikacja sklada sie z:
 - klienta Python
 - prostego endpointu REST do statystyk polaczen
 
-Aktualny protokol biznesowy opiera sie o trzy komunikaty:
+Aktualny protokol biznesowy opiera sie o komunikaty pokoj+gra:
+- `CREATENEWROOM` (request/response)
 - `STARTNEWGAME` (request/response)
 - `ENDTURN` (request/response)
 - `ENDGAME` (request/response)
 
+`STARTNEWGAME_REQUEST` musi zawierac `roomId` i `playerId`.
 Wiadomosci `ENDTURN` i `ENDGAME` musza zawierac `gameId`.
 
 ---
@@ -53,9 +55,9 @@ Hierarchia komunikatow:
 
 ### Python client
 
-- `client/websocket_client.py` - glowny klient CLI
-- `client/game_messages_example.py` - przyklad klas request/response
-- `client/test.py` - smoke test protokolu
+- `client/websocket_client.py` - jedyna implementacja klienta WebSocket
+- `client/test.py` - smoke test wykorzystujacy `websocket_client.py`
+- `client/game_messages_example.py` - generator przykladowych payloadow JSON (bez laczenia z serwerem)
 
 ---
 
@@ -101,7 +103,7 @@ Przyklad z parametrami:
 
 ```bash
 cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
-../.venv/bin/python websocket_client.py --server ws://localhost:8080/ws/chat --player "Anna" --scenario "Moloch" --turn 1 --reason "Victory points"
+../.venv/bin/python websocket_client.py --server ws://localhost:8080/ws/chat --player "Anna" --room room-1 --scenario "Moloch" --turn 1 --reason "Victory points"
 ```
 
 ---
@@ -116,7 +118,18 @@ Wspolne pola (baza):
 Wiadomosci game-scoped dodatkowo maja:
 - `gameId`
 
-### 5.1 CONNECTION (server -> client)
+### 5.1 CREATENEWROOM_REQUEST (client -> server)
+
+```json
+{
+  "messageType": "CREATENEWROOM_REQUEST",
+  "clientId": "58a84c5a-ca0e-4a8d-bf04-11ae1152bdf4",
+  "roomId": "room-1",
+  "playerName": "Anna"
+}
+```
+
+### 5.2 CONNECTION (server -> client)
 
 ```json
 {
@@ -127,30 +140,46 @@ Wiadomosci game-scoped dodatkowo maja:
 }
 ```
 
-### 5.2 STARTNEWGAME_REQUEST (client -> server)
+### 5.3 CREATENEWROOM_RESPONSE (server -> client)
+
+```json
+{
+  "messageType": "CREATENEWROOM_RESPONSE",
+  "timestamp": "2026-03-25T17:05:38.860000000",
+  "clientId": "58a84c5a-ca0e-4a8d-bf04-11ae1152bdf4",
+  "createdRoomId": "room-1",
+  "serverStatus": "STARTED room=room-1 player=Anna"
+}
+```
+
+### 5.4 STARTNEWGAME_REQUEST (client -> server)
 
 ```json
 {
   "messageType": "STARTNEWGAME_REQUEST",
   "clientId": "58a84c5a-ca0e-4a8d-bf04-11ae1152bdf4",
+  "roomId": "room-1",
+  "playerId": "Anna",
   "playerName": "Anna",
   "scenario": "Moloch"
 }
 ```
 
-### 5.3 STARTNEWGAME_RESPONSE (server -> client)
+### 5.5 STARTNEWGAME_RESPONSE (server -> client)
 
 ```json
 {
   "messageType": "STARTNEWGAME_RESPONSE",
   "timestamp": "2026-03-25T17:05:38.865660438",
   "clientId": "58a84c5a-ca0e-4a8d-bf04-11ae1152bdf4",
+  "roomId": "room-1",
+  "playerId": "Anna",
   "createdGameId": "8ef7dcb4-db11-4ddb-a8fc-2440391462bf",
-  "serverStatus": "STARTED scenario=Moloch player=Anna"
+  "serverStatus": "STARTED room=room-1 game=8ef7dcb4-db11-4ddb-a8fc-2440391462bf player=Anna"
 }
 ```
 
-### 5.4 ENDTURN_REQUEST (client -> server)
+### 5.6 ENDTURN_REQUEST (client -> server)
 
 ```json
 {
@@ -162,7 +191,7 @@ Wiadomosci game-scoped dodatkowo maja:
 }
 ```
 
-### 5.5 ENDTURN_RESPONSE (server -> client)
+### 5.7 ENDTURN_RESPONSE (server -> client)
 
 ```json
 {
@@ -175,7 +204,7 @@ Wiadomosci game-scoped dodatkowo maja:
 }
 ```
 
-### 5.6 ENDGAME_REQUEST (client -> server)
+### 5.8 ENDGAME_REQUEST (client -> server)
 
 ```json
 {
@@ -187,7 +216,7 @@ Wiadomosci game-scoped dodatkowo maja:
 }
 ```
 
-### 5.7 ENDGAME_RESPONSE (server -> client)
+### 5.9 ENDGAME_RESPONSE (server -> client)
 
 ```json
 {
@@ -204,9 +233,12 @@ Wiadomosci game-scoped dodatkowo maja:
 
 ## 6. Klient Python
 
+Implementacja klienta WebSocket znajduje sie tylko w `client/websocket_client.py`.
+
 Parametry `client/websocket_client.py`:
 - `--server` (domyslnie: `ws://localhost:8080/ws/chat`)
 - `--player` (domyslnie: `Anna`)
+- `--room` (domyslnie: `room-1`)
 - `--scenario` (domyslnie: `Moloch`)
 - `--turn` (domyslnie: `1`)
 - `--reason` (domyslnie: `Victory points`)
@@ -215,7 +247,7 @@ Przyklad:
 
 ```bash
 cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
-../.venv/bin/python websocket_client.py --player "Bot-1" --scenario "Moloch" --turn 2 --reason "Smoke"
+../.venv/bin/python websocket_client.py --player "Bot-1" --room room-2 --scenario "Moloch" --turn 2 --reason "Smoke"
 ```
 
 ---
@@ -235,6 +267,8 @@ cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
 cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
 ../.venv/bin/python game_messages_example.py
 ```
+
+Skrypt wypisuje przykladowe payloady JSON i nie nawiazuje polaczenia WebSocket.
 
 ### Build Java
 
@@ -286,4 +320,4 @@ Zmien port w konfiguracji Spring (`server.port`) lub zatrzymaj proces, ktory go 
 
 ---
 
-Dokumentacja jest zgodna z aktualnym stanem kodu na 2026-03-25.
+Dokumentacja jest zgodna z aktualnym stanem kodu na 2026-03-28.

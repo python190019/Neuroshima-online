@@ -6,6 +6,12 @@ public class StartNewGameRequest extends WebSocketMessage {
 
     public static final String TYPE = "STARTNEWGAME_REQUEST";
 
+    @JsonProperty("roomId")
+    private String roomId;
+
+    @JsonProperty("playerId")
+    private String playerId;
+
     @JsonProperty("playerName")
     private String playerName;
 
@@ -31,6 +37,22 @@ public class StartNewGameRequest extends WebSocketMessage {
 
     public void setScenario(String scenario) {
         this.scenario = scenario;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
     }
 }
 

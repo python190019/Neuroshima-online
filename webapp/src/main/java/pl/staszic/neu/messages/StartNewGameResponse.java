@@ -9,6 +9,12 @@ public class StartNewGameResponse extends WebSocketMessage {
     @JsonProperty("createdGameId")
     private String createdGameId;
 
+    @JsonProperty("roomId")
+    private String roomId;
+
+    @JsonProperty("playerId")
+    private String playerId;
+
     @JsonProperty("serverStatus")
     private String serverStatus;
 
@@ -30,6 +36,22 @@ public class StartNewGameResponse extends WebSocketMessage {
 
     public void setServerStatus(String serverStatus) {
         this.serverStatus = serverStatus;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
     }
 }
 

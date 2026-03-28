@@ -2,6 +2,7 @@
 """Klient Python dla nowych komunikatow websocket.
 
 Obslugiwane typy:
+- CREATENEWROOM_REQUEST/RESPONSE
 - STARTNEWGAME_REQUEST/RESPONSE
 - ENDTURN_REQUEST/RESPONSE
 - ENDGAME_REQUEST/RESPONSE
@@ -31,13 +32,28 @@ class GameScopedMessage(BaseMessage):
 
 
 @dataclass
+class CreateNewRoomRequest(BaseMessage):
+    roomId: str = ""
+    playerName: str = ""
+
+    def __init__(self, room_id: str, player_name: str) -> None:
+        super().__init__(messageType="CREATENEWROOM_REQUEST")
+        self.roomId = room_id
+        self.playerName = player_name
+
+
+@dataclass
 class StartNewGameRequest(BaseMessage):
+    roomId: str = ""
+    playerId: str = ""
     playerName: str = ""
     scenario: str = ""
 
-    def __init__(self, player_name: str, scenario: str) -> None:
+    def __init__(self, room_id: str, player_id: str, scenario: str) -> None:
         super().__init__(messageType="STARTNEWGAME_REQUEST")
-        self.playerName = player_name
+        self.roomId = room_id
+        self.playerId = player_id
+        self.playerName = player_id
         self.scenario = scenario
 
 
@@ -96,6 +112,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Klient websocket dla protokolu gry")
     parser.add_argument("--server", default="ws://localhost:8080/ws/chat", help="Adres serwera websocket")
     parser.add_argument("--player", default="Anna", help="Nazwa gracza")
+    parser.add_argument("--room", default="room-1", help="Id pokoju")
     parser.add_argument("--scenario", default="Moloch", help="Scenariusz dla STARTNEWGAME")
     parser.add_argument("--turn", type=int, default=1, help="Numer tury dla ENDTURN")
     parser.add_argument("--reason", default="Victory points", help="Powod zakonczenia gry")
@@ -107,7 +124,11 @@ def main() -> None:
     client = WebSocketGameClient(args.server)
     client.connect()
 
-    start_response = client.send(StartNewGameRequest(player_name=args.player, scenario=args.scenario))
+    client.send(CreateNewRoomRequest(room_id=args.room, player_name=args.player))
+
+    start_response = client.send(
+        StartNewGameRequest(room_id=args.room, player_id=args.player, scenario=args.scenario)
+    )
     game_id = start_response.get("createdGameId", "")
     if not game_id:
         raise RuntimeError("Brak createdGameId w odpowiedzi STARTNEWGAME_RESPONSE")

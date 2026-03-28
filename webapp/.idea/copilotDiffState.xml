@@ -35,14 +35,6 @@
             </PendingDiffInfo>
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/src/main/resources/logback.xml">
-          <value>
-            <PendingDiffInfo>
-              <option name="filePath" value="$PROJECT_DIR$/src/main/resources/logback.xml" />
-              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&lt;configuration&gt;&#10;    &lt;!-- Ustawienie zmiennej dla ścieżki pliku logów --&gt;&#10;    &lt;property name=&quot;LOG_FILE&quot; value=&quot;logs/websocket.log&quot;/&gt;&#10;    &lt;property name=&quot;LOG_ARCHIVE_DIR&quot; value=&quot;logs/archive&quot;/&gt;&#10;&#10;    &lt;!-- Appender do konsoli --&gt;&#10;    &lt;appender name=&quot;CONSOLE&quot; class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;&#10;        &lt;encoder&gt;&#10;            &lt;!-- Format logów: timestamp, poziom, nazwa klasy, wiadomość --&gt;&#10;            &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n&lt;/pattern&gt;&#10;        &lt;/encoder&gt;&#10;    &lt;/appender&gt;&#10;&#10;    &lt;!-- Appender do pliku logów z rolowaniem --&gt;&#10;    &lt;appender name=&quot;FILE&quot; class=&quot;ch.qos.logback.core.rolling.RollingFileAppender&quot;&gt;&#10;        &lt;file&gt;${LOG_FILE}&lt;/file&gt;&#10;        &#10;        &lt;!-- Polityka rolowania plików logów - co dzień lub gdy plik osiągnie 10MB --&gt;&#10;        &lt;rollingPolicy class=&quot;ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy&quot;&gt;&#10;            &lt;!-- Nazwa archiwizowanych plików --&gt;&#10;            &lt;fileNamePattern&gt;${LOG_ARCHIVE_DIR}/websocket-%d{yyyy-MM-dd}.%i.log.gz&lt;/fileNamePattern&gt;&#10;            &lt;!-- Maksymalny rozmiar pliku --&gt;&#10;            &lt;maxFileSize&gt;10MB&lt;/maxFileSize&gt;&#10;            &lt;!-- Maksymalna historia - trzymaj logi przez 30 dni --&gt;&#10;            &lt;maxHistory&gt;30&lt;/maxHistory&gt;&#10;        &lt;/rollingPolicy&gt;&#10;        &#10;        &lt;encoder&gt;&#10;            &lt;!-- Format logów: timestamp, poziom, nazwa klasy, wiadomość, stack trace jeśli istnieje --&gt;&#10;            &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%ex&lt;/pattern&gt;&#10;        &lt;/encoder&gt;&#10;    &lt;/appender&gt;&#10;&#10;    &lt;!-- Logger dla WebSocket komponentów --&gt;&#10;    &lt;logger name=&quot;org.example&quot; level=&quot;INFO&quot;/&gt;&#10;&#10;    &lt;!-- Root logger - ustawia domyślny poziom dla wszystkich logów --&gt;&#10;    &lt;root level=&quot;INFO&quot;&gt;&#10;        &lt;!-- Wysyłaj logi zarówno do konsoli jak i do pliku --&gt;&#10;        &lt;appender-ref ref=&quot;CONSOLE&quot;/&gt;&#10;        &lt;appender-ref ref=&quot;FILE&quot;/&gt;&#10;    &lt;/root&gt;&#10;&lt;/configuration&gt;&#10;" />
-            </PendingDiffInfo>
-          </value>
-        </entry>
       </map>
     </option>
   </component>

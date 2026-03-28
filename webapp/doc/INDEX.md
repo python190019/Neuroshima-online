@@ -13,8 +13,14 @@ Punkt wejścia do aktualnej dokumentacji projektu WebSocket Neuroshima.
 
 - backend: Java/Spring Boot (`pl.staszic.neu`)
 - websocket: `ws://localhost:8080/ws/chat`
-- protokół: `STARTNEWGAME`, `ENDTURN`, `ENDGAME` (request/response)
-- klient: wyłącznie Python (`client/websocket_client.py`)
+- protokół: `CREATENEWROOM`, `STARTNEWGAME`, `ENDTURN`, `ENDGAME` (request/response)
+- klient: implementacja wyłącznie w `client/websocket_client.py`
+
+Główny flow klienta:
+1. `CREATENEWROOM_REQUEST`
+2. `STARTNEWGAME_REQUEST` (`roomId`, `playerId`)
+3. `ENDTURN_REQUEST` (`gameId`)
+4. `ENDGAME_REQUEST` (`gameId`)
 
 ## Najważniejsze pliki
 
@@ -31,6 +37,9 @@ webapp/
 │   └── messages/
 │       ├── WebSocketMessage.java
 │       ├── GameScopedWebSocketMessage.java
+│       ├── Room.java
+│       ├── CreateNewRoomRequest.java
+│       ├── CreateNewRoomResponse.java
 │       ├── StartNewGameRequest.java
 │       ├── StartNewGameResponse.java
 │       ├── EndTurnRequest.java
@@ -63,10 +72,13 @@ cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
 cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
 ../.venv/bin/python test.py
 ```
-| "ModuleNotFoundError: websocket" | `pip install websocket-client` |
-| "Timeout" | Serwer jest niedostępny, sprawdź logi |
 
-Szczegóły: **[README.md](README.md#rozwiązywanie-problemów)**
+Najczęstsze problemy:
+
+- `ModuleNotFoundError: websocket` -> `../.venv/bin/python -m pip install -r ../requirements.txt`
+- `Timeout` -> serwer jest niedostępny, sprawdź logi w `logs/websocket.log`
+
+Szczegóły: `README.md`
 
 ---
 
@@ -85,6 +97,7 @@ Szczegóły: **[README.md](README.md#rozwiązywanie-problemów)**
 ✅ Serwer WebSocket - Java/Spring Boot
 ✅ Klient WebSocket - Python
 ✅ Komunikaty JSON
+✅ Obsługa pokoi i gier (`roomId` / `gameId`)
 ✅ Logowanie
 ✅ Testowanie
 ✅ Dokumentacja
@@ -96,12 +109,10 @@ Szczegóły: **[README.md](README.md#rozwiązywanie-problemów)**
 
 ## 📞 Podsumowanie
 
-Aplikacja WebSocket jest w pełni funkcjonalna i gotowa do użytku.
+Aplikacja jest gotowa do testów lokalnych i dalszej rozbudowy.
 
-Jeśli masz pytania, sprawdź:
-1. Logi serwera: `logs/websocket.log`
-2. Logi klienta: `client/client.log`
-3. Dokumentację: [README.md](README.md)
-
-**Happy WebSocketing! 🚀**
+Jeśli coś nie działa:
+1. Sprawdź log serwera: `logs/websocket.log`
+2. Uruchom smoke test: `client/test.py`
+3. Zobacz pełny opis protokołu: `doc/README.md`
 

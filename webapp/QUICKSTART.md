@@ -2,7 +2,7 @@
 
 Ten przewodnik uruchamia aktualną wersję projektu:
 - backend Java w pakiecie `pl.staszic.neu`
-- protokół `STARTNEWGAME` / `ENDTURN` / `ENDGAME`
+- protokół `CREATENEWROOM` / `STARTNEWGAME` / `ENDTURN` / `ENDGAME`
 - klient wyłącznie w Pythonie
 
 ## 1) Wymagania
@@ -41,14 +41,15 @@ cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
 ```
 
 Domyślny scenariusz klienta:
-1. wysyła `STARTNEWGAME_REQUEST`
-2. wysyła `ENDTURN_REQUEST`
-3. wysyła `ENDGAME_REQUEST`
+1. wysyła `CREATENEWROOM_REQUEST`
+2. wysyła `STARTNEWGAME_REQUEST` (z `roomId` i `playerId`)
+3. wysyła `ENDTURN_REQUEST`
+4. wysyła `ENDGAME_REQUEST`
 
 Przykład z parametrami:
 
 ```bash
-../.venv/bin/python websocket_client.py --server ws://localhost:8080/ws/chat --player "Bot-1" --scenario "Moloch" --turn 2 --reason "Smoke test"
+../.venv/bin/python websocket_client.py --server ws://localhost:8080/ws/chat --player "Bot-1" --room room-2 --scenario "Moloch" --turn 2 --reason "Smoke test"
 ```
 
 ## 5) Szybki test protokołu
@@ -56,6 +57,15 @@ Przykład z parametrami:
 ```bash
 cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
 ../.venv/bin/python test.py
+```
+
+`test.py` to lekki smoke test wykorzystujący klasy z `websocket_client.py`.
+
+Opcjonalnie możesz wygenerować przykładowe payloady JSON (bez połączenia z serwerem):
+
+```bash
+cd /home/dawid/cpp/projekty/Neuroshima/webapp/client
+../.venv/bin/python game_messages_example.py
 ```
 
 ## 6) Sprawdzenie logów

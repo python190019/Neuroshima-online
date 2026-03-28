@@ -9,20 +9,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import pl.staszic.neu.messages.EndGameRequest;
-import pl.staszic.neu.messages.EndGameResponse;
-import pl.staszic.neu.messages.EndTurnRequest;
-import pl.staszic.neu.messages.EndTurnResponse;
-import pl.staszic.neu.messages.StartNewGameRequest;
-import pl.staszic.neu.messages.StartNewGameResponse;
-import pl.staszic.neu.messages.WebSocketMessage;
+import pl.staszic.neu.messages.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,7 +36,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     // Mapa przechowująca wszystkie aktywne sesje WebSocket
     // Klucz: unikalny ID klienta, Wartość: sesja WebSocket
     private static final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    private static final Set<String> activeGames = ConcurrentHashMap.newKeySet();
+    private static final Map<String, Room> activeRooms = new ConcurrentHashMap<>();
+    private static final Map<String, String> affiliations = new ConcurrentHashMap<>();
+    private static final Map<String, String> activeGames = new ConcurrentHashMap<>();
 
     /**
      * Metoda wywoływana gdy nowy klient się łączy
@@ -86,6 +81,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
             logger.info("Message received from {}: {}", clientId, message.getPayload());
 
             switch (messageType) {
+                case JoinRoomRequest.TYPE -> handleJoinRoom(session, clientId, rootNode);
+                case LeaveRoomRequest.TYPE -> handleLeaveRoom(session, clientId, rootNode);
+                case CreateNewRoomRequest.TYPE -> handleCreateNewRoom(session, clientId, rootNode);
                 case StartNewGameRequest.TYPE -> handleStartNewGame(session, clientId, rootNode);
                 case EndGameRequest.TYPE -> handleEndGame(session, clientId, rootNode);
                 case EndTurnRequest.TYPE -> handleEndTurn(session, clientId, rootNode);
@@ -111,6 +109,23 @@ public class WebSocketHandler extends TextWebSocketHandler {
         
         // Usuń sesję z mapy
         sessions.remove(clientId);
+
+        String roomId = affiliations.remove(clientId);
+        if (roomId != null) {
+            Room room = activeRooms.get(roomId);
+            if (room != null) {
+                try {
+                    room.removePlayer(clientId);
+                } catch (Exception ignored) {
+                    // Klient mogl juz zostac usuniety z pokoju przez inny przeplyw.
+                }
+
+                if (room.hasActiveGame()) {
+                    activeGames.remove(room.getGameId());
+                    room.clearGame();
+                }
+            }
+        }
         
         Map<String, Object> disconnectionMessage = new HashMap<>();
         disconnectionMessage.put("messageType", "DISCONNECTION");
@@ -164,17 +179,170 @@ public class WebSocketHandler extends TextWebSocketHandler {
         return sessions.size();
     }
 
+    private void handleCreateNewRoom(WebSocketSession session, String clientId, JsonNode rootNode) throws IOException {
+        CreateNewRoomRequest request = objectMapper.treeToValue(rootNode, CreateNewRoomRequest.class);
+        request.setClientId(clientId);
+
+        if (isBlank(request.getRoomId())) {
+            sendError(session, clientId, "Room id is null or empty");
+            return;
+        }
+        if (activeRooms.containsKey(request.getRoomId())) {
+            sendError(session, clientId, "Room already exists");
+            return;
+        }
+        if (affiliations.containsKey(clientId)) {
+            sendError(session, clientId, "Client is already in a room");
+            return;
+        }
+
+        String roomId = request.getRoomId();
+        Room room = new Room(roomId);
+        try {
+            room.addPlayer(clientId);
+            affiliations.put(clientId, roomId);
+        } catch (Exception e) {
+            sendError(session, clientId, e.getMessage());
+            return;
+        }
+        activeRooms.put(roomId, room);
+
+        CreateNewRoomResponse response = new CreateNewRoomResponse();
+        response.setClientId(clientId);
+        response.setCreatedRoomId(roomId);
+        response.setServerStatus("STARTED room=" + request.getRoomId() + " player=" + request.getPlayerName());
+
+        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
+        logger.info("Room created: {}", objectMapper.writeValueAsString(response));
+    }
+
+    private void handleJoinRoom(WebSocketSession session, String clientId, JsonNode rootNode) throws IOException {
+        JoinRoomRequest request = objectMapper.treeToValue(rootNode, JoinRoomRequest.class);
+        request.setClientId(clientId);
+
+        if (isBlank(request.getRoomId())) {
+            sendError(session, clientId, "Room id is null or empty");
+            return;
+        }
+
+        if(affiliations.containsKey(clientId)) {
+            sendError(session, clientId, "Client is already in a room");
+            return;
+        }
+
+        Room room = activeRooms.get(request.getRoomId());
+
+        if(room == null) {
+            sendError(session, clientId, "Room does not exist");
+            return;
+        }
+
+        try {
+            room.addPlayer(request.getClientId());
+            affiliations.put(clientId, request.getRoomId());
+
+        } catch (Exception e) {
+            sendError(session, clientId, e.getMessage());
+            return;
+        }
+
+        JoinRoomResponse response = new JoinRoomResponse();
+        response.setClientId(clientId);
+        response.setServerStatus("JOINED room=" + request.getRoomId() + " player=" + request.getPlayerName());
+
+        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
+        logger.info("Room joined: {}", objectMapper.writeValueAsString(response));
+    }
+
+    private void handleLeaveRoom(WebSocketSession session, String clientId, JsonNode rootNode) throws IOException {
+        LeaveRoomRequest request = objectMapper.treeToValue(rootNode, LeaveRoomRequest.class);
+        request.setClientId(clientId);
+
+        if(!affiliations.containsKey(clientId)) {
+            sendError(session, clientId, "Client is not in a room");
+            return;
+        }
+
+        if (isBlank(request.getRoomId())) {
+            sendError(session, clientId, "Room id is null or empty");
+            return;
+        }
+
+        Room room = activeRooms.get(request.getRoomId());
+
+        if(room == null) {
+            sendError(session, clientId, "Room does not exist");
+            return;
+        }
+
+        try {
+            room.removePlayer(clientId);
+            affiliations.remove(clientId);
+            if (room.hasActiveGame()) {
+                activeGames.remove(room.getGameId());
+                room.clearGame();
+            }
+
+        } catch (Exception e) {
+            sendError(session, clientId, e.getMessage());
+            return;
+        }
+
+        LeaveRoomResponse response = new LeaveRoomResponse();
+        response.setClientId(clientId);
+        response.setServerStatus("LEFT room=" + request.getRoomId() + " player=" + request.getPlayerName());
+
+        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
+        logger.info("Room left: {}", objectMapper.writeValueAsString(response));
+    }
+
     private void handleStartNewGame(WebSocketSession session, String clientId, JsonNode rootNode) throws IOException {
         StartNewGameRequest request = objectMapper.treeToValue(rootNode, StartNewGameRequest.class);
         request.setClientId(clientId);
 
+        if (isBlank(request.getRoomId())) {
+            sendError(session, clientId, "STARTNEWGAME_REQUEST requires roomId");
+            return;
+        }
+        if (isBlank(request.getPlayerId())) {
+            sendError(session, clientId, "STARTNEWGAME_REQUEST requires playerId");
+            return;
+        }
+        String affiliatedRoomId = affiliations.get(clientId);
+        if (affiliatedRoomId == null) {
+            sendError(session, clientId, "Client is not in a room");
+            return;
+        }
+        if (!request.getRoomId().equals(affiliatedRoomId)) {
+            sendError(session, clientId, "Client is not affiliated with roomId=" + request.getRoomId());
+            return;
+        }
+
+        Room room = activeRooms.get(request.getRoomId());
+        if (room == null) {
+            sendError(session, clientId, "Room does not exist");
+            return;
+        }
+        if (!room.hasPlayer(clientId)) {
+            sendError(session, clientId, "Client is not a member of room=" + request.getRoomId());
+            return;
+        }
+        if (room.hasActiveGame()) {
+            sendError(session, clientId, "Room already has active game: " + room.getGameId());
+            return;
+        }
+
         String gameId = UUID.randomUUID().toString();
-        activeGames.add(gameId);
+        room.setGameId(gameId);
+        activeGames.put(gameId, room.getRoomId());
+
 
         StartNewGameResponse response = new StartNewGameResponse();
         response.setClientId(clientId);
+        response.setRoomId(request.getRoomId());
+        response.setPlayerId(request.getPlayerId());
         response.setCreatedGameId(gameId);
-        response.setServerStatus("STARTED scenario=" + request.getScenario() + " player=" + request.getPlayerName());
+        response.setServerStatus("STARTED room=" + request.getRoomId() + " game=" + gameId + " player=" + request.getPlayerId());
 
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
         logger.info("Game started: {}", objectMapper.writeValueAsString(response));
@@ -188,12 +356,18 @@ public class WebSocketHandler extends TextWebSocketHandler {
             sendError(session, clientId, "ENDGAME_REQUEST requires gameId");
             return;
         }
-        if (!activeGames.contains(request.getGameId())) {
+        if (!activeGames.containsKey(request.getGameId())) {
             sendError(session, clientId, "Unknown gameId: " + request.getGameId());
             return;
         }
 
-        activeGames.remove(request.getGameId());
+        String roomId = activeGames.remove(request.getGameId());
+        if (roomId != null) {
+            Room room = activeRooms.get(roomId);
+            if (room != null && request.getGameId().equals(room.getGameId())) {
+                room.clearGame();
+            }
+        }
 
         EndGameResponse response = new EndGameResponse();
         response.setClientId(clientId);
@@ -213,7 +387,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             sendError(session, clientId, "ENDTURN_REQUEST requires gameId");
             return;
         }
-        if (!activeGames.contains(request.getGameId())) {
+        if (!activeGames.containsKey(request.getGameId())) {
             sendError(session, clientId, "Unknown gameId: " + request.getGameId());
             return;
         }
@@ -227,6 +401,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
         logger.info("Turn ended: {}", objectMapper.writeValueAsString(response));
         broadcastMessage(response, clientId);
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     private void sendError(WebSocketSession session, String clientId, String error) throws IOException {
