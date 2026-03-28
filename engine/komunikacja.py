@@ -1,4 +1,4 @@
-from plansza import board_to_json, Zeton, board
+from plansza import import_data, board_to_json, export_game_state, Zeton, board
 import flask
 import json
 
@@ -9,17 +9,27 @@ app = flask.Flask(__name__)
 
 @app.route('/api/neuroshima/get_board', methods=['GET'])
 def get_board():
-    return json.dumps(board_to_json());
+    return json.dumps(board_to_json())
+
+@app.route('/api/neuroshima/get_state', methods=['GET'])
+def get_state():
+    return json.dumps(export_game_state())
 
 @app.route('/api/neuroshima/postaw', methods=['POST'])
 def postaw_zeton():
     data = flask.request.get_json()
     board[data['x']][data['y']] = Zeton(data['x'], data['y'], data['frakcja'], data['nazwa'], data['rotacja'])
     # return json.dumps(board_to_json());
-    return json.dumps({'status': 'success'})
+    return json.dumps(export_game_state())
+
+@app.route('/api/neuroshima/click', methods=['POST'])
+def click():
+    data = flask.request.get_json()
+    import_data(data)
 
 @app.route('/api/neuroshima/bitwa', methods=['POST'])
 def bitwa():
+
     for inicjatywa in range(9, -1, -1):
         for i in range(5):
             for j in range(9):
@@ -31,8 +41,8 @@ def bitwa():
             for j in range(9):
                 if board[i][j] is not None:
                     board[i][j].koniec_inicjatywy()
-
-    return json.dumps({'status': 'success'})
+    
+    return json.dumps(export_game_state())
 
 if __name__ == '__main__':
     # app.run(debug=True)

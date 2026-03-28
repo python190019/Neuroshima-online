@@ -11,8 +11,10 @@ post_data = {
     "rotacja": 3
 }
 
+print("ok\n")
 response = requests.post(f"{base_url}/postaw", json=post_data)
 print("POST response:", response.json())
+print("\n---------------------------\n")
 
 post_data = {
     "x": 1,
@@ -23,7 +25,9 @@ post_data = {
 }
 
 response = requests.post(f"{base_url}/postaw", json=post_data)
-print("POST response:", response.json())
+# print("POST response:", response.json())
+# print("\n---------------------------\n")
+
 
 post_data = {
     "x": 1,
@@ -34,7 +38,9 @@ post_data = {
 }
 
 response = requests.post(f"{base_url}/postaw", json=post_data)
-print("POST response:", response.json())
+# print("POST response:", response.json())
+# print("\n---------------------------\n")
+
 
 post_data = {
     "x": 4,
@@ -45,14 +51,17 @@ post_data = {
 }
 
 response = requests.post(f"{base_url}/postaw", json=post_data)
-print("POST response:", response.json())
+# print("POST response:", response.json())
+# print("\n---------------------------\n")
 
-response = requests.get(f"{base_url}/get_board")
-print("GET response:", response.json())
+# response = requests.get(f"{base_url}/get_board")
+# print("GET response:", response.json())
 
 print("---------------------------------------------------------------\n\n\n\n\n")
+# requests.post(f"{base_url}/bitwa")
+
 response = requests.post(f"{base_url}/bitwa")
 print("GET response:", response.json())
 
-response = requests.get(f"{base_url}/get_board")
-print("GET response:", response.json())
+# response = requests.get(f"{base_url}/get_board")
+# print("GET response:", response.json())

@@ -38,7 +38,7 @@ wlasciwosci = {
         "wzmocniony_atak": [0, 2, 4]},
     "obronca": {
         "hp": 2,
-        "strzal": [0, 1, 5],
+        "strzal": [[0, 1], [1, 1], [5, 1]],
         "inicjatywa": [1]},
     "oficer": {
         "hp": 1,

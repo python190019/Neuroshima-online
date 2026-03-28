@@ -19,6 +19,7 @@ roza = {
     5: [-1, -1]
 }
 
+
 class Zeton:
     def __init__(self,x, y, frakcja, nazwa, rotacja):
         self.frakcja = frakcja
@@ -32,11 +33,18 @@ class Zeton:
     def __getitem__(self, key):
         # pozwala robis self["xd"] zamiast self.wlasciwosci["xd"]
         return self.wlasciwosci.get(key)
+    
+    def czy_w_planszy(self, x, y):
+        return (0 <= x < 5 and 0 <= y < 9)
+
+    def postaw_na_plansze(self, x, y):
+        self.board[x][y] = self
 
     def dostan_rane(self, obrazenia, kierunek, jaki_atak):
         # kierunek -> skad przychodzi atak
+        kierunek2 = (kierunek - self.rotacja + 6) % 6
 
-        if "pancerz" in self.wlasciwosci and kierunek in self["pancerz"] and jaki_atak == "strzal":
+        if "pancerz" in self.wlasciwosci and kierunek2 in self["pancerz"] and jaki_atak == "strzal":
             obrazenia -= 1
 
         self.wlasciwosci["hp"] -= obrazenia
@@ -46,8 +54,6 @@ class Zeton:
             # wywolaj_medyka()
             board[self.x][self.y] = None
 
-    def czy_w_planszy(x, y):
-        return (0 <= x < 5 and 0 <= y < 9)
     
     def aktywuj(self, nr_inicjatywy):
         if "inicjatywa" in self.wlasciwosci and nr_inicjatywy in self["inicjatywa"]:
@@ -82,12 +88,24 @@ class Zeton:
                         nowyx += roza[strzal_obr][0]
                         nowyy += roza[strzal_obr][1]
 
-board = [[None] * 9 for i in range(5)]
+length = 9
+width = 5
+board = [[None] * length for i in range(width)]
+user_actions = []
+
+def import_data(data):
+
+    for x in width:
+        for y in length:
+            board[x][y] = data["board"]["x"]["y"]
+
+    user_actions = data["user_actions"]
+
 
 def board_to_json():
-    json_board = [[None] * 9 for i in range(5)]
-    for i in range(5):
-        for j in range(9):
+    json_board = [[None] * length for i in range(width)]
+    for i in range(width):
+        for j in range(length):
             if board[i][j] is not None:
                 json_board[i][j] = {
                     "frakcja": board[i][j].frakcja,
@@ -97,3 +115,7 @@ def board_to_json():
                     # "wlasciwosci": board[i][j].wlasciwosci
                 }
     return json_board
+
+def export_game_state():
+    data = {"board" : board_to_json(), "user_actions" : user_actions}
+    return data
