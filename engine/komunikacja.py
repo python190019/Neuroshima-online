@@ -1,4 +1,5 @@
-from plansza import import_data, board_to_json, export_game_state, Zeton, board
+from main import Game
+# from plansza import board_
 import flask
 import json
 
@@ -7,42 +8,52 @@ import json
 
 app = flask.Flask(__name__)
 
-@app.route('/api/neuroshima/get_board', methods=['GET'])
-def get_board():
-    return json.dumps(board_to_json())
+# @app.route('/api/neuroshima/get_board', methods=['GET'])
+# def get_board():
+#     return json.dumps(board_to_json())
 
-@app.route('/api/neuroshima/get_state', methods=['GET'])
+@app.route('/api/neuroshima/get_state', methods=['POST'])
 def get_state():
-    return json.dumps(export_game_state())
+    data = flask.request.get_json()
+    print(data)
+    game = Game(data)
+    return json.dumps(game.export_game_state())
 
 @app.route('/api/neuroshima/postaw', methods=['POST'])
 def postaw_zeton():
     data = flask.request.get_json()
-    board[data['x']][data['y']] = Zeton(data['x'], data['y'], data['frakcja'], data['nazwa'], data['rotacja'])
+    print(data)
+    game = Game(data)
+    # import_data(data)
+    zeton = data["zeton"]
+    zeton["rany"] = 0
+    game.postaw_zeton(zeton)
+    # Zeton(pole["x"], pole["y"], pole["frakcja"], pole["nazwa"], pole["rotacja"], pole["rany"])
+    # board[data['x']][data['y']] = Zeton(data['x'], data['y'], data['frakcja'], data['nazwa'], data['rotacja'])
     # return json.dumps(board_to_json());
-    return json.dumps(export_game_state())
+    return json.dumps(game.export_game_state())
 
-@app.route('/api/neuroshima/click', methods=['POST'])
-def click():
-    data = flask.request.get_json()
-    import_data(data)
+# @app.route('/api/neuroshima/click', methods=['POST'])
+# def click():
+#     data = flask.request.get_json()
+#     import_data(data)
 
-@app.route('/api/neuroshima/bitwa', methods=['POST'])
-def bitwa():
+# @app.route('/api/neuroshima/bitwa', methods=['POST'])
+# def bitwa():
 
-    for inicjatywa in range(9, -1, -1):
-        for i in range(5):
-            for j in range(9):
-                # print(inicjatywa, i, j)
-                if board[i][j] is not None:
-                    board[i][j].aktywuj(inicjatywa)
+    # for inicjatywa in range(9, -1, -1):
+    #     for i in range(5):
+    #         for j in range(9):
+    #             # print(inicjatywa, i, j)
+    #             if board[i][j] is not None:
+    #                 board[i][j].aktywuj(inicjatywa)
 
-        for i in range(5):
-            for j in range(9):
-                if board[i][j] is not None:
-                    board[i][j].koniec_inicjatywy()
+    #     for i in range(5):
+    #         for j in range(9):
+    #             if board[i][j] is not None:
+    #                 board[i][j].koniec_inicjatywy()
     
-    return json.dumps(export_game_state())
+    # return json.dumps(game.export_game_state())
 
 if __name__ == '__main__':
     # app.run(debug=True)
