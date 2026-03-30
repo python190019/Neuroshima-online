@@ -70,7 +70,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 case JoinRoomRequest.TYPE -> handleJoinRoom(session, clientId, rootNode);
                 case LeaveRoomRequest.TYPE -> handleLeaveRoom(session, clientId, rootNode);
                 case CreateNewRoomRequest.TYPE -> handleCreateNewRoom(session, clientId, rootNode);
-                case StartNewGameRequest.TYPE -> handleStartNewGame(session, clientId, rootNode);
+                case NewGameRequest.TYPE -> handleStartNewGame(session, clientId, rootNode);
                 case EndGameRequest.TYPE -> handleEndGame(session, clientId, rootNode);
                 case EndTurnRequest.TYPE -> handleEndTurn(session, clientId, rootNode);
                 default -> sendError(session, clientId, "Unsupported messageType: " + messageType);
@@ -132,8 +132,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleStartNewGame(WebSocketSession session, String clientId, JsonNode rootNode) throws IOException {
-        StartNewGameRequest request = objectMapper.treeToValue(rootNode, StartNewGameRequest.class);
-        StartNewGameResponse response = gameService.startNewGame(clientId, request);
+        NewGameRequest request = objectMapper.treeToValue(rootNode, NewGameRequest.class);
+        NewGameResponse response = gameService.startNewGame(clientId, request);
         sendJson(session, response);
         logger.info("Game started: {}", objectMapper.writeValueAsString(response));
     }

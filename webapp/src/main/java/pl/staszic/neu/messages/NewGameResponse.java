@@ -2,9 +2,9 @@ package pl.staszic.neu.messages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class StartNewGameResponse extends WebSocketMessage {
+public class NewGameResponse extends WebSocketMessage {
 
-    public static final String TYPE = "STARTNEWGAME_RESPONSE";
+    public static final String TYPE = "NEWGAME_RESPONSE";
 
     @JsonProperty("createdGameId")
     private String createdGameId;
@@ -12,13 +12,10 @@ public class StartNewGameResponse extends WebSocketMessage {
     @JsonProperty("roomId")
     private String roomId;
 
-    @JsonProperty("playerId")
-    private String playerId;
-
     @JsonProperty("serverStatus")
     private String serverStatus;
 
-    public StartNewGameResponse() {
+    public NewGameResponse() {
         super(TYPE);
     }
 
@@ -44,14 +41,6 @@ public class StartNewGameResponse extends WebSocketMessage {
 
     public void setRoomId(String roomId) {
         this.roomId = roomId;
-    }
-
-    public String getPlayerId() {
-        return playerId;
-    }
-
-    public void setPlayerId(String playerId) {
-        this.playerId = playerId;
     }
 }
 

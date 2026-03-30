@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pl.staszic.neu.game.model.Room;
+import pl.staszic.neu.game.model.Game;
 import pl.staszic.neu.messages.*;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -16,7 +16,7 @@ public class InMemoryGameService implements GameService {
 
     private final Map<String, Room> activeRooms = new ConcurrentHashMap<>();
     private final Map<String, String> affiliations = new ConcurrentHashMap<>();
-    private final Map<String, String> activeGames = new ConcurrentHashMap<>();
+    private final Map<String, Game> activeGames = new ConcurrentHashMap<>();
 
     @Override
     public CreateNewRoomResponse createNewRoom(String clientId, CreateNewRoomRequest request) {
@@ -134,15 +134,16 @@ public class InMemoryGameService implements GameService {
     }
 
     @Override
-    public StartNewGameResponse startNewGame(String clientId, StartNewGameRequest request) {
+    public NewGameResponse startNewGame(String clientId, NewGameRequest request) {
         request.setClientId(clientId);
 
         if (isBlank(request.getRoomId())) {
             throw new GameValidationException("STARTNEWGAME_REQUEST requires roomId");
         }
-        if (isBlank(request.getPlayerId())) {
-            throw new GameValidationException("STARTNEWGAME_REQUEST requires playerId");
-        }
+
+
+
+        //dodaj sprawdzenie poprawnosci scenario
 
         String affiliatedRoomId = affiliations.get(clientId);
         if (affiliatedRoomId == null) {
@@ -163,16 +164,16 @@ public class InMemoryGameService implements GameService {
             throw new GameValidationException("Room already has active game: " + room.getGameId());
         }
 
-        String gameId = UUID.randomUUID().toString();
-        room.setGameId(gameId);
-        activeGames.put(gameId, room.getRoomId());
+        Game game = new Game();
+        activeGames.put(game.getGameId(), game);
 
-        StartNewGameResponse response = new StartNewGameResponse();
+        room.setGameId(game.getGameId());
+
+        NewGameResponse response = new NewGameResponse();
         response.setClientId(clientId);
         response.setRoomId(request.getRoomId());
-        response.setPlayerId(request.getPlayerId());
-        response.setCreatedGameId(gameId);
-        response.setServerStatus("STARTED room=" + request.getRoomId() + " game=" + gameId + " player=" + request.getPlayerId());
+        response.setCreatedGameId(game.getGameId());
+        response.setServerStatus("STARTED game=" + request.getRoomId() + " in room=" + response.getRoomId() + " by=" + clientId);
         return response;
     }
 
@@ -191,29 +192,29 @@ public class InMemoryGameService implements GameService {
     }
 
     @Override
-    public EndGameResponse endGame(String clientId, EndGameRequest request) {
-        request.setClientId(clientId);
-
-        if (isBlank(request.getGameId())) {
-            throw new GameValidationException("ENDGAME_REQUEST requires gameId");
-        }
-        if (!activeGames.containsKey(request.getGameId())) {
-            throw new GameValidationException("Unknown gameId: " + request.getGameId());
-        }
-
-        String roomId = activeGames.remove(request.getGameId());
-        if (roomId != null) {
-            Room room = activeRooms.get(roomId);
-            if (room != null && request.getGameId().equals(room.getGameId())) {
-                room.clearGame();
-            }
-        }
-
+    public EndGameResponse endGame(String clientId, EndGameRequest request) { //do zrobienia
+//        request.setClientId(clientId);
+//
+//        if (isBlank(request.getGameId())) {
+//            throw new GameValidationException("ENDGAME_REQUEST requires gameId");
+//        }
+//        if (!activeGames.containsKey(request.getGameId())) {
+//            throw new GameValidationException("Unknown gameId: " + request.getGameId());
+//        }
+//
+//        String roomId = activeGames.remove(game.getGameId());
+//        if (roomId != null) {
+//            Room room = activeRooms.get(roomId);
+//            if (room != null && request.getGameId().equals(room.getGameId())) {
+//                room.clearGame();
+//            }
+//        }
+//
         EndGameResponse response = new EndGameResponse();
-        response.setClientId(clientId);
-        response.setGameId(request.getGameId());
-        response.setEnded(true);
-        response.setSummary("Game ended. Winner=" + request.getWinnerId() + ", reason=" + request.getReason());
+//        response.setClientId(clientId);
+//        response.setGameId(request.getGameId());
+//        response.setEnded(true);
+//        response.setSummary("Game ended. Winner=" + request.getWinnerId() + ", reason=" + request.getReason());
         return response;
     }
 

@@ -32,7 +32,7 @@ def on_user_input(client: "WebSocketGameClient", user_text: str) -> None:
         except Exception as e:
             logger.error(f"Nie udalo sie wyslac JOINROOM_REQUEST: {e}")
 
-    if (typ == "CREATEROOM"):
+    elif (typ == "CREATEROOM"):
         if len(wejscie) < 3:
             logger.warning("Uzycie: CREATEROOM <roomId> <playerName>")
             return
@@ -49,7 +49,7 @@ def on_user_input(client: "WebSocketGameClient", user_text: str) -> None:
         except Exception as e:
             logger.info(f"pokoj sie nie stworzyl: {e}")
 
-    if (typ == "LEAVEROOM"):
+    elif (typ == "LEAVEROOM"):
         if len(wejscie) < 3:
             logger.warning("Uzycie: LEAVEROOM <roomId> <playerName>")
             return
@@ -66,7 +66,7 @@ def on_user_input(client: "WebSocketGameClient", user_text: str) -> None:
         except Exception as e:
             logger.info(f"nie wyszedles z pokoju: {e}")
 
-    if (typ == "GETROOMSTATUS"):
+    elif (typ == "GETROOMSTATUS"):
         if len(wejscie) < 2:
             logger.warning("Uzycie: GETROOMSTATUS <roomId>")
 
@@ -80,8 +80,25 @@ def on_user_input(client: "WebSocketGameClient", user_text: str) -> None:
             logger.info("Wyslano GETROOMSTATUS_REQUEST")
         except Exception as e:
             logger.info(f"nie wyszedles z pokoju: {e}")
+    elif (typ == "NEWGAME"):
+        if(len(wejscie) < 2):
+            logger.warning("Uzycie: NEWGAME <roomId>")
+            return
 
-    pass
+        message = {
+            "messageType": "NEWGAME_REQUEST",
+            "roomId": wejscie[1],
+           }
+
+        try:
+            client.send(message)
+            logger.info("Wyslano NEWGAME_REQUEST")
+        except Exception as e:
+            logger.info(f"nie udalo sie stworzyc nowej gry: {e}")
+
+    else:
+        logger.warning(f"Nieznana komenda: {typ}")
+    return
 
 def user_input_loop(client: "WebSocketGameClient") -> None:
     """Pętla odczytu wejścia z terminala działająca równolegle z odbiorem WS."""
