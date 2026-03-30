@@ -9,8 +9,8 @@ class obj:
     def __init__(self, x, z, imgPath, wys, szer, warstwa, rotacja, id, app, trans, klasa, a):
         self.app = app
         self.x = x
-        self.z = z
         self.imgPath = imgPath
+        self.z = z
         self.wys = wys
         self.szer = szer
         self.a = a
@@ -31,8 +31,10 @@ class obj:
         self.node.setTransparency(TransparencyAttrib.MAlpha)
         self.node.setColor(1, 1, 1, self.trans)
         self.node.setHpr(0, 0, self.rotacja)
+        self.app.wszystko.append(self)
         return self.node
     def usun(self):
+        self.app.wszystko.remove(self)
         self.node.removeNode()
     def zawiera(self, kx, kz):
         if self.klasa == "hex":
@@ -80,7 +82,8 @@ class MyApp(ShowBase):
         cm = CardMaker("kursor")
         cm.setFrame(-0.005, 0.005, -0.005, 0.005)
         self.kursor = aspect2d.attachNewNode(cm.generate())
-        self.kursor.setColor(0, 0, 0, 1)
+        self.kursor.setTransparency(TransparencyAttrib.MAlpha)
+        self.kursor.setColor(0, 0, 0, 0)
         self.kursor.setBin("fixed", 0)
     def klik(self):
         # print("CLICK")
@@ -94,9 +97,11 @@ class MyApp(ShowBase):
                     ter.wyswietl()
                     self.podswietlone[element] = ter
         else:
+            b = True
             self.kursor.setPos(mpos.getX() * self.getAspectRatio(), 0, mpos.getY())
             for pole in self.pola:
                 if(pole.zawiera(self.kursor.getX(), self.kursor.getZ())):
+                    b = False
                     self.podswietlone[self.klikniety].usun()
                     self.podswietlone[self.klikniety] = self.pusty
                     self.klikniety.usun()
@@ -104,9 +109,16 @@ class MyApp(ShowBase):
                     self.klikniety.z = pole.z
                     self.klikniety.wyswietl()
                     self.klikniety = self.pusty
-                    
-                    
                     break
+            if((b and self.podswietlone[self.klikniety] != self.pusty) and self.klikniety != self.pusty):
+                self.podswietlone[self.klikniety].usun()
+                self.podswietlone[self.klikniety] = self.pusty
+                self.klikniety = self.pusty
+    def obroc(self, kat):
+        if(self.klikniety != self.pusty):
+            self.klikniety.usun()
+            self.klikniety.rotacja += 60*kat
+            self.klikniety.wyswietl()
     def upkursor(self, task):
         if self.mouseWatcherNode.hasMouse():
             mpos = self.mouseWatcherNode.getMouse()
@@ -128,12 +140,14 @@ class MyApp(ShowBase):
                 #     self.podswietlone[element].wyswietl()
 
         return task.cont
-    
+    # def skaluj(self):
+        # for element in 
     def __init__(self):
         super().__init__()
         # self.setBackgroundColor(0, 0, 0)
         self.a = 0.2
         # self.robhexa(0, 0, 2, 1)
+        self.wszystko = []
         self.pola = []
         self.plansza()
         self.kursor()
@@ -143,9 +157,11 @@ class MyApp(ShowBase):
         self.klikniety = self.pusty
         self.podswietlone = dict()
         self.img = ["borgo/zwiadowca2.png", "borgo/zwiadowca.png", "test.png"]
-        self.rdraw(-1)
+        self.rdraw(1)
         # self.taskMgr.add(self.upkursor, "upkursor")
         self.accept("mouse1", self.klik)
-
+        self.accept("arrow_left", self.obroc, [-1])
+        self.accept("arrow_right", self.obroc, [1])
+        # self.accept("window-event", self.skaluj)
 app = MyApp()
 app.run()
