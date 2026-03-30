@@ -67,7 +67,7 @@ class MyApp(ShowBase):
         for i in range(len(lista)):
             ter = obj(lista[i][1]*1.1, lista[i][0]*1.1, "pole.png", self.a*2*math.sqrt(3)/2, self.a*2, 0, 30, "a.png", self, 1, "hex", self.a)
             ter.wyswietl()
-            drugi = obj(lista[i][1]*1.1, lista[i][0]*1.1, "obwod2.png", (self.a*2*math.sqrt(3)/2)*1.17, self.a*2*1.17, 10, 30, "a.png", self, 1, "hex", self.a)
+            drugi = obj(lista[i][1]*1.1, lista[i][0]*1.1, "obwod.png", (self.a*2*math.sqrt(3)/2)*1.17, self.a*2*1.17, 10, 30, "a.png", self, 1, "hex", self.a)
             drugi.wyswietl()
             self.pola.append(ter)
     
