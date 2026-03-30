@@ -18,8 +18,22 @@ class Board:
     def postaw_zeton(self, x, y, zeton):
         self.board[x][y] = Zeton(x, y, zeton["frakcja"], zeton["nazwa"], zeton["rotacja"], zeton["rany"])
 
-    def obruc(self, x, y, rotacja):
-        self.board[x][y].obruc(rotacja)
+    def rotate(self, x, y, rotacja):
+        self.board[x][y].rotate(rotacja)
+
+    def is_empty(self, x, y):
+        return (self.board[x][y] == None)
+
+    def on_board(self, x, y):
+        if(not isinstance(x, int)):
+            return False
+        if(x < 0 or x >= self.length):
+            return False
+        if(not isinstance(y, int)):
+            return False
+        if(y < 0 or y >= self.width):
+            return False
+        return True  
 
     def import_board(self, data):
         for x in range(self.width):
@@ -30,8 +44,6 @@ class Board:
                 else:
                     self.postaw_zeton(x, y, pole)
 
-    def is_empty(self, x, y):
-        return (self.board[x][y] == None)
 
     def board_to_json(self):
         json_board = [[None] * self.length for i in range(self.width)]

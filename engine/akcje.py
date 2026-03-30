@@ -1,3 +1,4 @@
+from copy import deepcopy
 
 def dobierz(hand, pile, frakcja, nazwa):
     hand.append(nazwa)
@@ -78,93 +79,119 @@ def postaw_zeton(board, hand, frakcja, nazwa, x, y):
     zeton = {"nazwa" : nazwa, "frakcja" : frakcja, "rany" : 0, "rotacja" : 0}
     board.postaw_zeton(x, y, zeton)
 
-def obracanie(game):
-    actions = game.user_actions
-    print("akcje:", actions)
+def get_first(actions):
+    if(len(actions) == 0):
+        return "empty"
+    action = actions[0]
+    actions.pop(0)
+    return action
 
-    if(len(actions) <= 1):
-        return
-    x = actions[0]
-    y = actions[1]
-    
-    idx = 2
-
-    click = actions[idx]
-    idx += 1
-    print("click:", click)
-    if(click == "koniec"):
-        game.faza = "gra"
-        actions.clear()
+def obracanie(actions, board, x, y):
+    # print("obracanie")
+    action = get_first(actions)
+    if(action == "empty"):
         return
     
-    if(not isinstance(click, int)):
-        invalid_move(actions)
-        actions.append(x)
-        actions.append(y)
+    click = get_first(action)
+    if(click == "empty"):
         return
 
-    game.board.obruc(x, y, click)
-    actions.pop(-1)
-    
+    if(click == "left"):
+        board.rotate(x, y, -1)
+        return
+
+    elif(click == "right"):
+        board.rotate(x, y, 1)
+        return
+
+    else:
+        return "done"
 
 def co_zrobic(game):
-    if(game.faza == "obruc"):
-        obracanie(game)
+    actions = deepcopy(game.user_actions)
+    
+    action = get_first(actions)
+
+    if(action == "empty"):
         return
 
-    actions = game.user_actions
-    print("akcje:", actions)
-    if(len(actions) == 0):
-        return
-    click = actions[0]
-    idx = 1
-
-    if(click == "koniec"):
+    click = get_first(action)
+    
+    if(click == "done"):
         koniec_tury(game)
         poczatek_tury(game)
+        return
     
-    elif(click == "hand"):
-        click = actions[idx]
-        idx += 1
+    elif(click == "rotate"):
+        x = get_first(action)
+        y = get_first(action)
 
-        hand = game.hand[game.current_frakcja]
-
-        if(len(hand) <= click):
-            invalid_move(actions)
+        if(not game.board.on_board(x, y)):
+            invalid_move(game.user_actions)
             return
 
+        if(len(action) != 0):
+            invalid_move(game.user_actions)
+            return
+    
+        response = obracanie(actions, game.board, x, y)
+        if(response == "done"):
+            game.user_actions.clear()
+            return
 
-        if(idx >= len(actions)):
+        else:
+            game.user_actions.clear()
+            game.user_actions.append(["rotate", x, y])
+            return
+        
+
+    elif(click == "hand"):
+        click = get_first(action)
+
+        if(not isinstance(click, int)):
+            invalid_move(game.user_actions)
+            return
+
+        hand = game.hand[game.current_frakcja]
+        if(len(hand) <= click):
+            invalid_move(game.user_actions)
             return
 
         zeton = hand[click]
-        click = actions[idx]
-        idx += 1
-        if(click == "plansza"):
-            x = actions[idx]
-            idx += 1
-            y = actions[idx]
-            idx += 1
+        action = get_first(actions)
+
+        if(action == "empty"):
+            return
+        
+        click = get_first(action)
+
+        if(click == "board"):
+            x = get_first(action)
+            y = get_first(action)
+            
+            if((not isinstance(x, int)) or (not isinstance(y, int))):
+                invalid_move(game.user_actions)
+                return
+
             if(not game.board.is_empty(x, y)):
-                invalid_move(actions)
+                invalid_move(game.user_actions)
                 return
             
             postaw_zeton(game.board, hand, game.current_frakcja, zeton, x, y)
-            actions.clear()
-            game.faza = "obruc"
-            actions.append(x)
-            actions.append(y)
+            # game.faza = "rotate"
+            game.user_actions.clear()
+            game.user_actions.append(["rotate", x, y])
             return
 
         elif(click == "odrzuc"):
             odrzuc(hand, zeton)
-            actions.clear()
+            game.user_actions.clear()
             return
         
         else:
-            invalid_move(actions)
+            invalid_move(game.user_actions)
             return
         
     else:
-        invalid_move(actions)
+        invalid_move(game.user_actions)
         return

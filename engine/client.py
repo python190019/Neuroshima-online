@@ -4,8 +4,8 @@ import json
 base_url = "http://127.0.0.1:5000/api/neuroshima"
 
 def zapytaj(actions, post_data):
-    for action in actions:
-        post_data["user_actions"].append(action)
+    if(len(actions) > 0):
+        post_data["user_actions"].append(actions)
 
     post_data = requests.post(f"{base_url}/click", json=post_data).json()
     print("POST response:", post_data)
@@ -14,29 +14,29 @@ def zapytaj(actions, post_data):
 
 post_data = {
     "faza" : "poczatek",
-    "frakcje" : ["moloch", "borgo"]
+    "frakcje" : {"player1": "moloch", "player2": "borgo"},
 }
 
 post_data = zapytaj([], post_data)
 
 post_data = zapytaj(["hand", 0], post_data)
-post_data = zapytaj(["plansza", 2, 0], post_data)
+post_data = zapytaj(["board", 2, 0], post_data)
 
 # post_data = zapytaj([-1], post_data)
 # post_data = zapytaj([1], post_data)
 # post_data = zapytaj([1], post_data)
 # post_data = zapytaj(["hand", 0], post_data)
-post_data = zapytaj(["koniec"], post_data)
+post_data = zapytaj(["done"], post_data)
 # post_data = zapytaj(["hand", 0], post_data)
-post_data = zapytaj(["koniec"], post_data)
+post_data = zapytaj(["done"], post_data)
 
 post_data = zapytaj(["hand", 0], post_data)
-post_data = zapytaj(["plansza", 2, 0], post_data)
+post_data = zapytaj(["board", 2, 0], post_data)
 post_data = zapytaj(["hand", 0], post_data)
-post_data = zapytaj(["plansza", 2, 4], post_data)
-post_data = zapytaj([-1], post_data)
-post_data = zapytaj(["koniec"], post_data)
-post_data = zapytaj(["koniec"], post_data)
+post_data = zapytaj(["board", 2, 4], post_data)
+post_data = zapytaj(["left"], post_data)
+post_data = zapytaj(["done"], post_data)
+post_data = zapytaj(["done"], post_data)
 
 # response = requests.post(f"{base_url}/get_state", json=post_data)
 # print("POST response:", response.json())

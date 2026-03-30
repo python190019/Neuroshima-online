@@ -48,5 +48,5 @@ class Game:
                 "pile" : self.pile,
                 "hand" : self.hand,
                 }
-        print(data)
+        # print(data)
         return data

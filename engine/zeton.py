@@ -27,7 +27,7 @@ class Zeton:
         def czy_w_planszy(self, x, y):
             return (0 <= x < 5 and 0 <= y < 9)
 
-        def obruc(self, rotacja):
+        def rotate(self, rotacja):
             self.rotacja = (self.rotacja + rotacja + 6) % 6
 
         def dostan_rane(self, obrazenia, kierunek, jaki_atak):
