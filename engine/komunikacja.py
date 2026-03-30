@@ -36,6 +36,13 @@ def click():
     game = Game(data)
     return json.dumps(game.export_game_state())
 
+@app.route('/api/neuroshima/newgame', methods=['POST'])
+def newgame():
+    data = flask.request.get_json()
+    data["faza"] = "poczatek"
+    game = Game(data)
+    return json.dumps(game.export_game_state())
+
 if __name__ == '__main__':
     # app.run(debug=True)
     app.run()

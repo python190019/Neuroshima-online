@@ -80,14 +80,21 @@ def on_user_input(client: "WebSocketGameClient", user_text: str) -> None:
             logger.info("Wyslano GETROOMSTATUS_REQUEST")
         except Exception as e:
             logger.info(f"nie wyszedles z pokoju: {e}")
+
     elif (typ == "NEWGAME"):
-        if(len(wejscie) < 2):
+        if(len(wejscie) < 4):
             logger.warning("Uzycie: NEWGAME <roomId>")
             return
 
         message = {
             "messageType": "NEWGAME_REQUEST",
             "roomId": wejscie[1],
+            "scenario": {
+                "frakcje": {
+                    "player1": wejscie[2],
+                    "player2": wejscie[3],
+                }
+            }
            }
 
         try:

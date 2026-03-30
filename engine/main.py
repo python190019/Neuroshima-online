@@ -9,7 +9,7 @@ class Game:
         self.faza = data["faza"]
         self.game_over = 0
         if(self.faza == "poczatek"):
-            self.start_game(data["frakcje"][0], data["frakcje"][1])
+            self.start_game(data["frakcje"]["player1"], data["frakcje"]["player2"])
 
         else:
             self.next_turns = data["next_turns"]
@@ -48,4 +48,5 @@ class Game:
                 "pile" : self.pile,
                 "hand" : self.hand,
                 }
+        print(data)
         return data

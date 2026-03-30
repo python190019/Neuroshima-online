@@ -1,11 +1,15 @@
 package pl.staszic.neu.game.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pl.staszic.neu.game.model.Room;
 import pl.staszic.neu.game.model.Game;
 import pl.staszic.neu.messages.*;
+import pl.staszic.neu.rest.service.RestService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +21,20 @@ public class InMemoryGameService implements GameService {
     private final Map<String, Room> activeRooms = new ConcurrentHashMap<>();
     private final Map<String, String> affiliations = new ConcurrentHashMap<>();
     private final Map<String, Game> activeGames = new ConcurrentHashMap<>();
+
+    //nwm czy to jest dobre miejsce na restService i url, ale na na razie tak zostanie
+    private final RestService restService;
+    private final String gameStateServiceUrl;
+
+    @Autowired
+    public InMemoryGameService(
+        RestService restService,
+        @Value("${game.state-service.url:http://127.0.0.1:5000/api/neuroshima}") String gameStateServiceUrl
+    ) {
+        this.restService = restService;
+        this.gameStateServiceUrl = gameStateServiceUrl;
+    }
+    //koniec slabego kodu
 
     @Override
     public CreateNewRoomResponse createNewRoom(String clientId, CreateNewRoomRequest request) {
@@ -165,6 +183,7 @@ public class InMemoryGameService implements GameService {
         }
 
         Game game = new Game();
+        game.setGameState(restService.postJson(gameStateServiceUrl+"/newgame", request.getScenario()));
         activeGames.put(game.getGameId(), game);
 
         room.setGameId(game.getGameId());
