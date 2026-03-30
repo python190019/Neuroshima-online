@@ -11,19 +11,26 @@ def dociag(hand, pile, frakcja):
     while(len(hand) < 3 and len(pile) > 0):
             dobierz(hand, pile, frakcja, pile[-1])
 
-def bitwa(board):
+# def bitwa(board):
 
-    for inicjatywa in range(9, -1, -1):
-        for i in range(5):
-            for j in range(9):
-                if board[i][j] is not None:
-                    board[i][j].aktywuj(inicjatywa)
+#     for inicjatywa in range(9, -1, -1):
+#         for i in range(5):
+#             for j in range(9):
+#                 if board[i][j] is not None:
+#                     board[i][j].aktywuj(inicjatywa)
 
-        for i in range(5):
-            for j in range(9):
-                if board[i][j] is not None:
-                    board[i][j].koniec_inicjatywy()
+#         for i in range(5):
+#             for j in range(9):
+#                 if board[i][j] is not None:
+#                     board[i][j].koniec_inicjatywy()
+def get_from_hand(hand, click):
+    if(not isinstance(click, int)):
+        return None
 
+    if(len(hand) <= click):
+        return None
+
+    return hand[click]
 
 def invalid_move(user_actions):
     print("INVALID MOVE")
@@ -35,9 +42,9 @@ def poczatek_tury(game):
     frakcja = game.next_turns[0]["frakcja"]
     typ = game.next_turns[0]["typ"]
     
-    if(frakcja == "bitwa"):
-        bitwa()
-        return
+    # if(frakcja == "bitwa"):
+    #     bitwa()
+    #     return
 
     game.current_frakcja = frakcja
     if(typ == "wystaw_sztab"):
@@ -80,8 +87,9 @@ def postaw_zeton(board, hand, frakcja, nazwa, x, y):
     board.postaw_zeton(x, y, zeton)
 
 def get_first(actions):
-    if(len(actions) == 0):
-        return "empty"
+    if(actions is None or len(actions) == 0):
+        return None
+    
     action = actions[0]
     actions.pop(0)
     return action
@@ -107,16 +115,48 @@ def obracanie(actions, board, x, y):
     else:
         return "done"
 
-def co_zrobic(game):
-    actions = deepcopy(game.user_actions)
+def wstawianie(user_actions, board, hand, action, zeton, frakcja):
+    x = get_first(action)
+    y = get_first(action)
     
-    action = get_first(actions)
+    if(not board.on_board(x, y)):
+        return False
 
-    if(action == "empty"):
-        return
+    if(not board.is_empty(x, y)):
+        return False
+    
+    postaw_zeton(board, hand, frakcja, zeton, x, y)
+    user_actions.clear()
+    user_actions.append(["rotate", x, y])
+    return True
+
+def from_hand(game, action, zeton):
+    hand = game.hand[game.current_frakcja]
+    if(zeton is None):
+        return False
 
     click = get_first(action)
     
+    if(click == "board"):
+        status = wstawianie(game.user_actions, game.board, hand, action, zeton, game.current_frakcja)
+        return status
+
+    elif(click == "odrzuc"):
+        odrzuc(hand, zeton)
+        game.user_actions.clear()
+        return True
+    
+    else:
+        return False
+    
+def co_zrobic(game):
+    actions = deepcopy(game.user_actions)
+    action = get_first(actions)
+    click = get_first(action)
+
+    if(click is None):
+        return
+
     if(click == "done"):
         koniec_tury(game)
         poczatek_tury(game)
@@ -125,70 +165,22 @@ def co_zrobic(game):
     elif(click == "rotate"):
         x = get_first(action)
         y = get_first(action)
-
-        if(not game.board.on_board(x, y)):
-            invalid_move(game.user_actions)
-            return
-
-        if(len(action) != 0):
-            invalid_move(game.user_actions)
-            return
     
         response = obracanie(actions, game.board, x, y)
-        if(response == "done"):
-            game.user_actions.clear()
-            return
-
-        else:
-            game.user_actions.clear()
+        game.user_actions.clear()
+        if(response != "done"):
             game.user_actions.append(["rotate", x, y])
-            return
         
 
     elif(click == "hand"):
-        click = get_first(action)
-
-        if(not isinstance(click, int)):
-            invalid_move(game.user_actions)
-            return
-
         hand = game.hand[game.current_frakcja]
-        if(len(hand) <= click):
-            invalid_move(game.user_actions)
-            return
-
-        zeton = hand[click]
+        zeton = get_from_hand(hand, get_first(action))
         action = get_first(actions)
-
-        if(action == "empty"):
+        if(action is None):
             return
         
-        click = get_first(action)
-
-        if(click == "board"):
-            x = get_first(action)
-            y = get_first(action)
-            
-            if((not isinstance(x, int)) or (not isinstance(y, int))):
-                invalid_move(game.user_actions)
-                return
-
-            if(not game.board.is_empty(x, y)):
-                invalid_move(game.user_actions)
-                return
-            
-            postaw_zeton(game.board, hand, game.current_frakcja, zeton, x, y)
-            # game.faza = "rotate"
-            game.user_actions.clear()
-            game.user_actions.append(["rotate", x, y])
-            return
-
-        elif(click == "odrzuc"):
-            odrzuc(hand, zeton)
-            game.user_actions.clear()
-            return
-        
-        else:
+        status = from_hand(game, action, zeton)
+        if(status == False):
             invalid_move(game.user_actions)
             return
         
