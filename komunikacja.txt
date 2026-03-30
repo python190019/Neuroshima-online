@@ -1,0 +1,28 @@
+dla frontendu:
+    aktualna frakcja
+    board[5][9] = (None lub {"frakcja", "nazwa", "rotacja", "rany"})
+    hand = {"frakcja1" : ["nazwa", None, None], "frakcja2" : [cos, cos2, None]}
+    czyklikalne{
+        baord[5][9] = (nie/tak/obróć),
+        hand = {"frakcja1" : [3] = (bool), "frakcja2" : [3] = (bool)},
+        koniec tury, kosz, użyj, cancel, tak, nie 
+    }
+    message(string)
+
+dla engine:
+    cały poprzedni stan planszy
+    klik = {"type" : (hand/baord/guzik), ...}
+    {"type" : "hand", "slot" : (0/1/2)}
+    {"type" : "board", "x" : (int), "y" : (int)}
+    {"type" : "rotate", "rotation" : int}
+
+stan gry{
+    user_actions
+    faza
+    next_turns
+    board
+    hand
+    pile
+    aktualna frakcja
+    czyklikalne
+}
