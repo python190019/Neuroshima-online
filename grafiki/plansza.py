@@ -1,8 +1,8 @@
 import math
 from objekt import *
 
-def plansza(app):
-    a = app.a
+def plansza(app, bok):
+    a = bok
     lista = []
     pier = math.sqrt(3)
     for i in range(-3, 4, 3):
@@ -15,7 +15,7 @@ def plansza(app):
             lista.append([a*i*(3/2), a*pier*j+((pier*a)/2)])
     for i in range(len(lista)):
         ter = obj(lista[i][1]*1.1, lista[i][0]*1.1, "pole.png", a*2*math.sqrt(3)/2, a*2, 0, 30, "a.png", app, 1, "hex", a)
-        ter.wyswietl()
+        ter.wyswietl(True)
         drugi = obj(lista[i][1]*1.1, lista[i][0]*1.1, "obwod.png", (a*2*math.sqrt(3)/2)*1.17, a*2*1.17, 10, 30, "a.png", app, 1, "hex", a)
-        drugi.wyswietl()
+        drugi.wyswietl(True)
         app.pola.append(ter)

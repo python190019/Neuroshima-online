@@ -3,16 +3,9 @@ from direct.gui.OnscreenImage import OnscreenImage
 from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import CardMaker, TransparencyAttrib, NodePath, WindowProperties
-from plansza import *
+from stanplanszy import *
 
 class MyApp(ShowBase):
-    def rdraw(self, g):
-        for i in range(-1, 2, 1):
-            ter = obj(g*4*self.a*self.getAspectRatio()*1.1, (3/2)*self.a*math.sqrt(3)*i*1.1, self.img[i+1], self.a*2*math.sqrt(3)/2, self.a*2, 1, 30, self.img[i+1], self, 1, "hex", self.a)
-            ter.wyswietl()
-            self.przesuwalne.append(ter)
-            self.podswietlone[ter] = self.pusty
-
     # def kursor(self):
     #     cm = CardMaker("kursor")
     #     cm.setFrame(-0.005, 0.005, -0.005, 0.005)
@@ -54,58 +47,60 @@ class MyApp(ShowBase):
             self.klikniety.usun()
             self.klikniety.rotacja += 60*kat
             self.klikniety.wyswietl()
-    # def upkursor(self, task):
-    #     if self.mouseWatcherNode.hasMouse():
-    #         mpos = self.mouseWatcherNode.getMouse()
-    #         for element in self.przesuwalne:
-    #             self.kursor.setPos(mpos.getX() * self.getAspectRatio(), 0, mpos.getY())
-                # if (self.zawiera(element) and self.podswietlone[element] == self.pusty):
-                #     ter = obj(element.x, element.z, "podswietl.png", self.a*2*math.sqrt(3)/2, self.a*2, 2, 30, "podswietl.png", self, 0.3)
-                #     ter.wyswietl()
-                #     self.podswietlone[element] = ter
-                #     # self.licznik+=1
-                #     # print(self.licznik)
-                # elif (not self.zawiera(element)) and self.podswietlone[element] != self.pusty:
-                #     self.podswietlone[element].usun()
-                #     self.podswietlone[element] = self.pusty
-                # elif(self.podswietlone[element] != self.pusty):
-                #     self.podswietlone[element].usun()
-                #     self.podswietlone[element].x = element.x
-                #     self.podswietlone[element].z = element.z
-                #     self.podswietlone[element].wyswietl()
+    def upkursor(self, task):
+        if self.mouseWatcherNode.hasMouse():
+            mpos = self.mouseWatcherNode.getMouse()
+            for element in self.przesuwalne:
+                self.kursor.setPos(mpos.getX() * self.getAspectRatio(), 0, mpos.getY())
+                if (self.zawiera(element) and self.podswietlone[element] == self.pusty):
+                    ter = obj(element.x, element.z, "podswietl.png", self.a*2*math.sqrt(3)/2, self.a*2, 2, 30, "podswietl.png", self, 0.3)
+                    ter.wyswietl()
+                    self.podswietlone[element] = ter
+                    # self.licznik+=1
+                    # print(self.licznik)
+                elif (not self.zawiera(element)) and self.podswietlone[element] != self.pusty:
+                    self.podswietlone[element].usun()
+                    self.podswietlone[element] = self.pusty
+                elif(self.podswietlone[element] != self.pusty):
+                    self.podswietlone[element].usun()
+                    self.podswietlone[element].x = element.x
+                    self.podswietlone[element].z = element.z
+                    self.podswietlone[element].wyswietl()
 
-        # return task.cont
-    def skaluj(self):
-        for element in self.skaluj:
+        return task.cont
+    def skaluj(self, task):
+        for element in self.przesuwalne:
             ter = element
-            ter.usun()
-            ter
+            ter.usun(False)
+            ter.wyswietl(False)
     def __init__(self):
         super().__init__()
 
-        self.music = self.loader.loadMusic("soundtracks/dziubdziub.mp3") #audio
-        self.music.setLoop(True) #zakomentuj jak nie chcesz
-        self.music.setVolume(0.0) #dodaj glosnosc jak chcesz super muzyke
-        self.music.play()
-
+        # self.music = self.loader.loadMusic("soundtracks/dziubdziub.mp3") #audio
+        # self.music.setLoop(True) #zakomentuj jak nie chcesz
+        # self.music.setVolume(0.0) #dodaj glosnosc jak chcesz super muzyke
+        # self.music.play()
+        self.bok = 0.18
         # self.setBackgroundColor(0, 0, 0)
-        self.a = 0.2
+        # self.a = 0.15
         # self.robhexa(0, 0, 2, 1)
-        self.wszystko = []
+        # self.wszystko = []
         self.pola = []
-        plansza(self)
+        # plansza(self, self.a)
         # self.kursor()
         self.przesuwalne = []
-        self.licznik = 0
-        self.pusty = obj(0, 0, "test.png", 0, 0, 0, 0, "pusty", self, 0, "hex", self.a)
-        self.klikniety = self.pusty
+        # self.licznik = 0
+        self.pusty = obj(0, 0, "test.png", 0, 0, 0, 0, "pusty", self, 0, "hex", self.bok)
+        # self.klikniety = self.pusty
         self.podswietlone = dict()
-        self.img = ["borgo/zwiadowca2.png", "borgo/zwiadowca.png", "test.png"]
-        self.rdraw(1)
-        # self.taskMgr.add(self.upkursor, "upkursor")
-        self.accept("mouse1", self.klik)
-        self.accept("arrow_left", self.obroc, [-1])
-        self.accept("arrow_right", self.obroc, [1])
+        # nowy = zamien(0, 0, "borgo", "granat", 0, 30, 0, 0, self, 1, 2)
+        # nowy.wyswietl(True)
+        # self.hand = ["borgo/zwiadowca.png", "borgo/zwiadowca.png", "test.png"]
+        # rhand(self, "borgo", "borgo", self.hand, self.a)
+        # # self.taskMgr.add(self.upkursor, "upkursor")
+        # self.accept("mouse1", self.klik)
+        # self.accept("arrow_left", self.obroc, [-1])
+        # self.accept("arrow_right", self.obroc, [1])
         # self.accept("window-event", self.skaluj)
 app = MyApp()
 app.run()
