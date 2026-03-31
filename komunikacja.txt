@@ -24,5 +24,5 @@ stan gry{
     hand
     pile
     aktualna frakcja
-    czyklikalne
+    czyklikalne //czy klikalne nie należy do stanu gry, jest to jedynie atrybut wiadomości dla frontendu która != stan planszy bo jest spersonalizowana
 }
