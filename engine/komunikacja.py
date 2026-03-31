@@ -15,7 +15,7 @@ app = flask.Flask(__name__)
 @app.route('/api/neuroshima/get_state', methods=['POST'])
 def get_state():
     data = flask.request.get_json()
-    print(data)
+    # print(data)
     game = Game(data)
     return json.dumps(game.export_game_state())
 
@@ -39,7 +39,7 @@ def click():
 @app.route('/api/neuroshima/newgame', methods=['POST'])
 def newgame():
     data = flask.request.get_json()
-    data["faza"] = "poczatek"
+    data["faza"] = "newgame"
     game = Game(data)
     return json.dumps(game.export_game_state())
 

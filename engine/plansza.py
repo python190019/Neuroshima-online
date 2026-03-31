@@ -4,7 +4,9 @@ class Board:
     def __init__(self):
         self.length = 9
         self.width = 5
+        self.rotation_phase = False
         self.board = [[None] * self.length for i in range(self.width)]
+        self.available_hexs = [[False] * self.length for i in range(self.width)]
         
         self.roza = {
             0: [-1, 1],
@@ -17,6 +19,7 @@ class Board:
 
     def postaw_zeton(self, x, y, zeton):
         self.board[x][y] = Zeton(x, y, zeton["frakcja"], zeton["nazwa"], zeton["rotacja"], zeton["rany"])
+        # self.rotation_phase = True
 
     def rotate(self, x, y, rotacja):
         self.board[x][y].rotate(rotacja)
@@ -34,6 +37,29 @@ class Board:
         if(y < 0 or y >= self.width):
             return False
         return True  
+
+    def get_type(self, x, y):
+        if(self.board[x][y] is None):
+            return None
+        return self.board[x][y].frakcja
+
+    def update_available_hexs(self, type):
+        if(isinstance(type, bool)):
+            for x in range(self.width):
+                for y in range(self.length):
+                    self.available_hexs[x][y] = type
+            return
+        
+        for x in range(self.width):
+            for y in range(self.length):
+                if(self.get_type(x, y) == type):
+                    self.available_hexs[x][y] = True
+                else:
+                    self.available_hexs[x][y] = False
+        
+        if(isinstance(type, dict)):
+            self.available_hexs[type["x"]][type["y"]] = "rotate" 
+
 
     def import_board(self, data):
         for x in range(self.width):
