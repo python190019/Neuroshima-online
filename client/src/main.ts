@@ -1,5 +1,6 @@
 import { CanvasClickHandler } from "./CanvasClickHandler.js";
 import { CanvasDragHandler } from "./CanvasDragHandler.js";
+import { CanvasRotateHandler } from "./CanvasRotateHandler.js";
 import { Hexagon, Rectangle, Shape } from "./GameClasses/index.js";
 
 const canvasElement = document.getElementById("app-canvas");
@@ -30,6 +31,7 @@ const shapes: Shape[] = [
 
 new CanvasClickHandler(canvas, shapes);
 new CanvasDragHandler(canvas, shapes);
+new CanvasRotateHandler(canvas, shapes);
 
 function fu(): void {
   shapes.push(

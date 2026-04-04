@@ -4,12 +4,12 @@ export class Hexagon extends Shape {
   constructor(
     position: { x: number; y: number },
     public radius: number,
-    clickable?: boolean,
-    dragable?: boolean,
-    fillColor?: string,
-    strokeColor?: string
+    clickable: boolean = false,
+    dragable: boolean = false,
+    fillColor: string = "#0ea5e9",
+    strokeColor: string = "#e2e8f0"
   ) {
-    super(position, clickable, dragable, fillColor, strokeColor);
+    super(position, clickable, dragable, false, 0, fillColor, strokeColor);
   }
 
   draw(context: CanvasRenderingContext2D): void {

@@ -31,6 +31,11 @@ export class CanvasDragHandler {
   };
 
   private readonly handleMouseUp = (): void => {
+    if(this.activeShape === null){
+        return;
+    }
+    this.activeShape.dragable = false;
+    this.activeShape.rotable = true;
     this.activeShape = null;
   };
 
