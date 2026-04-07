@@ -19,12 +19,18 @@ class Game:
         else:
             self.import_game_state(data)
 
-            status = self.actions.handler(self)
-            if(status != None):
-                self.user_actions.clear()
-                self.actions.default_available_actions(self)
+            status = True
+            while(status):
+                status = self.actions.handler(self)
+                if(status != None):
+                    self.user_actions.clear()
+                    self.actions.default_available_actions(self)
             
-           
+    def setup_pile(self, frakcja):
+        for nazwa in wszystkie_frakcje.frakcje.get(frakcja, {}):
+            for _ in range(wszystkie_frakcje.frakcje[frakcja][nazwa]["liczbajednostek"]):
+                self.pile[frakcja].append(nazwa)
+
 
     def start_game(self, frakcja1, frakcja2):
         self.current_frakcja = None
@@ -33,9 +39,12 @@ class Game:
         self.next_turns.append({"frakcja" : frakcja1, "typ" : "wystaw_sztab"})
         self.next_turns.append({"frakcja" : frakcja2, "typ" : "wystaw_sztab"})
         self.pile = {
-                    frakcja1 : [nazwa for nazwa in wszystkie_frakcje.frakcje.get(frakcja1, {})], 
-                    frakcja2 : [nazwa for nazwa in wszystkie_frakcje.frakcje.get(frakcja2, {})]
+                    frakcja1 : [], 
+                    frakcja2 : []
                     }
+        self.setup_pile(frakcja1)
+        self.setup_pile(frakcja2)
+
         self.hand = {frakcja1 : [], frakcja2 : []}
         # self.faza = "gra"
         self.actions.poczatek_tury(self)
@@ -107,8 +116,8 @@ class Game:
         
 
     def export_game_state(self):
-        # print("Exporting game state...")
-        # self.actions.print_game_state(self)
+        print("Exporting game state...")
+        self.actions.print_game_state(self)
         for frakcja in self.hand.keys():
             self.actions.fill_hand(self.hand[frakcja])
         data = {
