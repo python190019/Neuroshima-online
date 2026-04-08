@@ -1,6 +1,7 @@
 import { Shape } from "./GameClasses/index.js";
+import { CanvasEventHandler } from "./CanvasEventHandler.js";
 
-export class CanvasClickHandler {
+export class CanvasClickHandler extends CanvasEventHandler {
   private readonly handleClick = (event: MouseEvent): void => {
     const point = this.getCanvasPoint(event);
 
@@ -12,19 +13,11 @@ export class CanvasClickHandler {
   };
 
   constructor(
-    private readonly canvas: HTMLCanvasElement,
-    private readonly objects: Shape[]
+    protected readonly canvas: HTMLCanvasElement,
+    protected readonly objects: Shape[]
   ) {
+    super(canvas, objects);
     this.canvas.addEventListener("click", this.handleClick);
-  }
-
-  private getCanvasPoint(event: MouseEvent): { x: number; y: number } {
-    const rect = this.canvas.getBoundingClientRect();
-
-    return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    };
   }
 }
 

@@ -1,6 +1,7 @@
+import { CanvasEventHandler } from "./CanvasEventHandler.js";
 import {Shape} from "./GameClasses/index.js";
 
-export class CanvasRotateHandler {
+export class CanvasRotateHandler extends CanvasEventHandler{
   private activeShape: Shape | null = null;
   private intialAngle: number = 0;
 
@@ -39,20 +40,12 @@ export class CanvasRotateHandler {
   }
 
     constructor(
-        private readonly Canvas: HTMLCanvasElement,
-        private readonly objects: Shape[]
+        protected readonly canvas: HTMLCanvasElement,
+        protected readonly objects: Shape[]
     ) {
-        this.Canvas.addEventListener("mousedown", this.handleMouseDown);
-        this.Canvas.addEventListener("mousemove", this.handleMouseMove);
+        super(canvas, objects);
+        this.canvas.addEventListener("mousedown", this.handleMouseDown);
+        this.canvas.addEventListener("mousemove", this.handleMouseMove);
         window.addEventListener("mouseup", this.handleMouseUp);
-    }
-
-    private getCanvasPoint(event: MouseEvent): { x: number; y: number } {
-        const rect = this.Canvas.getBoundingClientRect();
-
-        return {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top,
-        };
     }
 }

@@ -1,6 +1,7 @@
 import { Shape } from "./GameClasses/index.js";
+import { CanvasEventHandler } from "./CanvasEventHandler.js";
 
-export class CanvasDragHandler {
+export class CanvasDragHandler extends CanvasEventHandler {
   private activeShape: Shape | null = null;
   private dragOffset = { x: 0, y: 0 };
 
@@ -40,21 +41,13 @@ export class CanvasDragHandler {
   };
 
   constructor(
-    private readonly canvas: HTMLCanvasElement,
-    private readonly objects: Shape[]
+    protected readonly canvas: HTMLCanvasElement,
+    protected readonly objects: Shape[]
   ) {
+    super(canvas, objects);
     this.canvas.addEventListener("mousedown", this.handleMouseDown);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
     window.addEventListener("mouseup", this.handleMouseUp);
-  }
-
-  private getCanvasPoint(event: MouseEvent): { x: number; y: number } {
-    const rect = this.canvas.getBoundingClientRect();
-
-    return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    };
   }
 }
 
