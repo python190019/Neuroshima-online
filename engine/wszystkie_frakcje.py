@@ -1,9 +1,10 @@
 from importlib import import_module
 from copy import deepcopy
 
-dostepne_frakcje = ["moloch", "borgo"]
+dostepne_frakcje = ["moloch", "borgo", "testowa"]
+path = "frakcje"
 frakcje = {}
 
 for frakcja in dostepne_frakcje:
-    lib = import_module(frakcja)
+    lib = import_module(f"{path}.{frakcja}")
     frakcje[frakcja] = deepcopy(lib.wlasciwosci)
