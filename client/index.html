@@ -3,13 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Canvas + TypeScript</title>
+    <title>Neuroshima-online client</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <canvas id="app-canvas" aria-label="Przykladowy canvas"></canvas>
-    <script type="module" src="./dist/main.js"></script>
-    <button id="add-element">add element</button>
+    <form>
+      <script type="module" src="./dist/main.js"></script>
+      <label for="login">Login:</label><br>
+      <input type="text" id="login" name="login"><br>
+      <label for="password">Password:</label><br>
+      <input type="password" id="password" name="password">
+    </form>
+    <button id="login-button">Login</button>
   </body>
 </html>
 

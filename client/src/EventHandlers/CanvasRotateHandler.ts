@@ -1,5 +1,5 @@
 import { CanvasEventHandler } from "./CanvasEventHandler.js";
-import {Shape} from "./GameClasses/index.js";
+import {Shape} from "../GameClasses/index.js";
 
 export class CanvasRotateHandler extends CanvasEventHandler{
   private activeShape: Shape | null = null;

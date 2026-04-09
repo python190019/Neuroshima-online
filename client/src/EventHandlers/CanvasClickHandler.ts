@@ -1,4 +1,4 @@
-import { Shape } from "./GameClasses/index.js";
+import { Shape } from "../GameClasses/index.js";
 import { CanvasEventHandler } from "./CanvasEventHandler.js";
 
 export class CanvasClickHandler extends CanvasEventHandler {

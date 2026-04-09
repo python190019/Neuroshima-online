@@ -1,6 +1,6 @@
-import { CanvasClickHandler } from "./CanvasClickHandler.js";
-import { CanvasDragHandler } from "./CanvasDragHandler.js";
-import { CanvasRotateHandler } from "./CanvasRotateHandler.js";
+import { CanvasClickHandler } from "./EventHandlers/CanvasClickHandler.js";
+import { CanvasDragHandler } from "./EventHandlers/CanvasDragHandler.js";
+import { CanvasRotateHandler } from "./EventHandlers/CanvasRotateHandler.js";
 import { Hexagon, Rectangle, Shape } from "./GameClasses/index.js";
 
 const canvasElement = document.getElementById("app-canvas");
