@@ -11,7 +11,7 @@ class Tests:
     def test_bitwa1(self):
         board = Board()
         zeton = {"frakcja" : "moloch", "nazwa" : "szturmowiec", "rotacja" : 0, "rany" : 0}
-        board.postaw_zeton(1, 3, zeton)
+        board.postaw_zeton(3, 3, zeton)
 
         zeton = {"frakcja" : "borgo", "nazwa" : "sztab", "rotacja" : 0, "rany" : 0}
         board.postaw_zeton(2, 4, zeton)
@@ -20,7 +20,7 @@ class Tests:
         board.postaw_zeton(2, 2, zeton)
 
         zeton = {"frakcja" : "moloch", "nazwa" : "sztab", "rotacja" : 1, "rany" : 0}
-        board.postaw_zeton(3, 5, zeton)
+        board.postaw_zeton(1, 5, zeton)
 
         # board.print_board()
 
