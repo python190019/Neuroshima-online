@@ -126,10 +126,11 @@ class Actions:
         self.update_available_actions(game, available)
 
     def use_ruch(self, game, action):
+        print("state:", game.state)
         if(game.state == State.SELECTED_HAND):
             x = action[Action.Key.X]
             y = action[Action.Key.Y]
-            name = game.baord.get_name(x, y)
+            name = game.board.get_name(x, y)
             game.state = State.MOVING
             game.selected = {Selected.X : x, Selected.Y : y, Selected.NAME : name}
             # self.available_actions_ruch(game)
@@ -143,7 +144,7 @@ class Actions:
             game.board.przenies(x, y, nx, ny)
             game.state = State.ROTATE
             game.selected[Selected.X] = nx
-            game.selected[Selected.y] = ny
+            game.selected[Selected.Y] = ny
             
         return True
 
@@ -215,6 +216,8 @@ class Actions:
         return True
 
     def koniec_tury(self, game, check=False):
+        print("check:", check)
+        print("next turns:", game.next_turns)
         next_turn = game.next_turns[0]
         frakcja = next_turn[Turn.FRACTION]
         typ = next_turn[Turn.TYPE]
@@ -357,13 +360,15 @@ class Actions:
     #   Handler functions      
     #############################################################################
     def prepare_for_new_action(self, game):
+        if(game.state == State.ROTATE):
+            self.kwestia_sieciarzy(game.board)
         game.state = State.NO_SELECTION
         game.selected = None
 
     def handle_board(self, game, action):
         print("handle_board")
+        name = game.selected[Selected.NAME]
         if game.state == State.PLACING:
-            name = game.selected[Selected.NAME]
             return self.wstawianie(game, action, name)
         
         elif(game.state == State.SELECTED_HAND):
@@ -371,6 +376,9 @@ class Actions:
             if(function is None):
                 return False
             return function(game, Mode.USE, action)
+            
+        elif(game.state == State.MOVING):
+            return self.ruch(game, Mode.USE, action)
 
         else:
             return False
@@ -414,7 +422,6 @@ class Actions:
         y = action[Action.Key.Y]
         rotation = action[Action.Key.ROTATION]
         game.board.rotate(x, y, rotation)
-        self.kwestia_sieciarzy(game.board)
         self.prepare_for_new_action(game)
         return True
 

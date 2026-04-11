@@ -104,43 +104,43 @@ class Tests:
         board.bitwa()
         output = board.wszystkie_jednostki()
 
-        correct_output = [[1, 3, {'frakcja': 'testowa', 'nazwa': 'dwu-sieciarz', 'rotacja': 1, 'rany': 0, 'zasiecowany': False}], [1, 5, {'frakcja': 'moloch', 'nazwa': 'sztab', 'rotacja': 0, 'rany': 0, 'zasiecowany': True}], [1, 7, {'frakcja': 'testowa', 'nazwa': 'sieciarz', 'rotacja': 2, 'rany': 0, 'zasiecowany': False}], [2, 2, {'frakcja': 'moloch', 'nazwa': 'sieciarz', 'rotacja': 0, 'rany': 0, 'zasiecowany': False}], [2, 4, {'frakcja': 'moloch', 'nazwa': 'sieciarz', 'rotacja': 3, 'rany': 0, 'zasiecowany': False}], [2, 8, {'frakcja': 'moloch', 'nazwa': 'sieciarz', 'rotacja': 1, 'rany': 0, 'zasiecowany': True}], [3, 3, {'frakcja': 'testowa', 'nazwa': 'sieciarz', 'rotacja': 5, 'rany': 0, 'zasiecowany': False}], [3, 7, {'frakcja': 'testowa', 'nazwa': 'sieciarz', 'rotacja': 3, 'rany': 0, 'zasiecowany': False}], [4, 6, {'frakcja': 'moloch', 'nazwa': 'opancerzonywartownik', 'rotacja': 2, 'rany': 0, 'zasiecowany': True}]]       
+        correct_output = [[1, 3, {Token.FRACTION : 'testowa', Token.NAME: 'dwu-sieciarz', Token.ROTATION: 1, Token.DAMAGE: 0, Token.WIRED: False}], [1, 5, {Token.FRACTION: 'moloch', Token.NAME: 'sztab', Token.ROTATION: 0, Token.DAMAGE: 0, Token.WIRED: True}], [1, 7, {Token.FRACTION: 'testowa', Token.NAME: 'sieciarz', Token.ROTATION: 2, Token.DAMAGE: 0, Token.WIRED: False}], [2, 2, {Token.FRACTION: 'moloch', Token.NAME: 'sieciarz', Token.ROTATION: 0, Token.DAMAGE: 0, Token.WIRED: False}], [2, 4, {Token.FRACTION: 'moloch', Token.NAME: 'sieciarz', Token.ROTATION: 3, Token.DAMAGE: 0, Token.WIRED: False}], [2, 8, {Token.FRACTION: 'moloch', Token.NAME: 'sieciarz', Token.ROTATION: 1, Token.DAMAGE: 0, Token.WIRED: True}], [3, 3, {Token.FRACTION: 'testowa', Token.NAME: 'sieciarz', Token.ROTATION: 5, Token.DAMAGE: 0, Token.WIRED: False}], [3, 7, {Token.FRACTION: 'testowa', Token.NAME: 'sieciarz', Token.ROTATION: 3, Token.DAMAGE: 0, Token.WIRED: False}], [4, 6, {Token.FRACTION: 'moloch', Token.NAME: 'opancerzonywartownik', Token.ROTATION: 2, Token.DAMAGE: 0, Token.WIRED: True}]]       
         assert(Diff().compare(output, correct_output))
 
     def test_bitwa_moduly(self):
         board = Board()
 
         # ---- borgo ----
-        zeton = {"frakcja" : "borgo", "nazwa" : "sztab", "rotacja" : 0, "rany" : 0}
+        zeton = {Token.FRACTION : "borgo", Token.NAME : "sztab", Token.ROTATION : 0, Token.DAMAGE : 0}
         board.postaw_zeton(1, 1, zeton)
 
-        zeton = {"frakcja" : "borgo", "nazwa" : "super-mutant", "rotacja" : 2, "rany" : 0}
+        zeton = {Token.FRACTION : "borgo", Token.NAME : "super-mutant", Token.ROTATION : 2, Token.DAMAGE : 0}
         board.postaw_zeton(0, 2, zeton)
 
-        zeton = {"frakcja" : "borgo", "nazwa" : "sieciarz", "rotacja" : 4, "rany" : 0}
+        zeton = {Token.FRACTION : "borgo", Token.NAME : "sieciarz", Token.ROTATION : 4, Token.DAMAGE : 0}
         board.postaw_zeton(2, 4, zeton)
 
-        zeton = {"frakcja" : "borgo", "nazwa" : "zwiadowca", "rotacja" : 0, "rany" : 0}
+        zeton = {Token.FRACTION : "borgo", Token.NAME : "zwiadowca", Token.ROTATION : 0, Token.DAMAGE : 0}
         board.postaw_zeton(3, 5, zeton)
 
 
         # ---- moloch ----
-        zeton = {"frakcja" : "moloch", "nazwa" : "sztab", "rotacja" : 0, "rany" : 0}
+        zeton = {Token.FRACTION : "moloch", Token.NAME : "sztab", Token.ROTATION : 0, Token.DAMAGE : 0}
         board.postaw_zeton(2, 8, zeton)
 
-        zeton = {"frakcja" : "moloch", "nazwa" : "zwiadowca", "rotacja" : 0, "rany" : 0}
+        zeton = {Token.FRACTION : "moloch", Token.NAME : "zwiadowca", Token.ROTATION : 0, Token.DAMAGE : 0}
         board.postaw_zeton(2, 6, zeton)
 
-        zeton = {"frakcja" : "moloch", "nazwa" : "szturmowiec", "rotacja" : 4, "rany" : 0}
+        zeton = {Token.FRACTION : "moloch", Token.NAME : "szturmowiec", Token.ROTATION : 4, Token.DAMAGE : 0}
         board.postaw_zeton(1, 7, zeton)
 
-        zeton = {"frakcja" : "moloch", "nazwa" : "oficer", "rotacja" : 0, "rany" : 0}
+        zeton = {Token.FRACTION : "moloch", Token.NAME : "oficer", Token.ROTATION : 0, Token.DAMAGE : 0}
         board.postaw_zeton(1, 5, zeton)
 
-        zeton = {"frakcja" : "moloch", "nazwa" : "mozg", "rotacja" : 0, "rany" : 0}
+        zeton = {Token.FRACTION : "moloch", Token.NAME : "mozg", Token.ROTATION : 0, Token.DAMAGE : 0}
         board.postaw_zeton(0, 6, zeton)
 
-        zeton = {"frakcja" : "moloch", "nazwa" : "lowca", "rotacja" : 4, "rany" : 0}
+        zeton = {Token.FRACTION : "moloch", Token.NAME : "lowca", Token.ROTATION : 4, Token.DAMAGE : 0}
         board.postaw_zeton(0, 4, zeton)
 
         board.bitwa()
@@ -159,7 +159,7 @@ class Tests:
         # for i in range(10):
         #     print("\n")
 
-        correct_output = [[1, 3, {Token.FRACTION: 'testowa', Token.NAME: 'dwu-sieciarz', Token.ROTATION: 1, Token.DAMAGE: 0, Token.WIRED: False}], [1, 5, {Token.FRACTION: 'moloch', Token.NAME: 'sztab', Token.ROTATION: 0, Token.DAMAGE: 0, Token.WIRED: True}], [1, 7, {Token.FRACTION: 'testowa', Token.NAME: 'sieciarz', Token.ROTATION: 2, Token.DAMAGE: 0, Token.WIRED: False}], [2, 2, {Token.FRACTION: 'moloch', Token.NAME: 'sieciarz', Token.ROTATION: 0, Token.DAMAGE: 0, Token.WIRED: False}], [2, 4, {Token.FRACTION: 'moloch', Token.NAME: 'sieciarz', Token.ROTATION: 3, Token.DAMAGE: 0, Token.WIRED: False}], [2, 8, {Token.FRACTION: 'moloch', Token.NAME: 'sieciarz', Token.ROTATION: 1, Token.DAMAGE: 0, Token.WIRED: True}], [3, 3, {Token.FRACTION: 'testowa', Token.NAME: 'sieciarz', Token.ROTATION: 5, Token.DAMAGE: 0, Token.WIRED: False}], [3, 7, {Token.FRACTION: 'testowa', Token.NAME: 'sieciarz', Token.ROTATION: 3, Token.DAMAGE: 0, Token.WIRED: False}], [4, 6, {Token.FRACTION: 'moloch', Token.NAME: 'opancerzonywartownik', Token.ROTATION: 2, Token.DAMAGE: 0, Token.WIRED: True}]]       
+        correct_output = [[0, 6, {Token.FRACTION: 'moloch', Token.NAME: 'mozg', Token.ROTATION: 0, Token.DAMAGE: 0, Token.WIRED: False}], [1, 1, {Token.FRACTION: 'borgo', Token.NAME: 'sztab', Token.ROTATION: 0, Token.DAMAGE: 6, Token.WIRED: False}], [1, 7, {Token.FRACTION: 'moloch', Token.NAME: 'szturmowiec', Token.ROTATION: 4, Token.DAMAGE: 0, Token.WIRED: False}], [2, 4, {Token.FRACTION: 'borgo', Token.NAME: 'sieciarz', Token.ROTATION: 4, Token.DAMAGE: 0, Token.WIRED: False}], [2, 6, {Token.FRACTION: 'moloch', Token.NAME: 'zwiadowca', Token.ROTATION: 0, Token.DAMAGE: 0, Token.WIRED: False}], [2, 8, {Token.FRACTION: 'moloch', Token.NAME: 'sztab', Token.ROTATION: 0, Token.DAMAGE: 0, Token.WIRED: False}], [3, 5, {Token.FRACTION: 'borgo', Token.NAME: 'zwiadowca', Token.ROTATION: 0, Token.DAMAGE: 0, Token.WIRED: False}]]     
 
 
         # print(correct_output)

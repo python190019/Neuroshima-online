@@ -63,8 +63,8 @@ class Zeton:
         def czy_sieciarz(self):
             return (Token.Stats.WIRE in self.wlasciwosci)
 
-        # def czy_w_planszy(self, x, y):
-        #     return (0 <= x < 5 and 0 <= y < 9)
+        def czy_w_planszy(self, x, y):
+            return (0 <= x < 5 and 0 <= y < 9)
 
         def rotate(self, rotacja):
             if (self.zasiecowany):

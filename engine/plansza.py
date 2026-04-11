@@ -163,7 +163,7 @@ class Board:
             self.kwestia_sieciarzy()
             self.boost_all()
 
-            self.print_board()
+            # self.print_board()
 
             for x in range(self.width):
                 for y in range(self.length):
