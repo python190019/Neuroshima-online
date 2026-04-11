@@ -49,7 +49,7 @@ wlasciwosci = {
         },
         "inicjatywa": [2]
     },
-    "zabójca": {
+    "zabojca": {
         "typ": "plansza",
         "liczbajednostek": 2,
         "hp": 1,

@@ -121,7 +121,10 @@ class Board:
 
     def bitwa(self):
         for inicjatywa in range(self.max_inicjatywa, -1, -1):
+            print(f"--- Inicjatywa {inicjatywa} ---")
             self.kwestia_sieciarzy()
+            self.print_board()
+
             for x in range(self.width):
                 for y in range(self.length):
                     if(self.is_empty(x, y)):
@@ -150,8 +153,14 @@ class Board:
                     row.append(None)
                 else:
                     # print(type(board.board[i][j]))
-                    row.append((self.board[i][j].frakcja[0], self.board[i][j].nazwa, self.board[i][j].rotacja))
-                    # row.append(self.board[i][j].zeton_to_json())
+                    akt = self.board[i][j]
+                    row.append((
+                        # akt.frakcja[0], 
+                        akt.zasiecowany,
+                        akt.nazwa, 
+                        akt.rotacja
+                    ))
+                    # row.append(akt.zeton_to_json())
             print(row)
 
     def wszystkie_jednostki(self):

@@ -73,5 +73,62 @@ class Tests:
         # print(correct_output)
         assert(Diff().compare(output, correct_output))
         # assert(output == correct_output)
+
+    def test_bitwa3(self):
+        board = Board()
+        zeton = {"frakcja" : "testowa", "nazwa" : "sieciarz", "rotacja" : 5, "rany" : 0}
+        board.postaw_zeton(3, 3, zeton)
+
+        zeton = {"frakcja" : "moloch", "nazwa" : "sieciarz", "rotacja" : 0, "rany" : 0}
+        board.postaw_zeton(2, 2, zeton)
+
+        zeton = {"frakcja" : "testowa", "nazwa" : "dwu-sieciarz", "rotacja" : 1, "rany" : 0}
+        board.postaw_zeton(1, 3, zeton)
+
+        zeton = {"frakcja" : "moloch", "nazwa" : "sieciarz", "rotacja" : 3, "rany" : 0}
+        board.postaw_zeton(2, 4, zeton)
+
+        zeton = {"frakcja" : "moloch", "nazwa" : "sztab", "rotacja" : 0, "rany" : 0}
+        board.postaw_zeton(1, 5, zeton)
+
+        zeton = {"frakcja" : "testowa", "nazwa" : "sieciarz", "rotacja" : 2, "rany" : 0}
+        board.postaw_zeton(1, 7, zeton)
+
+        zeton = {"frakcja" : "moloch", "nazwa" : "sieciarz", "rotacja" : 1, "rany" : 0}
+        board.postaw_zeton(2, 8, zeton)
+
+        zeton = {"frakcja" : "testowa", "nazwa" : "sieciarz", "rotacja" : 3, "rany" : 0}
+        board.postaw_zeton(3, 7, zeton)
+
+        zeton = {"frakcja" : "moloch", "nazwa" : "opancerzonywartownik", "rotacja" : 2, "rany" : 0}
+        board.postaw_zeton(4, 6, zeton)
+
+        board.kwestia_sieciarzy()
+        # board.print_board()
+
+        # print(board.sieciarze.status_sieciarzy)
+
+        board.bitwa()
+        output = board.wszystkie_jednostki()
+
+        # board.print_board()
+
+        # print(output)
+
+        # for i in range(10):
+        #     print("\n")
+
+        # board.print_board()
+        
+        # for i in range(10):
+        #     print("\n")
+
+        correct_output = [[1, 3, {'frakcja': 'testowa', 'nazwa': 'dwu-sieciarz', 'rotacja': 1, 'rany': 0, 'zasiecowany': False}], [1, 5, {'frakcja': 'moloch', 'nazwa': 'sztab', 'rotacja': 0, 'rany': 0, 'zasiecowany': True}], [1, 7, {'frakcja': 'testowa', 'nazwa': 'sieciarz', 'rotacja': 2, 'rany': 0, 'zasiecowany': False}], [2, 2, {'frakcja': 'moloch', 'nazwa': 'sieciarz', 'rotacja': 0, 'rany': 0, 'zasiecowany': False}], [2, 4, {'frakcja': 'moloch', 'nazwa': 'sieciarz', 'rotacja': 3, 'rany': 0, 'zasiecowany': False}], [2, 8, {'frakcja': 'moloch', 'nazwa': 'sieciarz', 'rotacja': 1, 'rany': 0, 'zasiecowany': True}], [3, 3, {'frakcja': 'testowa', 'nazwa': 'sieciarz', 'rotacja': 5, 'rany': 0, 'zasiecowany': False}], [3, 7, {'frakcja': 'testowa', 'nazwa': 'sieciarz', 'rotacja': 3, 'rany': 0, 'zasiecowany': False}], [4, 6, {'frakcja': 'moloch', 'nazwa': 'opancerzonywartownik', 'rotacja': 2, 'rany': 0, 'zasiecowany': True}]]       
+
+
+        # print(correct_output)
+        assert(Diff().compare(output, correct_output))
+
+    
 # test = Tests()
 # test.test_bitwa1()

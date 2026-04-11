@@ -43,7 +43,11 @@ class Zeton:
             return (0 <= x < 5 and 0 <= y < 9)
 
         def rotate(self, rotacja):
+            if (self.zasiecowany):
+                return 0
+            
             self.rotacja = rotacja
+            return 1
 
         def dostan_rane(self, obrazenia, kierunek, czy_blokowalny=False):
             # kierunek -> skad przychodzi atak
@@ -64,8 +68,6 @@ class Zeton:
             #     self.board[self.x][self.y] = None
 
         def melee(self, board, x, y, direction, power):
-            # print("mlelelelel")
-
             czy_sztab = (self.nazwa == "sztab")
             # print()
             # frakcja = board.get_type(x, y)
@@ -78,6 +80,7 @@ class Zeton:
             if(not board.is_valid_target(nx, ny, self.frakcja, czy_sztab)):
                 return
 
+            print(f"melee: ({x},{y}) -> ({nx},{ny}), jestem {self.frakcja}, {self.nazwa}, kierunek {direction}, power {power}")
             board.board[nx][ny].dostan_rane(power, direction)
 
         def shoot(self, board, x, y, direction, power):
@@ -103,6 +106,7 @@ class Zeton:
 
         def activate(self, board, inicjatywa):
             if (self.zasiecowany):
+                # print("Jestem zasieciowany, nie moge atakowac, smuteczek", self.frakcja, self.nazwa)
                 return
             
             if(inicjatywa not in self.wlasciwosci.get("inicjatywa", [])):

@@ -222,20 +222,23 @@ class sieciarze:
                     cel.odsieciuj()
 
         for i in self.status_sieciarzy:
+            akt = board.board[i[0]][i[1]]
+            
             if self.status_sieciarzy[i] != 1:
+                akt.zasieciuj()    
                 continue
                 
-            akt = board.board[i[0]][i[1]]
-
             for kier in akt["siec"]:
                 kier = (kier + akt.rotacja + 6) % 6
                 nx, ny = board.go(i[0], i[1], kier)
+                cel = board.board[nx][ny]
 
-                if not board.is_valid_target(nx, ny, akt.frakcja):
+                if (not board.is_valid_target(nx, ny, akt.frakcja)) or cel.czy_sieciarz() == True:
                     continue
 
-                cel = board.board[nx][ny]
                 cel.zasieciuj()
+
+        self.status_sieciarzy = dict(self.status_sieciarzy)
 
         # print("--------------------------------------------\n")
 
