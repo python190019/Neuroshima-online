@@ -67,6 +67,8 @@ class Board:
         return self.board[x][y].nazwa
 
     def is_valid_target(self, x, y, frakcja, czy_sztab=False):
+        if (not self.is_index_on_board(x, y)):
+            return False
         if(not self.on_board(x, y)):
             return False
         if(self.is_empty(x, y)):
@@ -79,6 +81,9 @@ class Board:
 
     def is_empty(self, x, y):
         return (self.board[x][y] == None)
+
+    def is_index_on_board(self, x, y):
+        return (0 <= x < self.width and 0 <= y < self.length)
 
     def on_board(self, x, y):
         if(not isinstance(x, int)):
@@ -116,6 +121,7 @@ class Board:
 
     def bitwa(self):
         for inicjatywa in range(self.max_inicjatywa, -1, -1):
+            self.kwestia_sieciarzy()
             for x in range(self.width):
                 for y in range(self.length):
                     if(self.is_empty(x, y)):
@@ -144,7 +150,7 @@ class Board:
                     row.append(None)
                 else:
                     # print(type(board.board[i][j]))
-                    row.append((self.board[i][j].nazwa, self.board[i][j].rotacja))
+                    row.append((self.board[i][j].frakcja[0], self.board[i][j].nazwa, self.board[i][j].rotacja))
                     # row.append(self.board[i][j].zeton_to_json())
             print(row)
 

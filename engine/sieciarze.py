@@ -214,6 +214,13 @@ class sieciarze:
 
         # return self.status_sieciarzy
 
+        for i in range(self.board.width):
+            for j in range(self.board.length):
+                cel = board.board[i][j]
+                
+                if (cel != None):
+                    cel.odsieciuj()
+
         for i in self.status_sieciarzy:
             if self.status_sieciarzy[i] != 1:
                 continue

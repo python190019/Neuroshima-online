@@ -26,12 +26,15 @@ class Zeton:
                 "nazwa": self.nazwa,
                 "rotacja": self.rotacja,
                 "rany": self.rany,
-                # "zasiecowany": self.zasiecowany
+                "zasiecowany": self.zasiecowany
             }
             return json
         
         def zasieciuj(self):
             self.zasiecowany = True
+        
+        def odsieciuj(self):
+            self.zasiecowany = False
 
         def czy_sieciarz(self):
             return ("siec" in self.wlasciwosci)
@@ -44,6 +47,8 @@ class Zeton:
 
         def dostan_rane(self, obrazenia, kierunek, czy_blokowalny=False):
             # kierunek -> skad przychodzi atak
+            # print("dostalem rane", self.frakcja, self.nazwa, obrazenia, kierunek, czy_blokowalny)
+            
             kierunek2 = (kierunek - self.rotacja + 6) % 6
             pancerz = self.wlasciwosci.get("pancerz", {})
 
@@ -59,10 +64,14 @@ class Zeton:
             #     self.board[self.x][self.y] = None
 
         def melee(self, board, x, y, direction, power):
+            # print("mlelelelel")
+
             czy_sztab = (self.nazwa == "sztab")
             # print()
             # frakcja = board.get_type(x, y)
             nx, ny = board.go(x, y, direction)
+
+            # print(f"melee: ({x},{y}) -> ({nx},{ny}), kierunek {direction}, power {power}")
             if(not board.on_board(nx, ny)):
                 return
             
@@ -93,6 +102,9 @@ class Zeton:
 
 
         def activate(self, board, inicjatywa):
+            if (self.zasiecowany):
+                return
+            
             if(inicjatywa not in self.wlasciwosci.get("inicjatywa", [])):
                 return
             
@@ -102,7 +114,8 @@ class Zeton:
             for type in ataki.keys():
                 attack_function = self.attack_functions.get(type)
                 for (direction, power) in ataki[type]:
-                    attack_function(board, self.x, self.y, direction, power)
+                    direct = (direction + self.rotacja) % 6
+                    attack_function(board, self.x, self.y, direct, power)
 
 
             # if "inicjatywa" in self.wlasciwosci and nr_inicjatywy in self["inicjatywa"]:
