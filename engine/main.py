@@ -4,14 +4,15 @@ import wszystkie_frakcje
 from akcje import Actions
 from akcje import State
 from random import shuffle
+from variable import *
 
 class Game:
     def __init__(self, data):
         self.board = Board()
+        self.actions = Actions(self)
         self.faza = data["faza"]
         self.available_actions = {}
-        self.game_over = 0
-        self.actions = Actions(self)
+        self.game_over = False
 
 
         if(self.faza == "newgame"):
@@ -23,12 +24,16 @@ class Game:
             # status = True
             # while(status):
             status = self.actions.handler(self)
-            if(status == False):
+            if(not status):
                 self.actions.invalid_move()
+
+            status = self.actions.user_available_actions(self)
+            if(not status):
+                print("INVALID STATE")
 
     def setup_pile(self, frakcja):
         for nazwa in wszystkie_frakcje.frakcje.get(frakcja, {}):
-            for _ in range(wszystkie_frakcje.frakcje[frakcja][nazwa]["liczbajednostek"]):
+            for _ in range(wszystkie_frakcje.frakcje[frakcja][nazwa][Token.UNIT_COUNT]):
                 self.pile[frakcja].append(nazwa)
         shuffle(self.pile[frakcja])
 
@@ -39,8 +44,8 @@ class Game:
         self.current_frakcja = None
         # self.user_actions = []
         self.next_turns = []
-        self.next_turns.append({"frakcja" : frakcja1, "typ" : "wystaw_sztab"})
-        self.next_turns.append({"frakcja" : frakcja2, "typ" : "wystaw_sztab"})
+        self.next_turns.append({Turn.FRACTION : frakcja1, Turn.TYPE : Turn.Type.HQ_PLACEMENT})
+        self.next_turns.append({Turn.FRACTION : frakcja2, Turn.TYPE : Turn.Type.HQ_PLACEMENT})
         self.pile = {
                     frakcja1 : [], 
                     frakcja2 : []
@@ -64,6 +69,7 @@ class Game:
         self.state = data["state"]
         self.selected = data["selected"]
         self.board.import_board(data["board"])
+        self.actions.kwestia_sieciarzy(self.board)
         self.pile = data["pile"]
         self.hand = data["hand"]
         self.available_actions = data["available_actions"]
@@ -99,7 +105,7 @@ class Game:
         print("State:", self.state)
         print("Selected:", self.selected)
         print("Current frakcja:", self.current_frakcja)
-        # print("User actions:", self.user_actions)
+        # print("Next_turns:", self.next_turns)
         print("Board:")
         self.board.print_board()
         for frakcja in self.hand.keys():
@@ -112,10 +118,14 @@ class Game:
 
     def print_available_actions(self, available_actions):
         # print("Available actions:")
-        print("Hand:", available_actions["hand"])
+        print("Hand:", available_actions[UI.HAND])
         print("Board:")
-        for row in available_actions["board"]:
-            for hex in row:
-                print(hex, end=" ")
-            print()
-        print("Bottoms:", available_actions["bottoms"])
+        for x in range(self.board.width):
+            row = []
+            for y in range(self.board.length):
+                if(not self.board.on_board(x, y)):
+                    continue
+                row.append(available_actions[UI.BOARD][x][y])
+            print(row)
+        print("Bottoms:", available_actions[UI.BOTTOM])
+

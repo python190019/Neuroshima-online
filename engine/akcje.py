@@ -1,83 +1,96 @@
 from copy import deepcopy
 
+from collections import defaultdict
 import wszystkie_frakcje
 from variable import *
+from zeton import Zeton
+from sieciarze import Sieciarze
 
 class Actions:
     def __init__(self, game):
         self.MAX_HAND_SIZE = 3
-        self.bottoms = [Bottom.END_TURN, Bottom.DISCARD, Bottom.USE, Bottom.CANCEL,Bottom.YES, Bottom.NO]
+        self.bottoms = [Bottom.END_TURN, Bottom.DISCARD, Bottom.USE, Bottom.CANCEL, Bottom.YES, Bottom.NO]
         self.available_structure = {
-            "hand" : False,
-            "bottoms" : {bottom : False for bottom in self.bottoms}
+            UI.HAND : False,
+            UI.BOTTOM : {bottom : False for bottom in self.bottoms}
         }
         self.bottom_handlers = {
             Bottom.END_TURN : self.handle_end_turn,
+            Bottom.DISCARD : self.handle_discard,
             Bottom.CANCEL : self.handle_cancel,
             Bottom.USE : self.handle_use
         }
         self.action_handlers = {
-            Action_Type.BOARD : self.handle_board,
-            Action_Type.HAND : self.handle_hand,
-            Action_Type.ROTATE : self.handle_rotate,
-            Action_Type.BOTTOM : self.handle_bottom,
+            Action.Type.BOARD : self.handle_board,
+            Action.Type.HAND : self.handle_hand,
+            Action.Type.ROTATE : self.handle_rotate,
+            Action.Type.BOTTOM : self.handle_bottom,
         }
         self.instant_token_handlers = {
-            Instant_Token.BITWA : self.use_bitwa,
+            Token.Type.Instant.BITWA : self.bitwa,
+            Token.Type.Instant.MOVE : self.ruch,
+        }
+
+        self.state_handlers = {
+            State.SELECTED_HAND : self.hand_available_actions,
+            State.NO_SELECTION : self.default_available_actions,
+            State.MOVING : self.available_actions_ruch,
+            State.ROTATE : self.rotate_available_actions,
+            State.PLACING : self.placing_available_actions
         }
 
     #############################################################################
     #   Board functions       
     #############################################################################
     def wstawianie(self, game, action, nazwa):
-        # print("Wstawianie:", action, nazwa, frakcja)
+        print("Wstawianie:", action, nazwa)
         board = game.board
         frakcja = game.current_frakcja
         hand = game.hand[frakcja]
-        if((nazwa is None) or (self.get_zeton_type(nazwa, frakcja) != "plansza")):
+        if((nazwa is None) or (self.get_zeton_type(nazwa, frakcja) != Token.Type.BOARD)):
             return False
 
-        x = action["x"]
-        y = action["y"]
+        x = action[Action.Key.X]
+        y = action[Action.Key.Y]
         if(not board.on_board(x, y)):
             return False
 
         if(not board.is_empty(x, y)):
             return False
         
-        self.odrzuc(hand, nazwa)
-        zeton = {"nazwa" : nazwa, "frakcja" : frakcja, "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(x, y, zeton)
-        board.update_available_hexs([], [(x, y)], None)
-        
-        self.update_available_actions(game, deepcopy(self.available_structure))
+        self.odrzuc(hand, game.selected[Selected.SLOT])
+        # zeton = Zeton.default_token
+        # zeton[Token.NAME] = nazwa
+        # zeton[Token.FRACTION] = frakcja
+        game.board.postaw_zeton(x, y, Zeton.clear_token(nazwa, frakcja))
         game.state = State.ROTATE
-        game.selected = {"x" : x, "y" : y}
+        game.selected = {Selected.X : x, Selected.Y : y, Selected.NAME : nazwa}
         return True
+    
+    def kwestia_sieciarzy(self, board):
+        Sieciarze().kwestia_sieciarzy(board)
 
     #############################################################################
     #   Instant tokens functions 
     #############################################################################
     def available_actions_bitwa(self, game):
+        # print("bitwa available actions")
         available = self.available_structure
         game.board.update_available_hexs([], [], None)
         if(self.koniec_tury(game, True)):
-            available["bottoms"]["uzyj"] = True
+            available[UI.BOTTOM][Bottom.USE] = True
 
-        available["bottoms"]["discard"] = True
+        available[UI.BOTTOM][Bottom.DISCARD] = True
+        # print("available:", available)
         self.update_available_actions(game, available)
 
-    def use_bitwa(self, game, use=True):
-        if(not use):
-            self.available_actions_bitwa(game)
-            return None
-        
+    def use_bitwa(self, game):
         if(game.state != State.SELECTED_HAND):
             return False
         if(not self.koniec_tury(game)):
             return False
         
-        game.next_turns.insert(0, {"frakcja" : "bitwa", "typ" : None})
+        game.next_turns.insert(0, {Turn.FRACTION : Turn.BITWA, Turn.TYPE : None})
         self.poczatek_tury(game)
         return True
     
@@ -87,14 +100,60 @@ class Actions:
         self.poczatek_tury(game)
         return True
 
-
     def bitwa(self, game, mode):
-        if(mode == Variable.RUN):
+        # print("bitwa")
+        if(mode == Mode.RUN):
             return self.run_bitwa(game)
-        if(mode == Variable.AVAILABLE_ACTIONS):
-            self.available_actions_bitwa()
-        if(mode == Variable.USE):
-            self.use_bitwa()
+        if(mode == Mode.AVAILABLE_ACTIONS):
+            self.available_actions_bitwa(game)
+        if(mode == Mode.USE):
+            self.use_bitwa(game)
+
+    def available_actions_ruch(self, game):
+        available = deepcopy(self.available_structure)
+        if(game.state == State.SELECTED_HAND):
+            game.board.update_available_hexs([game.current_frakcja], game.board.ALL_HEXES, game.board.can_move)
+            available[UI.BOTTOM][Bottom.DISCARD] = True
+            available[UI.BOTTOM][Bottom.CANCEL] = True
+        
+        if(game.state == State.MOVING):
+            x = game.selected[Selected.X]
+            y = game.selected[Selected.Y]
+            adj = game.board.adjacent_hexes(x, y)
+            game.board.update_available_hexs([None], adj, None)
+            available[UI.BOTTOM][Bottom.CANCEL] = True
+
+        self.update_available_actions(game, available)
+
+    def use_ruch(self, game, action):
+        if(game.state == State.SELECTED_HAND):
+            x = action[Action.Key.X]
+            y = action[Action.Key.Y]
+            name = game.baord.get_name(x, y)
+            game.state = State.MOVING
+            game.selected = {Selected.X : x, Selected.Y : y, Selected.NAME : name}
+            # self.available_actions_ruch(game)
+            return True
+
+        if(game.state == State.MOVING):
+            x = game.selected[Selected.X]
+            y = game.selected[Selected.Y]
+            nx = action[Action.Key.X]
+            ny = action[Action.Key.Y]
+            game.board.przenies(x, y, nx, ny)
+            game.state = State.ROTATE
+            game.selected[Selected.X] = nx
+            game.selected[Selected.y] = ny
+            
+        return True
+
+
+
+    def ruch(self, game, mode, action={}):
+        if(mode == Mode.AVAILABLE_ACTIONS):
+            self.available_actions_ruch(game)
+        if(mode == Mode.USE):
+            return self.use_ruch(game, action)
     
     #############################################################################
     #   Hand functions       
@@ -111,8 +170,8 @@ class Actions:
         hand.append(nazwa)
         pile.remove(nazwa)
 
-    def odrzuc(self, hand, zeton):
-        hand.remove(zeton)
+    def odrzuc(self, hand, slot):
+        hand.pop(slot)
 
     def dociag(self, hand, pile):
         while(len(hand) < self.MAX_HAND_SIZE and len(pile) > 0):
@@ -127,70 +186,53 @@ class Actions:
 
         return hand[click]
 
-    def hand_available_actions(self, game):
-        frakcja = game.current_frakcja
-        name = game.hand[frakcja][game.selected["slot"]]
-        type = self.get_zeton_type(name, frakcja)
-        if(type == Token_Type.ON_BOARD):
-            available = deepcopy(self.available_structure)
-            game.board.update_available_hexs([None], game.board.ALL_HEXES, None)
-
-            available["bottoms"][Bottom.CANCEL] = True
-            if(game.faza != "sztaby"):
-                available["bottoms"][Bottom.DISCARD] = True
-
-        if(type == Token_Type.INSTANT):
-            function = self.instant_token_handlers.get(name, None)
-            available = function(game, Variable.AVAILABLE_ACTIONS)
-
-        self.update_available_actions(game, available)
-
     #############################################################################
     #   Turn functions       
     #############################################################################
     def poczatek_tury(self, game):
         if(game.current_frakcja != None):
             return False
-        frakcja = game.next_turns[0]["frakcja"]
-        typ = game.next_turns[0]["typ"]
+        frakcja = game.next_turns[0][Turn.FRACTION]
+        typ = game.next_turns[0][Turn.TYPE]
         game.current_frakcja = frakcja
         
-        if(frakcja == Variable.BITWA):
-            self.bitwa(game)
+        if(frakcja == Turn.BITWA):
+            self.bitwa(game, Mode.RUN)
             return True
 
-        if(typ == Turn_Type.HQ_PLACEMENT):
-            game.faza = "sztaby"
+        if(typ == Turn.Type.HQ_PLACEMENT):
+            game.faza = Phase.HQ_PLACEMENT
             self.dobierz(game.hand[frakcja], game.pile[frakcja], "sztab")
 
         else:
-            game.faza = "tura"
+            game.faza = Phase.GAME
             self.dociag(game.hand[frakcja], game.pile[frakcja])
 
         if(len(game.pile[frakcja]) == 0):
-            game.next_turns.append({"frakcja" : "bitwa", "typ" : "ostatnia"})
+            game.next_turns.append({Turn.FRACTION : Turn.BITWA, Turn.TYPE : Turn.Type.LAST})
 
+        self.prepare_for_new_action(game)
         return True
 
     def koniec_tury(self, game, check=False):
         next_turn = game.next_turns[0]
-        frakcja = next_turn["frakcja"]
-        typ = next_turn["typ"]
+        frakcja = next_turn[Turn.FRACTION]
+        typ = next_turn[Turn.TYPE]
 
-        if((typ == Turn_Type.HQ_PLACEMENT) and (len(game.hand[frakcja]) > 0)):
+        if((typ == Turn.Type.HQ_PLACEMENT) and (len(game.hand[frakcja]) > 0)):
             return False
         
         # if(frakcja == "bitwa"):
         #     return True
         
-        if(frakcja != "bitwa" and len(game.hand[frakcja]) == 3):
+        if(frakcja != Turn.BITWA and len(game.hand[frakcja]) == self.MAX_HAND_SIZE):
             return False
         
         if(check):
             return True
         
         game.next_turns.pop(0)
-        game.next_turns.append({"frakcja" : frakcja, "typ" : "tura"})
+        game.next_turns.append({Turn.FRACTION : frakcja, Turn.TYPE : Turn.Type.STANDARD})
         game.current_frakcja = None
         return True
 
@@ -198,11 +240,11 @@ class Actions:
     #   General functions       
     #############################################################################
     def get_zeton_type(self, nazwa, frakcja):
-        return wszystkie_frakcje.frakcje.get(frakcja, {}).get(nazwa, {}).get("typ", None)
+        return wszystkie_frakcje.frakcje.get(frakcja, {}).get(nazwa, {}).get(Token.TYPE, None)
 
-    def invalid_move(self, user_actions):
+    def invalid_move(self, message=""):
         print("INVALID MOVE")
-        user_actions.clear()
+        
     
     def get_first(self, actions):
         if(actions is None or len(actions) == 0):
@@ -216,12 +258,38 @@ class Actions:
     def default_available_actions(self, game):
         available = deepcopy(self.available_structure)
         if(self.koniec_tury(game, check=True)):
-            available["bottoms"][Bottom.END_TURN] = True
+            available[UI.BOTTOM][Bottom.END_TURN] = True
         
         game.board.update_available_hexs([], [], None)
-        available["hand"] = True
+        available[UI.HAND] = True
 
         self.update_available_actions(game, available)
+
+    def rotate_available_actions(self, game):
+        x = game.selected[Selected.X]
+        y = game.selected[Selected.Y]
+        available = deepcopy(self.available_structure)
+        game.board.update_available_hexs([game.current_frakcja], [(x, y)], None)
+        self.update_available_actions(game, available)
+
+    def placing_available_actions(self, game):
+        available = deepcopy(self.available_structure)
+        game.board.update_available_hexs([None], game.board.ALL_HEXES, None)
+
+        available[UI.BOTTOM][Bottom.CANCEL] = True
+        if(game.faza != Phase.HQ_PLACEMENT):
+            available[UI.BOTTOM][Bottom.DISCARD] = True
+        
+        self.update_available_actions(game, available)
+
+    def hand_available_actions(self, game):
+        name = game.selected[Selected.NAME]
+        function = self.instant_token_handlers.get(name, None)
+        if(function is None):
+            return False
+        function(game, Mode.AVAILABLE_ACTIONS)
+
+        return True
 
     def update_hand_available_actions(self, current_frakcja, hand, available_hand):
         actions = {key : [False for i in range(self.MAX_HAND_SIZE)] for key in hand.keys()}
@@ -237,10 +305,18 @@ class Actions:
     def update_available_actions(self, game, available_actions):
         # print("AVAILABLE ACTIONS:", available_actions)
         game.available_actions = {}
-        game.available_actions["hand"] = self.update_hand_available_actions(game.current_frakcja, game.hand, available_actions["hand"])
-        game.available_actions["board"] = game.board.available_hexs
-        game.available_actions["bottoms"] = available_actions["bottoms"]
+        game.available_actions[UI.HAND] = self.update_hand_available_actions(game.current_frakcja, game.hand, available_actions[UI.HAND])
+        game.available_actions[UI.BOARD] = game.board.available_hexs
+        game.available_actions[UI.BOTTOM] = available_actions[UI.BOTTOM]
         # print(game.available_actions["board"])
+
+    def user_available_actions(self, game):
+        function = self.state_handlers.get(game.state, None)
+        if(function is None):
+            return False
+        function(game)
+        return True
+
 
     #############################################################################
     #   Bottoms functions      
@@ -263,13 +339,19 @@ class Actions:
     def handle_use(self, game):
         if game.state != State.SELECTED_HAND:
             return False
-        frakcja = game.current_frakcja
-        nazwa = self.get_from_hand(game.hand[frakcja], game.selected["slot"])
+        nazwa = game.selected[Selected.NAME]
         function = self.instant_token_handlers.get(nazwa, None)
         if function is None:
             return False
         
-        function(game, Variable.USE)
+        function(game, Mode.USE)
+
+    def handle_discard(self, game):
+        if game.state != State.SELECTED_HAND:
+            return False
+        self.odrzuc(self.game.hand[game.current_frakcja], self.selected[Selected.SLOT])
+        self.prepare_for_new_action(game)
+        return True
 
     #############################################################################
     #   Handler functions      
@@ -277,36 +359,48 @@ class Actions:
     def prepare_for_new_action(self, game):
         game.state = State.NO_SELECTION
         game.selected = None
-        self.default_available_actions(game)
 
     def handle_board(self, game, action):
-        if game.state == State.SELECTED_HAND:
-            slot = game.selected["slot"]
-            hand = game.hand[game.current_frakcja]
-            name = self.get_from_hand(hand, slot)
+        print("handle_board")
+        if game.state == State.PLACING:
+            name = game.selected[Selected.NAME]
             return self.wstawianie(game, action, name)
+        
+        elif(game.state == State.SELECTED_HAND):
+            function = self.instant_token_handlers.get(name, None)
+            if(function is None):
+                return False
+            return function(game, Mode.USE, action)
 
         else:
             return False
         
     def handle_hand(self, game, action):
+        # print("handle hand")
         if game.state != State.NO_SELECTION:
             return False
         
         hand = game.hand[game.current_frakcja]
-        nazwa = self.get_from_hand(hand, action["slot"])
+        nazwa = self.get_from_hand(hand, action[Action.Key.SLOT])
+        # print(nazwa)
+        # print(game.current_frakcja)
+        type = self.get_zeton_type(nazwa, game.current_frakcja)
         if(nazwa is None):
-            # self.invalid_move(game.user_actions)
             return False
 
-        game.state = State.SELECTED_HAND
-        game.selected = {"slot" : action["slot"]}
-        self.hand_available_actions(game)
+        # print(type)
+        if(type == Token.Type.BOARD):
+            game.state = State.PLACING
+        
+        if(type == Token.Type.INSTANT):
+            game.state = State.SELECTED_HAND
+        game.selected = {Selected.SLOT : action[Action.Key.SLOT], Selected.NAME : nazwa}
+        # self.hand_available_actions(game)
         return True
 
     def handle_bottom(self, game, action):
-        name = action["bottom"]
-        if(not game.available_actions["bottoms"][name]):
+        name = action[Action.Key.BOTTOM]
+        if(not game.available_actions[UI.BOTTOM][name]):
             return False
 
         function = self.bottom_handlers.get(name, None)
@@ -316,10 +410,11 @@ class Actions:
             return False
 
     def handle_rotate(self, game, action):
-        x = action["x"]
-        y = action["y"]
-        rotation = action["rotation"]
+        x = action[Action.Key.X]
+        y = action[Action.Key.Y]
+        rotation = action[Action.Key.ROTATION]
         game.board.rotate(x, y, rotation)
+        self.kwestia_sieciarzy(game.board)
         self.prepare_for_new_action(game)
         return True
 
@@ -330,7 +425,7 @@ class Actions:
         # if(action is None):
         #     return None
         
-        function = self.action_handlers.get(action["type"], None)
+        function = self.action_handlers.get(action[Action.Key.TYPE], None)
         if(function is not None):
             return function(game, action)
             

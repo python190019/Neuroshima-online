@@ -1,19 +1,38 @@
 import wszystkie_frakcje
+from variable import *
+from copy import deepcopy
 
 class Zeton:
+        default_token = {
+            Token.NAME : None,
+            Token.FRACTION : None,
+            Token.ROTATION : 0,
+            Token.DAMAGE : 0,
+            # Token.WIRED : False
+        }
+
+        @classmethod
+        def clear_token(cls, name, fraction):
+            token = deepcopy(cls.default_token)
+            token[Token.NAME] = name
+            token[Token.FRACTION] = fraction
+            return token
+    
         def __init__(self,  x, y, data):
-            self.frakcja = data["frakcja"]
-            self.nazwa = data["nazwa"]
-            self.rotacja = data["rotacja"]
-            self.rany = data["rany"]
+            # print(data)
+            # print("token.name:", Token.NAME)
+            self.frakcja = data[Token.FRACTION]
+            self.nazwa = data[Token.NAME]
+            self.rotacja = data[Token.ROTATION]
+            self.rany = data[Token.DAMAGE]
             self.x = x
             self.y = y
             self.wlasciwosci = wszystkie_frakcje.frakcje.get(self.frakcja, {}).get(self.nazwa, {})
             self.zasiecowany = False
             self.attack_functions = {
-                "melee" : self.melee,
-                "shoot" : self.shoot,
-                "gauss" : self.gauss
+                Attack.MELEE : self.melee,
+                Attack.SHOOT : self.shoot,
+                Attack.GAUSS : self.gauss
             }
 
         def __getitem__(self, key):
@@ -22,11 +41,11 @@ class Zeton:
         
         def zeton_to_json(self):
             json = {
-                "frakcja": self.frakcja,
-                "nazwa": self.nazwa,
-                "rotacja": self.rotacja,
-                "rany": self.rany,
-                "zasiecowany": self.zasiecowany
+                Token.FRACTION: self.frakcja,
+                Token.NAME: self.nazwa,
+                Token.ROTATION: self.rotacja,
+                Token.DAMAGE: self.rany,
+                Token.WIRED: self.zasiecowany
             }
             return json
         
@@ -36,11 +55,14 @@ class Zeton:
         def odsieciuj(self):
             self.zasiecowany = False
 
-        def czy_sieciarz(self):
-            return ("siec" in self.wlasciwosci)
+        def czy_zasieciowany(self):
+            return self.zasiecowany
 
-        def czy_w_planszy(self, x, y):
-            return (0 <= x < 5 and 0 <= y < 9)
+        def czy_sieciarz(self):
+            return (Token.Stats.WIRE in self.wlasciwosci)
+
+        # def czy_w_planszy(self, x, y):
+        #     return (0 <= x < 5 and 0 <= y < 9)
 
         def rotate(self, rotacja):
             if (self.zasiecowany):
@@ -54,7 +76,7 @@ class Zeton:
             # print("dostalem rane", self.frakcja, self.nazwa, obrazenia, kierunek, czy_blokowalny)
             
             kierunek2 = (kierunek - self.rotacja + 6) % 6
-            pancerz = self.wlasciwosci.get("pancerz", {})
+            pancerz = self.wlasciwosci.get(Token.Stats.ARMOR, {})
 
             if (kierunek2 in pancerz) and (czy_blokowalny):
                 obrazenia -= 1
@@ -62,7 +84,7 @@ class Zeton:
             self.rany += obrazenia
 
         def koniec_inicjatywy(self):
-            return(self["hp"] > self.rany)
+            return(self[Token.Stats.HP] > self.rany)
             # if self["hp"] <= self.rany:
             #     # wywolaj_medyka()
             #     self.board[self.x][self.y] = None
@@ -80,7 +102,7 @@ class Zeton:
             if(not board.is_valid_target(nx, ny, self.frakcja, czy_sztab)):
                 return
 
-            print(f"melee: ({x},{y}) -> ({nx},{ny}), jestem {self.frakcja}, {self.nazwa}, kierunek {direction}, power {power}")
+            # print(f"melee: ({x},{y}) -> ({nx},{ny}), jestem {self.frakcja}, {self.nazwa}, kierunek {direction}, power {power}")
             board.board[nx][ny].dostan_rane(power, direction)
 
         def shoot(self, board, x, y, direction, power):
@@ -109,47 +131,14 @@ class Zeton:
                 # print("Jestem zasieciowany, nie moge atakowac, smuteczek", self.frakcja, self.nazwa)
                 return
             
-            if(inicjatywa not in self.wlasciwosci.get("inicjatywa", [])):
+            if(inicjatywa not in self.wlasciwosci.get(Token.Stats.INITIATIVE, [])):
                 return
             
             # print("aktywacja", self.nazwa, self.frakcja)
-            ataki = self.wlasciwosci["ataki"]
+            ataki = self.wlasciwosci[Token.Stats.ATTACKS]
 
             for type in ataki.keys():
                 attack_function = self.attack_functions.get(type)
                 for (direction, power) in ataki[type]:
                     direct = (direction + self.rotacja) % 6
                     attack_function(board, self.x, self.y, direct, power)
-
-
-            # if "inicjatywa" in self.wlasciwosci and nr_inicjatywy in self["inicjatywa"]:
-            #     if ("atak" in self.wlasciwosci):
-            #         # print(self.frakcja, self.nazwa, nr_inicjatywy)
-
-            #         for atak, sila in self["atak"]:
-            #             atak_obr = (atak + self.rotacja) % 6
-            #             nowyx = self.x + self.roza[atak_obr][0]
-            #             nowyy = self.y + self.roza[atak_obr][1]
-                        
-            #             if self.czy_w_planszy(nowyx, nowyy) and self.board[nowyx][nowyy] is not None:
-            #                 # print("nowyx, nowyy: ", nowyx, nowyy)
-            #                 if self.board[nowyx][nowyy].frakcja != self.frakcja:
-            #                     self.board[nowyx][nowyy].dostan_rane(sila, (atak_obr + 3) % 6, "atak")
-
-            #     if ("strzal" in self.wlasciwosci):
-            #         # print(self.frakcja, self.nazwa, nr_inicjatywy)
-
-            #         for strzal, sila in self["strzal"]:
-            #             strzal_obr = (strzal + self.rotacja) % 6
-            #             nowyx = self.x + self.roza[strzal_obr][0]
-            #             nowyy = self.y + self.roza[strzal_obr][1]
-                        
-            #             while self.czy_w_planszy(nowyx, nowyy):
-            #                 # print("nowyx, nowyy: ", nowyx, nowyy)
-
-            #                 if self.board[nowyx][nowyy] is not None:
-            #                     if self.board[nowyx][nowyy].frakcja != self.frakcja:
-            #                         self.board[nowyx][nowyy].dostan_rane(sila, (strzal_obr + 3) % 6, "strzal")
-            #                         break
-            #                 nowyx += self.roza[strzal_obr][0]
-            #                 nowyy += self.roza[strzal_obr][1]

@@ -6,7 +6,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from akcje import Actions
 from main import Game
 from plansza import Board
+from variable import *
 from diff import Diff
+from zeton import Zeton
 
 class DummyGame:
     def __init__(self):
@@ -15,30 +17,58 @@ class DummyGame:
         # self.bottoms = ["koniec tury", "kosz", "użyj", "cancel", "tak", "nie"]
 
 class Test_board:
+    def filled_board(self, expr):
+        return [[expr for _ in range(Board.length)] for _ in range(Board.width)]
+    
     def test_on_board(self):
         board = Board()
+        assert (board.on_board(0, 1) == False)
+        assert (board.on_board(0, 5) == False)
         assert (board.on_board(0, 8) == False)
+        assert (board.on_board(0, 2) == True)
+        assert (board.on_board(0, 6) == True)
+
+        assert (board.on_board(1, 1) == True)
+        assert (board.on_board(1, 7) == True)
+        assert (board.on_board(1, 4) == False)
+        assert (board.on_board(1, 9) == False)
+
+        assert (board.on_board(2, 0) == True)
         assert (board.on_board(2, 4) == True)
+        assert (board.on_board(2, 8) == True)
+        assert (board.on_board(2, -1) == False)
+        assert (board.on_board(2, 5) == False)
+        assert (board.on_board(2, 10) == False)
+
+        assert (board.on_board(3, 3) == True)
+        assert (board.on_board(3, 5) == True)
+        assert (board.on_board(3, 4) == False)
         assert (board.on_board(3, 0) == False)
 
+        assert (board.on_board(4, 1) == False)
+        assert (board.on_board(4, 5) == False)
+        assert (board.on_board(4, 8) == False)
+        assert (board.on_board(4, 2) == True)
+        assert (board.on_board(4, 6) == True)
+
     def fill_board(self, board):
-        zeton = {"nazwa" : "klaun", "frakcja" : "moloch", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(2, 4, zeton)
+        # zeton = {Token.NAME : "klaun", Token.FRACTION : "moloch", Token.DAMAGE : 0, Token.ROTATION : 0}
+        board.postaw_zeton(2, 4, Zeton.clear_token("klaun", "moloch"))
 
-        zeton = {"nazwa" : "szturmowiec", "frakcja" : "moloch", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(2, 2,zeton)
+        # zeton = {"nazwa" : "szturmowiec", "frakcja" : "moloch", "rany" : 0, "rotacja" : 0}
+        board.postaw_zeton(2, 2, Zeton.clear_token("szturmowiec", "moloch"))
 
-        zeton = {"nazwa" : "wartownik", "frakcja" : "moloch", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(0, 2, zeton)
+        # zeton = {"nazwa" : "wartownik", "frakcja" : "moloch", "rany" : 0, "rotacja" : 0}
+        board.postaw_zeton(0, 2, Zeton.clear_token("wartownik", "moloch"))
 
-        zeton = {"nazwa" : "mutek", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(1, 1,zeton)
+        # zeton = {"nazwa" : "mutek", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
+        board.postaw_zeton(1, 1, Zeton.clear_token("mutek", "borgo"))
 
-        zeton = {"nazwa" : "mutek", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(4, 2,zeton)
+        # zeton = {"nazwa" : "mutek", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
+        board.postaw_zeton(4, 2, Zeton.clear_token("mutek", "borgo"))
 
-        zeton = {"nazwa" : "sztab", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(3, 3, zeton)
+        # zeton = {"nazwa" : "sztab", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
+        board.postaw_zeton(3, 3, Zeton.clear_token("sztab", "borgo"))
 
 
     def test_available_hexes1(self):
@@ -46,7 +76,9 @@ class Test_board:
         self.fill_board(board)
 
         board.update_available_hexs([None, "moloch"], board.ALL_HEXES, None)
-        correct_output = [[True] * board.length for i in range(board.width)]
+        correct_output = self.filled_board(False)
+        for (x, y) in board.ALL_HEXES:
+            correct_output[x][y] = True
         correct_output[1][1] = False
         correct_output[4][2] = False
         correct_output[3][3] = False
@@ -59,7 +91,7 @@ class Test_board:
         x, y = board.find_zeton("sztab", "borgo")
         board.update_available_hexs(["moloch"], board.adjacent_hexes(x, y), None)
         # print(board.available_hexs)
-        correct_output = [[False] * board.length for i in range(board.width)]
+        correct_output = self.filled_board(False)
         correct_output[2][2] = True
         correct_output[2][4] = True
         assert(Diff().compare(board.available_hexs, correct_output))

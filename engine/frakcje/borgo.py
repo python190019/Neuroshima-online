@@ -1,113 +1,119 @@
 import json
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from variable import Token
+from variable import Attack
 
 wlasciwosci = {
     ############## wojownicy
     "mutek": {
-        "typ": "plansza",
-        "liczbajednostek": 6,
-        "hp": 1,
-        "ataki": {
-            "melee": [[0, 1], [1, 1], [5, 1]],
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 6,
+        Token.Stats.HP: 1,
+        Token.Stats.ATTACKS: {
+            Attack.MELEE: [[0, 1], [1, 1], [5, 1]],
         },
-        "inicjatywa": [2]
+        Token.Stats.INITIATIVE: [2]
     },
     "nożownik": {
-        "typ": "plansza",
-        "liczbajednostek": 4,
-        "hp": 1,
-        "ataki": {
-            "melee": [[4, 1], [5, 1]],
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 4,
+        Token.Stats.HP: 1,
+        Token.Stats.ATTACKS: {
+            Attack.MELEE: [[4, 1], [5, 1]],
         },
-        "inicjatywa": [3]
+        Token.Stats.INITIATIVE: [3]
     },
     "sieciarz": {
-        "typ": "plansza",
-        "liczbajednostek": 2,
-        "hp": 1,
-        "ataki": {
-            "melee": [[2, 3]],
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 2,
+        Token.Stats.HP: 1,
+        Token.Stats.ATTACKS: {
+            Attack.MELEE: [[2, 3]],
         },
-        "siec" : [2],
-        "inicjatywa": [1]
+        Token.Stats.WIRE : [2],
+        Token.Stats.INITIATIVE: [1]
     },
     "super-mutant": {
-        "typ": "plansza",
-        "liczbajednostek": 1,
-        "hp": 2,
-        "ataki": {
-            "melee": [[0, 2], [1, 2], [5, 1]],
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 1,
+        Token.Stats.HP: 2,
+        Token.Stats.ATTACKS: {
+            Attack.MELEE: [[0, 2], [1, 2], [5, 1]],
         },
         "pancerz" : [0, 1, 5],
-        "inicjatywa": [2]
+        Token.Stats.INITIATIVE: [2]
     },
     "siłacz": {
-        "typ": "plansza",
-        "liczbajednostek": 2,
-        "hp": 1,
-        "ataki": {
-            "melee": [[0, 2]],
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 2,
+        Token.Stats.HP: 1,
+        Token.Stats.ATTACKS: {
+            Attack.MELEE: [[0, 2]],
         },
-        "inicjatywa": [2]
+        Token.Stats.INITIATIVE: [2]
     },
     "zabojca": {
-        "typ": "plansza",
-        "liczbajednostek": 2,
-        "hp": 1,
-        "ataki": {
-            "shoot": [[5, 1]],
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 2,
+        Token.Stats.HP: 1,
+        Token.Stats.ATTACKS: {
+            Attack.SHOOT: [[5, 1]],
         },
         "abilitki" : ["mobilność"],
-        "inicjatywa": [3]
+        Token.Stats.INITIATIVE: [3]
     },
     ############## sztab
     "sztab": {
-        "typ": "plansza",
-        "liczbajednostek": 1,
-        "hp": 20,
-        "ataki": {
-            "melee": [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1]],
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 1,
+        Token.Stats.HP: 20,
+        Token.Stats.ATTACKS: {
+            Attack.MELEE: [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1]],
         },
         "wyzsza_inicjatywa": [0, 1, 2, 3, 4, 5],
-        "inicjatywa": [0]
+        Token.Stats.INITIATIVE: [0]
     },
 
     ############## moduły
     "medyk": {
-        "typ": "plansza",
-        "liczbajednostek": 1,
-        "hp": 1,
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 1,
+        Token.Stats.HP: 1,
         "leczenie": [0, 1, 5]
     },
     "oficer": {
-        "typ": "plansza",
-        "liczbajednostek": 2,
-        "hp": 1,
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 2,
+        Token.Stats.HP: 1,
         "wzmocniony_atak": [0, 1, 5]
     },
     "super-oficer": {
-        "typ": "plansza",
-        "liczbajednostek": 1,
-        "hp": 2,
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 1,
+        Token.Stats.HP: 2,
         "wzmocniony_atak": [0, 1, 5]
     },
     "zwiadowca": {
-        "typ": "plansza",
-        "liczbajednostek": 2,
-        "hp": 1,
+        Token.TYPE: Token.Type.BOARD,
+        Token.UNIT_COUNT: 2,
+        Token.Stats.HP: 1,
         "wyzsza_inicjatywa": [0, 1, 5]
     },
 
     ############# natychmiastowe
     "bitwa": {
-        "typ": "natychmiastowy",
-        "liczbajednostek": 6,
+        Token.TYPE: Token.Type.INSTANT,
+        Token.UNIT_COUNT: 6,
     },
     "ruch": {
-        "typ": "natychmiastowy",
-        "liczbajednostek": 4,
+        Token.TYPE: Token.Type.INSTANT,
+        Token.UNIT_COUNT: 4,
     },
     "granat": {
-        "typ": "natychmiastowy",
-        "liczbajednostek": 1,
+        Token.TYPE: Token.Type.INSTANT,
+        Token.UNIT_COUNT: 1,
     }
 }

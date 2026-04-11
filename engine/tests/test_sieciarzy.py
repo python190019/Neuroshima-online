@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from collections import defaultdict
 from plansza import Board
+from variable import *
 
 # from plansza import Board
 
@@ -42,39 +43,39 @@ def test_scc():
 
     # [0, 5]
     board.postaw_zeton(2, 4, { 
-        "frakcja": "moloch",
-        "nazwa": "sieciarz",
-        "rotacja": 1,
-        "rany": 0
+        Token.FRACTION: "moloch",
+        Token.NAME: "sieciarz",
+        Token.ROTATION: 1,
+        Token.DAMAGE: 0
     })
 
     board.postaw_zeton(0, 4, { 
-        "frakcja": "moloch",
-        "nazwa": "sieciarz",
-        "rotacja": 3,
-        "rany": 0
+        Token.FRACTION: "moloch",
+        Token.NAME: "sieciarz",
+        Token.ROTATION: 3,
+        Token.DAMAGE: 0
     })
 
     # [0]
     board.postaw_zeton(1, 3, {
-        "frakcja": "testowa",
-        "nazwa": "sieciarz",
-        "rotacja": 2,
-        "rany": 0
+        Token.FRACTION: "testowa",
+        Token.NAME: "sieciarz",
+        Token.ROTATION: 2,
+        Token.DAMAGE: 0
     })
 
     board.postaw_zeton(2, 6, {
-        "frakcja": "testowa",
-        "nazwa": "sieciarz",
-        "rotacja": 0,
-        "rany": 0
+        Token.FRACTION: "testowa",
+        Token.NAME: "sieciarz",
+        Token.ROTATION: 0,
+        Token.DAMAGE: 0
     })
 
     board.postaw_zeton(1, 5, {
-        "frakcja": "testowa",
-        "nazwa": "sieciarz",
-        "rotacja": 5,
-        "rany": 0
+        Token.FRACTION: "testowa",
+        Token.NAME: "sieciarz",
+        Token.ROTATION: 5,
+        Token.DAMAGE: 0
     })
 
     pop = defaultdict(int, {(2, 4): 1, (0, 4): 1, (1, 5): 1, (1, 3): 1, (2, 6): 2})
@@ -89,10 +90,10 @@ def test_scc():
     assert (data == pop)
 
     board.postaw_zeton(1, 1, { 
-        "frakcja": "moloch",
-        "nazwa": "sieciarz",
-        "rotacja": 1,
-        "rany": 0
+        Token.FRACTION: "moloch",
+        Token.NAME: "sieciarz",
+        Token.ROTATION: 1,
+        Token.DAMAGE: 0
     })
 
     pop = defaultdict(int, {(1, 1): 1, (2, 4): 1, (0, 4): 1, (1, 5): 2, (1, 3): 2, (2, 6): 2})

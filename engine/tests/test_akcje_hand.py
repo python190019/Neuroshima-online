@@ -39,5 +39,5 @@ class Test_hand:
         game = DummyGame()
         actions = Actions(game)
         hand = ["a", "b"]
-        actions.odrzuc(hand, "a")
+        actions.odrzuc(hand, 0)
         assert hand == ["b"]

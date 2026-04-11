@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-class sieciarze:
+class Sieciarze:
     def dfs1(self, akt):
         self.odw.add(akt)
 
