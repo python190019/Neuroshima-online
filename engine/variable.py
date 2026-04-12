@@ -39,6 +39,10 @@ class Token:
             BITWA = "bitwa"
             MOVE = "ruch"
             BOMB = "bomba"
+            GRENADE = "granat"
+            SNIPER = "snajper"
+        class Board:
+            HQ = "sztab"
 
     class Stats:
         ARMOR = "pancerz"

@@ -73,19 +73,22 @@ class Zeton:
             self.rotacja = rotacja
             return 1
 
-        def dostan_rane(self, obrazenia, kierunek, czy_blokowalny=False):
+        def dostan_rane(self, obrazenia):
+            self.rany += obrazenia
             # kierunek -> skad przychodzi atak
             # print("dostalem rane", self.frakcja, self.nazwa, obrazenia, kierunek, czy_blokowalny)
             
+
+        def attacked(self, obrazenia, kierunek, czy_blokowalny=False):
             kierunek2 = (kierunek - self.rotacja + 6) % 6
             pancerz = self.wlasciwosci.get(Token.Stats.ARMOR, {})
 
             if (kierunek2 in pancerz) and (czy_blokowalny):
                 obrazenia -= 1
 
-            self.rany += obrazenia
+            self.dostan_rane(obrazenia)
 
-        def koniec_inicjatywy(self):
+        def is_alive(self):
             return(self[Token.Stats.HP] > self.rany)
             # if self["hp"] <= self.rany:
             #     # wywolaj_medyka()
@@ -105,7 +108,7 @@ class Zeton:
                 return
 
             # print(f"melee: ({x},{y}) -> ({nx},{ny}), jestem {self.frakcja}, {self.nazwa}, kierunek {direction}, power {power}")
-            board.board[nx][ny].dostan_rane(power, direction)
+            board.board[nx][ny].attacked(power, direction)
 
         def shoot(self, board, x, y, direction, power):
             # frakcja = board.get_type(x, y)
@@ -117,14 +120,14 @@ class Zeton:
             if(not board.is_valid_target(nx, ny, self.frakcja)):
                 return
             
-            board.board[nx][ny].dostan_rane(power, direction, True)
+            board.board[nx][ny].attacked(power, direction, True)
 
         def gauss(self, board, x, y, direction, power):
             # self.frakcja = board.get_type(x, y)
             nx, ny = x, y
             while(board.on_board(nx, ny)):
                 if(board.is_valid_target(nx, ny, self.frakcja)):
-                    board.board[nx][ny].dostan_rane(power, direction, True)
+                    board.board[nx][ny].attacked(power, direction, True)
                 nx, ny = board.go(nx, ny, direction)
 
         def is_boost(self, frakcja):

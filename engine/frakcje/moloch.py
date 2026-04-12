@@ -177,11 +177,11 @@ wlasciwosci = {
         }
     },
     ############# natychmiastowe
-    "bitwa": {
+    Token.Type.Instant.BITWA: {
         Token.TYPE : Token.Type.INSTANT,
         Token.UNIT_COUNT : 4,
     },
-    "ruch": {
+    Token.Type.Instant.MOVE: {
         Token.TYPE : Token.Type.INSTANT,
         Token.UNIT_COUNT : 1,
     },
@@ -189,7 +189,7 @@ wlasciwosci = {
         Token.TYPE : Token.Type.INSTANT,
         Token.UNIT_COUNT : 5,
     },
-    "bomba": {
+    Token.Type.Instant.BOMB: {
         Token.TYPE : Token.Type.INSTANT,
         Token.UNIT_COUNT : 1,
     }

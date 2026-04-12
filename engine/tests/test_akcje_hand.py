@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from akcje import Actions
 
 class DummyGame:
+    MAX_HAND_SIZE = 3
     def __init__(self):
         self.bottoms = {"xd"}
 
@@ -39,5 +40,5 @@ class Test_hand:
         game = DummyGame()
         actions = Actions(game)
         hand = ["a", "b"]
-        actions.odrzuc(hand, 0)
+        actions.odrzuc(hand, "a")
         assert hand == ["b"]

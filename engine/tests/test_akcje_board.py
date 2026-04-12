@@ -11,6 +11,7 @@ from diff import Diff
 from zeton import Zeton
 
 class DummyGame:
+    MAX_HAND_SIZE = 3
     def __init__(self):
         board = Board()
         pass
@@ -88,8 +89,8 @@ class Test_board:
         board = Board()
         self.fill_board(board)
 
-        x, y = board.find_zeton("sztab", "borgo")
-        board.update_available_hexs(["moloch"], board.adjacent_hexes(x, y), None)
+        hq = board.find_zeton("sztab", "borgo")
+        board.update_available_hexs(["moloch"], board.adjacent_hexes(hq.x, hq.y), None)
         # print(board.available_hexs)
         correct_output = self.filled_board(False)
         correct_output[2][2] = True

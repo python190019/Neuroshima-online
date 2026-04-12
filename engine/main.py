@@ -7,13 +7,20 @@ from random import shuffle
 from variable import *
 
 class Game:
+    bottoms = [Bottom.END_TURN, Bottom.DISCARD, Bottom.USE, Bottom.CANCEL, Bottom.YES, Bottom.NO]
+    available_structure = {
+        UI.HAND : False,
+        UI.BOTTOM : {bottom : False for bottom in bottoms}
+    }
+    MAX_HAND_SIZE = 3
+
     def __init__(self, data):
         self.board = Board()
         self.actions = Actions(self)
         self.faza = data["faza"]
+        # self.frakcje = data["frakcje"]
         self.available_actions = {}
         self.game_over = False
-
 
         if(self.faza == "newgame"):
             self.start_game(data["frakcje"]["player1"], data["frakcje"]["player2"])
@@ -23,9 +30,11 @@ class Game:
 
             # status = True
             # while(status):
+            
             if(not self.actions.handler(self)):
                 self.actions.invalid_move()
-
+                return
+            
             if(not self.actions.user_available_actions(self)):
                 print("INVALID STATE")
 
@@ -39,7 +48,10 @@ class Game:
     def start_game(self, frakcja1, frakcja2):
         self.state = State.NO_SELECTION
         self.selected = None
+        self.active_action = None
         self.current_frakcja = None
+        self.frakcje = [frakcja1, frakcja2]
+        self.enemy = {self.frakcje[0] : self.frakcje[1], self.frakcje[1] : self.frakcje[0]}
         # self.user_actions = []
         self.next_turns = []
         self.next_turns.append({Turn.FRACTION : frakcja1, Turn.TYPE : Turn.Type.HQ_PLACEMENT})
@@ -60,12 +72,15 @@ class Game:
     def import_game_state(self, data):
         # print("Importing game state...")
         self.faza = data["faza"]
+        self.frakcje = data["frakcje"]
+        self.enemy = {self.frakcje[0] : self.frakcje[1], self.frakcje[1] : self.frakcje[0]}
         self.next_turns = data["next_turns"]
         self.current_frakcja = data["current_frakcja"]
         self.action = data["action"]
         # self.user_actions = data["user_actions"]
         self.state = data["state"]
         self.selected = data["selected"]
+        self.active_action = data["active_action"]
         self.board.import_board(data["board"])
         self.actions.kwestia_sieciarzy(self.board)
         self.pile = data["pile"]
@@ -84,8 +99,10 @@ class Game:
             self.actions.fill_hand(self.hand[frakcja])
         data = {
                 "faza" : self.faza,
+                "frakcje" : self.frakcje,
                 "state" : self.state,
                 "selected" : self.selected,
+                "active_action" : self.active_action,
                 "next_turns" : self.next_turns,
                 "current_frakcja" : self.current_frakcja,
                 # "user_actions" : self.user_actions,
@@ -102,6 +119,7 @@ class Game:
         print("Faza:", self.faza)
         print("State:", self.state)
         print("Selected:", self.selected)
+        print("Active action:", self.active_action)
         print("Current frakcja:", self.current_frakcja)
         # print("Next_turns:", self.next_turns)
         print("Board:")

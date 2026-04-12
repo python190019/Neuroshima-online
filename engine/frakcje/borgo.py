@@ -114,15 +114,15 @@ wlasciwosci = {
     },
 
     ############# natychmiastowe
-    "bitwa": {
+    Token.Type.Instant.BITWA: {
         Token.TYPE: Token.Type.INSTANT,
         Token.UNIT_COUNT: 6,
     },
-    "ruch": {
+    Token.Type.Instant.MOVE: {
         Token.TYPE: Token.Type.INSTANT,
         Token.UNIT_COUNT: 4,
     },
-    "granat": {
+    Token.Type.Instant.GRENADE: {
         Token.TYPE: Token.Type.INSTANT,
         Token.UNIT_COUNT: 1,
     }

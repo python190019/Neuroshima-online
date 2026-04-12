@@ -1,3 +1,5 @@
+from variable import Token
+
 wlasciwosci = {
     "sieciarz": {
         "typ": "plansza",
@@ -11,4 +13,8 @@ wlasciwosci = {
         "hp": 1,
         "siec": [0, 1]
     },
+    Token.Type.Instant.SNIPER : {
+        Token.TYPE : Token.Type.INSTANT,
+        Token.UNIT_COUNT : 1,
+    }
 }

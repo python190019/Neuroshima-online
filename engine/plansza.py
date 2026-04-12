@@ -51,8 +51,13 @@ class Board:
                 if(pole is None):
                     continue
                 if(pole.nazwa == nazwa and pole.frakcja == frakcja):
-                    return (x, y)
+                    return self.board[x][y]
         return None
+
+    def not_is_hq(self, x, y):
+        if(self.is_empty(x, y)):
+            return True
+        return (self.board[x][y].nazwa != Token.Type.Board.HQ)
 
     def postaw_zeton(self, x, y, zeton):
         self.board[x][y] = Zeton(x, y, zeton)
@@ -91,6 +96,11 @@ class Board:
 
     # def is_index_on_board(self, x, y):
     #     return (0 <= x < self.width and 0 <= y < self.length)
+
+    def deal_damage(self, x, y, damage):
+        if(self.is_empty(x, y)):
+            return
+        self.board[x][y].dostan_rane(damage)
 
     def on_board(self, x, y):
         if(not isinstance(x, int)):
@@ -159,6 +169,19 @@ class Board:
                     continue
                 self.board[x][y].boost(self)
 
+    def check_hex(self, x, y):
+        if(self.board[x][y].is_empty()):
+            return True
+        return self.board[x][y].is_alive()
+
+    def zdejmij_trupy(self):
+        for x in range(self.width):
+            for y in range(self.length):
+                if(self.is_empty(x, y)):
+                    continue
+                if(not self.board[x][y].is_alive()):
+                    self.zdejmij_zeton(x, y)
+
     def bitwa(self):
         for inicjatywa in range(self.max_inicjatywa, -1, -1):
             print(f"--- Inicjatywa {inicjatywa} ---")
@@ -174,12 +197,7 @@ class Board:
                         continue
                     self.board[x][y].activate(self, inicjatywa)
             
-            for x in range(self.width):
-                for y in range(self.length):
-                    if(self.is_empty(x, y)):
-                        continue
-                    if(not self.board[x][y].koniec_inicjatywy()):
-                        self.board[x][y] = None
+            self.zdejmij_trupy()
     
     def kwestia_sieciarzy(self):
         self.sieciarze = Sieciarze()
