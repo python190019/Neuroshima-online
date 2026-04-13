@@ -67,6 +67,8 @@ class Board:
         self.board[x][y] = None
 
     def przenies(self, x, y, nx, ny):
+        if(x == nx and y == ny):
+            return
         self.board[nx][ny] = self.board[x][y]
         self.board[x][y] = None
 
@@ -206,6 +208,35 @@ class Board:
     def go(self, x, y, direction):
         return (x + self.roza[direction]["x"], y + self.roza[direction]["y"])
     
+    def is_adjacent(self, x1, y1, x2, y2):
+        dist = abs(x1 - x2) + abs(y1 - y2)
+        return dist == 2
+
+    def can_be_pushed(self, px, py, x, y):
+        if(self.is_empty(x, y)):
+            return False
+        if(self.board[x][y].czy_zasieciowany()):
+            return False
+        
+        pusher_adj = self.adjacent_hexes(px, py)
+        my_adj = self.adjacent_hexes(x, y)
+        for hex in my_adj:
+            if(hex not in pusher_adj):
+                return True
+        return False
+
+    def can_push(self, x, y):
+        if(self.is_empty(x, y)):
+            return False
+        if(self.board[x][y].czy_zasieciowany()):
+            return False
+        
+        for hex in self.adjacent_hexes(x, y):
+            nx, ny = hex
+            if(self.can_be_pushed(x, y, nx, ny)):
+                return True
+        return False
+
     def print_board(self):
         for i in range(self.width):
             row = []

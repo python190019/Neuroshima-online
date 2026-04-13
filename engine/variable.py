@@ -4,6 +4,8 @@ class State:
     PLACING = "placing"
     ROTATE = "rotate"
     MOVING = "moving"
+    SELECTED_PUSHER = "selected_pusher"
+    PUSHING = "pushing"
 
 class UI:
     BOTTOM = "bottom"
@@ -14,6 +16,8 @@ class Selected:
     SLOT = "slot"
     X = "x"
     Y = "y"
+    PUSHER_X = "pusher_x"
+    PUSHER_Y = "pusher_y"
     NAME = "name"
 
 
@@ -41,6 +45,7 @@ class Token:
             BOMB = "bomba"
             GRENADE = "granat"
             SNIPER = "snajper"
+            PUSH = "odepchniecie"
         class Board:
             HQ = "sztab"
 

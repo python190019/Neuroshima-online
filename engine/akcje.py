@@ -34,9 +34,10 @@ class Actions:
         self.state_handlers = {
             State.SELECTED_HAND : self.hand_available_actions,
             State.NO_SELECTION : self.default_available_actions,
-            State.MOVING : InstantToken(Token.Type.Instant.MOVE).available_actions,
+            # State.MOVING : InstantToken(Token.Type.Instant.MOVE).available_actions,
             State.ROTATE : self.rotate_available_actions,
-            State.PLACING : self.placing_available_actions
+            State.PLACING : self.placing_available_actions,
+            # State.SELECTED_PUSHer : InstantToken(Token.Type.Instant.PUSH).available_actions,
         }
 
     #############################################################################
@@ -237,6 +238,10 @@ class Actions:
         InstantToken(game.active_action).resolve(game, Mode.AVAILABLE_ACTIONS)
         return True
 
+    def instant_taken_available_actions(self, game):
+        name = game.active_action
+        InstantToken(name).resolve(game, Mode.AVAILABLE_ACTIONS)
+
     def update_hand_available_actions(self, current_frakcja, hand, available_hand):
         actions = {key : [False for i in range(self.MAX_HAND_SIZE)] for key in hand.keys()}
         if(not available_hand):
@@ -256,6 +261,13 @@ class Actions:
         game.available_actions[UI.BOTTOM] = available_actions[UI.BOTTOM]
 
     def user_available_actions(self, game):
+        print("Updating available actions...")
+        print("Current state:", game.state)
+        if(game.active_action is not None):
+            print("active action:", game.active_action)
+            self.instant_taken_available_actions(game)
+            return True
+
         function = self.state_handlers.get(game.state, None)
         if(function is None):
             return False
@@ -288,8 +300,7 @@ class Actions:
     #   Handler functions      
     #############################################################################
     def prepare_for_new_action(self, game):
-        if(game.state == State.ROTATE):
-            self.kwestia_sieciarzy(game.board)
+        self.kwestia_sieciarzy(game.board)
         game.state = State.NO_SELECTION
         game.selected = None
         game.active_action = None

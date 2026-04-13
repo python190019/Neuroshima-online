@@ -185,7 +185,7 @@ wlasciwosci = {
         Token.TYPE : Token.Type.INSTANT,
         Token.UNIT_COUNT : 1,
     },
-    "odepchniecie": {
+    Token.Type.Instant.PUSH: {
         Token.TYPE : Token.Type.INSTANT,
         Token.UNIT_COUNT : 5,
     },

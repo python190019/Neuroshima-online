@@ -145,7 +145,7 @@ def test_ruch_selected2():
     # print(output)
     active_hand = []
     active_bottoms = [Bottom.CANCEL]
-    active_hexes = [(3, 1), (3, 3)]
+    active_hexes = [(3, 1), (3, 3), (2, 2)]
     check_available_actions(active_hand, active_bottoms, active_hexes, output)
 
 def test_ruch3():
@@ -336,3 +336,133 @@ def test_sniper_use():
     assert(game.hand["testowa"] == [])
     zeton = game.board.board[2][2]
     assert(zeton.rany == 1)
+
+def test_push_selected():
+    data = deepcopy(default_game_state)
+    data["hand"]["moloch"].append(Token.Type.Instant.PUSH)
+    data["board"][1][1] = Zeton.clear_token("sieciarz", "borgo")
+    data["board"][1][1][Token.ROTATION] = 1
+    data["board"][3][1] = Zeton.clear_token("mutek", "borgo")
+    data["board"][2][4] = Zeton.clear_token("sztab", "borgo")
+
+    data["board"][2][2] = Zeton.clear_token("klaun", "moloch")
+    data["board"][2][0] = Zeton.clear_token("sztab", "moloch")
+    data["action"] = None
+    
+    game = Game(data)
+    data = game.export_game_state()
+    data["action"] = {Action.Key.TYPE : UI.HAND, Action.Key.SLOT : 0}
+    game = Game(data)
+
+    assert(game.state == State.SELECTED_HAND)
+    assert(game.selected[Selected.SLOT] == 0)
+    assert(game.selected[Selected.NAME] == Token.Type.Instant.PUSH)
+
+    output = game.available_actions
+    active_hand = []
+    active_bottoms = [Bottom.DISCARD, Bottom.CANCEL]
+    active_hexes = [(2, 2)]
+    # print(output)
+    check_available_actions(active_hand, active_bottoms, active_hexes, output)
+    
+
+def test_push_selected2():
+    data = deepcopy(default_game_state)
+    data["hand"]["moloch"].append(Token.Type.Instant.PUSH)
+    data["board"][1][1] = Zeton.clear_token("sieciarz", "borgo")
+    data["board"][1][1][Token.ROTATION] = 1
+    data["board"][3][1] = Zeton.clear_token("mutek", "borgo")
+    data["board"][2][4] = Zeton.clear_token("sztab", "borgo")
+
+    data["board"][2][2] = Zeton.clear_token("klaun", "moloch")
+    data["board"][2][0] = Zeton.clear_token("sztab", "moloch")
+    data["board"][4][2] = Zeton.clear_token("sieciarz", "moloch")
+
+    data["action"] = None
+    data["state"] = State.SELECTED_HAND
+    data["selected"] = {Selected.SLOT : 0, Selected.NAME : Token.Type.Instant.PUSH}
+    data["active_action"] = Token.Type.Instant.PUSH
+    # data["action"] = None
+    # game = Game(data)
+    data = Game(data).export_game_state()
+    data["action"] = {Action.Key.TYPE : UI.BOARD, Action.Key.X : 2, Action.Key.Y : 2}
+    game = Game(data)
+    # data["available_actions"][UI.BOARD][2][2] = True
+
+    assert(game.state == State.SELECTED_PUSHER)
+    assert(game.selected[Selected.X] == 2)
+    assert(game.selected[Selected.Y] == 2)
+    assert(game.selected[Selected.NAME] == "klaun")
+
+    output = game.available_actions
+    print(output)
+    active_hand = []
+    active_bottoms = [Bottom.CANCEL]
+    active_hexes = [(1, 1), (2, 4)]
+    check_available_actions(active_hand, active_bottoms, active_hexes, output)
+
+def test_push_target_selected():
+    data = deepcopy(default_game_state)
+    data["hand"]["moloch"].append(Token.Type.Instant.PUSH)
+    data["board"][1][1] = Zeton.clear_token("sieciarz", "borgo")
+    data["board"][1][1][Token.ROTATION] = 1
+    data["board"][3][1] = Zeton.clear_token("mutek", "borgo")
+    data["board"][2][4] = Zeton.clear_token("sztab", "borgo")
+
+    data["board"][2][2] = Zeton.clear_token("klaun", "moloch")
+    data["board"][2][0] = Zeton.clear_token("sztab", "moloch")
+    data["board"][4][2] = Zeton.clear_token("sieciarz", "moloch")
+
+    data["action"] = None
+    data["state"] = State.SELECTED_PUSHER
+    data["selected"] = {Selected.X : 2, Selected.Y : 2, Selected.NAME : "klaun"}
+    data["active_action"] = Token.Type.Instant.PUSH
+    # data["current_frakcja"] = "borgo"
+    data = Game(data).export_game_state()
+    data["action"] = {Action.Key.TYPE : UI.BOARD, Action.Key.X : 1, Action.Key.Y : 1}
+    game = Game(data)
+
+    assert(game.state == State.PUSHING)
+    assert(game.selected[Selected.NAME] == "sieciarz")
+    assert(game.selected[Selected.X] == 1)
+    assert(game.selected[Selected.Y] == 1)
+    assert(game.current_frakcja == "borgo")
+    output = game.available_actions
+    active_hand = []
+    active_bottoms = []
+    active_hexes = [(0, 2)]
+    check_available_actions(active_hand, active_bottoms, active_hexes, output)
+
+
+def test_push_use():
+    data = deepcopy(default_game_state)
+    data["hand"]["moloch"].append(Token.Type.Instant.PUSH)
+    data["board"][1][1] = Zeton.clear_token("sieciarz", "borgo")
+    data["board"][1][1][Token.ROTATION] = 1
+    data["board"][3][1] = Zeton.clear_token("mutek", "borgo")
+    data["board"][2][4] = Zeton.clear_token("sztab", "borgo")
+
+    data["board"][2][2] = Zeton.clear_token("klaun", "moloch")
+    data["board"][2][0] = Zeton.clear_token("sztab", "moloch")
+    data["board"][4][2] = Zeton.clear_token("sieciarz", "moloch")
+
+    data["action"] = None
+    data["state"] = State.PUSHING
+    data["selected"] = {Selected.X : 1, Selected.Y : 1, Selected.PUSHER_X : 2, Selected.PUSHER_Y : 2, Selected.NAME : "sieciarz"}
+    data["active_action"] = Token.Type.Instant.PUSH
+    data["current_frakcja"] = "borgo"
+
+    data = Game(data).export_game_state()
+    data["action"] = {Action.Key.TYPE : UI.BOARD, Action.Key.X : 0, Action.Key.Y : 2}
+    game = Game(data)
+
+    assert(game.state == State.NO_SELECTION)
+    assert(game.selected == None)
+    assert(game.active_action == None)
+    assert(game.board.board[1][1] == None)
+    zeton = game.board.board[0][2]
+    assert(zeton.nazwa == "sieciarz")
+    assert(zeton.frakcja == "borgo")
+    assert(zeton.rotacja == 1)
+    assert(game.hand["moloch"] == [])
+    assert(game.current_frakcja == "moloch")

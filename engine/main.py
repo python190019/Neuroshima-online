@@ -70,10 +70,11 @@ class Game:
         self.actions.default_available_actions(self)
 
     def import_game_state(self, data):
-        # print("Importing game state...")
+        print("Importing game state...")
         self.faza = data["faza"]
         self.frakcje = data["frakcje"]
         self.enemy = {self.frakcje[0] : self.frakcje[1], self.frakcje[1] : self.frakcje[0]}
+        print("Enemy mapping:", self.enemy)
         self.next_turns = data["next_turns"]
         self.current_frakcja = data["current_frakcja"]
         self.action = data["action"]
@@ -82,13 +83,13 @@ class Game:
         self.selected = data["selected"]
         self.active_action = data["active_action"]
         self.board.import_board(data["board"])
-        self.actions.kwestia_sieciarzy(self.board)
         self.pile = data["pile"]
         self.hand = data["hand"]
         self.available_actions = data["available_actions"]
         for frakcja in self.hand.keys():
             self.actions.resize_hand(self.hand[frakcja])
 
+        self.actions.kwestia_sieciarzy(self.board)
         # self.actions.print_game_state(self)
         
 
