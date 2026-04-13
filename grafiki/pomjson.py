@@ -20,7 +20,7 @@ ham3 = {
     "rany" : 2
 }
 board = [
-        ["None", "None", "None", "None", "None", "None", "None", "None", "None"],
+        ["None", "None", ham1, "None", "None", "None", "None", "None", "None"],
         ["None", "None", "None", "None", "None", "None", "None", "None", "None"],
         [ham1, "None", ham3, "None", ham2, "None", "None", "None", "None"],
         ["None", "None", "None", "None", "None", "None", "None", "None", "None"],

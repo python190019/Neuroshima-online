@@ -86,7 +86,7 @@ class MyApp(ShowBase):
         # self.setBackgroundColor(0, 0, 0)
         # self.a = 0.15
         # self.robhexa(0, 0, 2, 1)
-        # self.wszystko = []
+        self.wszystko = []
         self.pola = []
         # plansza(self, self.a)
         # self.kursor()
@@ -95,6 +95,9 @@ class MyApp(ShowBase):
         # self.pusty = obj(0, 0, "test.png", 0, 0, 0, 0, "pusty", self, 0, "hex", self.bok)
         # self.klikniety = self.pusty
         # self.podswietlone = dict()
+                #   x, z, imgPath, wys, szer, warstwa, rotacja, id, app, trans, klasa, a
+        # ter = obj(0, 0, "hegemonia/biegacz.png", 0.4, 0.4, 0, 0, "a", self, 1, "hex", 0.2)
+        # ter.wyswietl(True)
         stanplanszy(self)
         # nowy = obj(0, 0, "test.png", 0, 0, 0, 0, "pusty", self, 1, "hex", self.bok, 0)
         # nowy.wyswietl(True)
