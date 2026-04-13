@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 /grafiki/__pycache__/
+.cph/
+.vscode/
