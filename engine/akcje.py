@@ -53,11 +53,6 @@ class Actions:
 
         x = action[Action.Key.X]
         y = action[Action.Key.Y]
-        if(not board.on_board(x, y)):
-            return False
-
-        if(not board.is_empty(x, y)):
-            return False
         
         self.odrzuc(hand, game.selected[Selected.SLOT])
         game.board.postaw_zeton(x, y, Zeton.clear_token(nazwa, frakcja))
@@ -280,6 +275,7 @@ class Actions:
     #############################################################################
     def handle_end_turn(self, game):
         self.poczatek_tury(game)
+        self.koniec_tury(game)
         self.prepare_for_new_action(game)
         return True
 
