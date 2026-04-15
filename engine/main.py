@@ -5,6 +5,7 @@ from akcje import Actions
 from akcje import State
 from random import shuffle
 from variable import *
+from hand import Hand
 
 class Game:
     bottoms = [Bottom.END_TURN, Bottom.DISCARD, Bottom.USE, Bottom.CANCEL, Bottom.YES, Bottom.NO]

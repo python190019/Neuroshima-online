@@ -97,6 +97,8 @@ class Turn:
     FRACTION = "frakcja"
     class Type:
         LAST = "ostatnia"
+        FIRST = "pierwsza"
+        SECOND = "druga"
         STANDARD = "tura"
         HQ_PLACEMENT = "wystaw_sztab"
 
