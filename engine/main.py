@@ -13,7 +13,6 @@ class Game:
         UI.HAND : False,
         UI.BOTTOM : {bottom : False for bottom in bottoms}
     }
-    MAX_HAND_SIZE = 3
 
     def __init__(self, data):
         self.board = Board()
@@ -63,9 +62,10 @@ class Game:
                     }
         self.setup_pile(frakcja1)
         self.setup_pile(frakcja2)
-
-        self.hand = {frakcja1 : [], frakcja2 : []}
-        # self.faza = "gra"
+    
+        # self.hand = {frakcja1 : [], frakcja2 : []}
+        self.faza = "gra"
+        self.hand = Hand(self.frakcje)
         self.actions.poczatek_tury(self)
         # print("FAZA:", self.faza)
         self.actions.default_available_actions(self)
@@ -85,10 +85,11 @@ class Game:
         self.active_action = data["active_action"]
         self.board.import_board(data["board"])
         self.pile = data["pile"]
-        self.hand = data["hand"]
+        self.hand = Hand(self.frakcje).from_dict(data["hand"])
+        # self.hand = data["hand"]
         self.available_actions = data["available_actions"]
-        for frakcja in self.hand.keys():
-            self.actions.resize_hand(self.hand[frakcja])
+        # for frakcja in self.hand.keys():
+        #     self.actions.resize_hand(self.hand[frakcja])
 
         self.actions.kwestia_sieciarzy(self.board)
         # self.actions.print_game_state(self)
@@ -97,8 +98,8 @@ class Game:
     def export_game_state(self):
         print("Exporting game state...")
         self.print_game_state()
-        for frakcja in self.hand.keys():
-            self.actions.fill_hand(self.hand[frakcja])
+        # for frakcja in self.hand.keys():
+        #     self.actions.fill_hand(self.hand[frakcja])
         data = {
                 "faza" : self.faza,
                 "frakcje" : self.frakcje,
@@ -110,7 +111,7 @@ class Game:
                 # "user_actions" : self.user_actions,
                 "board" : self.board.board_to_json(), 
                 "pile" : self.pile,
-                "hand" : self.hand,
+                "hand" : self.hand.to_dict(),
                 "available_actions" : self.available_actions
                 }
         # print(data)
@@ -126,10 +127,12 @@ class Game:
         # print("Next_turns:", self.next_turns)
         print("Board:")
         self.board.print_board()
-        for frakcja in self.hand.keys():
-            print(frakcja)
-            # print("Pile:", self.pile[frakcja])
-            print("Hand:", self.hand[frakcja])
+        print("Hand:")
+        self.hand.print_hand()
+        # for frakcja in self.hand.keys():
+        #     print(frakcja)
+        #     # print("Pile:", self.pile[frakcja])
+        #     print("Hand:", self.hand[frakcja])
         print("Available actions:")
         self.print_available_actions(self.available_actions)
         print("\n---------------------------\n")

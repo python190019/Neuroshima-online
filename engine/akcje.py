@@ -10,7 +10,7 @@ from battle import Battle
 
 class Actions:
     def __init__(self, game):
-        self.MAX_HAND_SIZE = game.MAX_HAND_SIZE
+        # self.MAX_HAND_SIZE = game.MAX_HAND_SIZE
         self.bottom_handlers = {
             Bottom.END_TURN : self.handle_end_turn,
             Bottom.DISCARD : self.handle_discard,
@@ -47,14 +47,15 @@ class Actions:
         print("Wstawianie:", action, nazwa)
         board = game.board
         frakcja = game.current_frakcja
-        hand = game.hand[frakcja]
+        # hand = game.hand[frakcja]
         if((nazwa is None) or (self.get_zeton_type(nazwa, frakcja) != Token.Type.BOARD)):
             return False
 
         x = action[Action.Key.X]
         y = action[Action.Key.Y]
         
-        self.odrzuc(hand, game.selected[Selected.SLOT])
+        game.hand.discard_token(nazwa)
+        # self.odrzuc(hand, game.selected[Selected.NAME])
         game.board.postaw_zeton(x, y, Zeton.clear_token(nazwa, frakcja))
         game.state = State.ROTATE
         game.selected = {Selected.X : x, Selected.Y : y, Selected.NAME : nazwa}
@@ -67,33 +68,33 @@ class Actions:
     #############################################################################
     #   Hand functions       
     #############################################################################
-    def resize_hand(self, hand):
-        while(len(hand) > 0 and hand[-1] is None):
-            hand.pop(-1)
+    # def resize_hand(self, hand):
+    #     while(len(hand) > 0 and hand[-1] is None):
+    #         hand.pop(-1)
 
-    def fill_hand(self, hand):
-        while(len(hand) < self.MAX_HAND_SIZE):
-            hand.append(None)
+    # def fill_hand(self, hand):
+    #     while(len(hand) < self.MAX_HAND_SIZE):
+    #         hand.append(None)
 
-    def dobierz(self, hand, pile, nazwa):
-        hand.append(nazwa)
-        pile.remove(nazwa)
+    # def dobierz(self, hand, pile, nazwa):
+    #     hand.append(nazwa)
+    #     pile.remove(nazwa)
 
-    def odrzuc(self, hand, name):
-        hand.remove(name)
+    # def odrzuc(self, hand, name):
+    #     hand.remove(name)
 
-    def dociag(self, hand, pile):
-        while(len(hand) < self.MAX_HAND_SIZE and len(pile) > 0):
-                self.dobierz(hand, pile, pile[-1])
+    # def dociag(self, hand, pile):
+    #     while(len(hand) < self.MAX_HAND_SIZE and len(pile) > 0):
+    #             self.dobierz(hand, pile, pile[-1])
 
-    def get_from_hand(self, hand, click):
-        if(not isinstance(click, int)):
-            return None
+    # def get_from_hand(self, hand, click):
+    #     if(not isinstance(click, int)):
+    #         return None
 
-        if(len(hand) <= click):
-            return None
+    #     if(len(hand) <= click):
+    #         return None
 
-        return hand[click]
+    #     return hand[click]
 
     #############################################################################
     #   Turn functions       
@@ -109,13 +110,15 @@ class Actions:
             Battle(game)
             return True
 
+        game.hand.new_turn(frakcja, game.pile[frakcja], typ)
         if(typ == Turn.Type.HQ_PLACEMENT):
             game.faza = Phase.HQ_PLACEMENT
-            self.dobierz(game.hand[frakcja], game.pile[frakcja], "sztab")
+            game.hand.draw_token(game.pile[frakcja], "sztab")
+            # self.dobierz(game.hand[frakcja], game.pile[frakcja], "sztab")
 
         else:
             game.faza = Phase.GAME
-            self.dociag(game.hand[frakcja], game.pile[frakcja])
+            game.hand.draw_tokens(game.pile[frakcja])
 
         if(len(game.pile[frakcja]) == 0):
             game.next_turns.append({Turn.FRACTION : Turn.BITWA, Turn.TYPE : Turn.Type.LAST})
