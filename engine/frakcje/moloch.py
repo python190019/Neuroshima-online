@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from variable import Token
+from variable import Boost, Token
 from variable import Attack
 
 wlasciwosci = {
@@ -104,16 +104,6 @@ wlasciwosci = {
         Token.Stats.HP: 1,
         Token.Stats.WIRE: [0, 5]
     },
-    "sztab": {
-        Token.TYPE : Token.Type.BOARD,
-        Token.UNIT_COUNT : 1,
-        Token.Stats.HP: 20,
-        "wzmocniony_atak": [0, 1, 2, 3, 4, 5],
-        Token.Stats.ATTACKS : {
-            Attack.MELEE: [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1]],
-        },
-        Token.Stats.INITIATIVE: [0]
-    },
     "szturmowiec": {
         Token.TYPE : Token.Type.BOARD,
         Token.UNIT_COUNT : 1,
@@ -133,48 +123,66 @@ wlasciwosci = {
         },
         Token.Stats.INITIATIVE: [2]
     },
+    "sztab": {
+        Token.TYPE : Token.Type.BOARD,
+        Token.UNIT_COUNT : 1,
+        Token.Stats.HP: 20,
+        Token.Stats.ATTACKS : {
+            Attack.MELEE: [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1]],
+        },
+        Token.Stats.BOOSTS: {
+            Boost.SHOOT: [0, 1, 2, 3, 4, 5],
+        },
+        Token.Stats.BOOST_TARGET: "own",
+        Token.Stats.INITIATIVE: [0],
+    },
 
     ############## moduły
     "oficer": {
         Token.TYPE : Token.Type.BOARD,
         Token.UNIT_COUNT : 1,
         Token.Stats.HP: 1,
-        "wzmocnienia":{
-            "wzmocniony_strzal": [1, 3, 5]
-        }
+        Token.Stats.BOOSTS: {
+            Boost.SHOOT: [1, 3, 5],
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
     "zwiadowca": {
         Token.TYPE : Token.Type.BOARD,
         Token.UNIT_COUNT : 1,
         Token.Stats.HP: 1,
-        "wzmocnienia":{
-            "wyzsza_inicjatywa": [0, 2, 4]
-        }
+        Token.Stats.BOOSTS: {
+             Boost.INITIATIVE: [0, 2, 4]
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
     "matka": {
         Token.TYPE : Token.Type.BOARD,
         Token.UNIT_COUNT : 1,
         Token.Stats.HP: 1,
-        "wzmocnienia":{
-            "dodatkowa_inicjatywa": [0]
-        }
+        Token.Stats.BOOSTS: {
+            Boost.NEW_INITIATIVE: [0]
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
     "medyk": {
         Token.TYPE : Token.Type.BOARD,
         Token.UNIT_COUNT : 2,
         Token.Stats.HP: 1,
-        "wzmocnienia":{
-            "leczenie": [0, 2, 4]
-        }
+        Token.Stats.BOOSTS: {
+            Boost.HEAL: [0, 2, 4]
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
     "mozg": {
         Token.TYPE : Token.Type.BOARD,
         Token.UNIT_COUNT : 1,
         Token.Stats.HP: 1,
-        "wzmocnienia":{
-            "wzmocniony_strzal": [0, 2, 4],
-            "wzmocniony_atak": [0, 2, 4]
-        }
+        Token.Stats.BOOSTS: {
+            Boost.SHOOT: [0, 2, 4],
+            Boost.MELEE: [0, 2, 4]
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
     ############# natychmiastowe
     Token.Type.Instant.BITWA: {

@@ -1,3 +1,4 @@
+import battle
 import pytest
 import os
 import sys
@@ -8,6 +9,8 @@ from plansza import Board
 from diff import Diff
 from variable import *
 from zeton import Zeton
+from akcje_na_planszy import AkcjeNaPlanszy
+# form battle import Battle
 
 class Tests:
     def test_bitwa1(self):

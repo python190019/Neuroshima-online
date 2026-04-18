@@ -1,6 +1,10 @@
 from collections import defaultdict
 
 class Sieciarze:
+    def __init__(self, board):
+        self.board = board
+        self.kwestia_sieciarzy()
+
     def dfs1(self, akt):
         self.odw.add(akt)
 
@@ -176,9 +180,7 @@ class Sieciarze:
         #     napis = "aktywny" if self.status_sieciarzy[siec] == 1 else "zasieciowany"
         #     print("   ", siec, "->", napis)
 
-    def kwestia_sieciarzy(self, board):
-        self.board = board
-
+    def kwestia_sieciarzy(self):
         self.zbuduj_graf()
         self.policz_scc()
         self.zbuduj_graf_scc()
@@ -216,13 +218,13 @@ class Sieciarze:
 
         for i in range(self.board.width):
             for j in range(self.board.length):
-                cel = board.board[i][j]
+                cel = self.board.board[i][j]
                 
                 if (cel != None):
                     cel.odsieciuj()
 
         for i in self.status_sieciarzy:
-            akt = board.board[i[0]][i[1]]
+            akt = self.board.board[i[0]][i[1]]
             
             if self.status_sieciarzy[i] != 1:
                 akt.zasieciuj()    
@@ -230,10 +232,10 @@ class Sieciarze:
                 
             for kier in akt["siec"]:
                 kier = (kier + akt.rotacja + 6) % 6
-                nx, ny = board.go(i[0], i[1], kier)
-                cel = board.board[nx][ny]
+                nx, ny = self.board.go(i[0], i[1], kier)
+                cel = self.board.board[nx][ny]
 
-                if (not board.is_valid_target(nx, ny, akt.frakcja)) or cel.czy_sieciarz() == True:
+                if (not self.board.is_valid_target(nx, ny, akt.frakcja)) or cel.czy_sieciarz() == True:
                     continue
 
                 cel.zasieciuj()

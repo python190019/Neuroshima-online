@@ -3,8 +3,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from variable import Token
-from variable import Attack
+from variable import Token, Attack, Boost
 
 wlasciwosci = {
     ############## wojownicy
@@ -41,7 +40,7 @@ wlasciwosci = {
         Token.UNIT_COUNT: 1,
         Token.Stats.HP: 2,
         Token.Stats.ATTACKS: {
-            Attack.MELEE: [[0, 2], [1, 2], [5, 1]],
+            Attack.MELEE: [[0, 2], [1, 1], [5, 1]],
         },
         "pancerz" : [0, 1, 5],
         Token.Stats.INITIATIVE: [2]
@@ -73,9 +72,10 @@ wlasciwosci = {
         Token.Stats.ATTACKS: {
             Attack.MELEE: [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1]],
         },
-        "wzmocnienia": {
-            "wyzsza_inicjatywa": [0, 1, 2, 3, 4, 5]
+        Token.Stats.BOOSTS: {
+            Boost.INITIATIVE: [0, 1, 2, 3, 4, 5]
         },
+        Token.Stats.BOOST_TARGET: "own",
         Token.Stats.INITIATIVE: [0]
     },
 
@@ -84,33 +84,37 @@ wlasciwosci = {
         Token.TYPE: Token.Type.BOARD,
         Token.UNIT_COUNT: 1,
         Token.Stats.HP: 1,
-        "wzmocnienia": {
-            "leczenie": [0, 1, 5]
-        }
+        Token.Stats.BOOSTS: {
+            Boost.HEAL: [0, 1, 5]
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
     "oficer": {
         Token.TYPE: Token.Type.BOARD,
         Token.UNIT_COUNT: 2,
         Token.Stats.HP: 1,
-        "wzmocnienia": {
-            "wzmocniony_atak": [0, 1, 5]
-        }
+        Token.Stats.BOOSTS: {
+            Boost.MELEE: [0, 1, 5]
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
     "super-oficer": {
         Token.TYPE: Token.Type.BOARD,
         Token.UNIT_COUNT: 1,
         Token.Stats.HP: 2,
-        "wzmocnienia": {
-            "wzmocniony_atak": [0, 1, 5]
-        }
+        Token.Stats.BOOSTS: {
+            Boost.MELEE: [0, 1, 5]
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
     "zwiadowca": {
         Token.TYPE: Token.Type.BOARD,
         Token.UNIT_COUNT: 2,
         Token.Stats.HP: 1,
-        "wzmocnienia": {
-            "wyzsza_inicjatywa": [0, 1, 5]
-        }
+        Token.Stats.BOOSTS: {
+            Boost.INITIATIVE: [0, 1, 5]
+        },
+        Token.Stats.BOOST_TARGET: "own"
     },
 
     ############# natychmiastowe

@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from collections import defaultdict
 from plansza import Board
 from variable import *
+from akcje_na_planszy import AkcjeNaPlanszy
 
 # from plansza import Board
 
@@ -80,8 +81,10 @@ def test_scc():
 
     pop = defaultdict(int, {(2, 4): 1, (0, 4): 1, (1, 5): 1, (1, 3): 1, (2, 6): 2})
     
-    board.kwestia_sieciarzy()
-    data = board.sieciarze.status_sieciarzy
+    anp = AkcjeNaPlanszy(board)
+    anp.kwestia_sieciarzy()
+
+    data = anp.sieciarze.status_sieciarzy
 
     # print(data)
     # print(data == pop)
@@ -98,8 +101,10 @@ def test_scc():
 
     pop = defaultdict(int, {(1, 1): 1, (2, 4): 1, (0, 4): 1, (1, 5): 2, (1, 3): 2, (2, 6): 2})
     
-    board.kwestia_sieciarzy()
-    data = board.sieciarze.status_sieciarzy
+    anp = AkcjeNaPlanszy(board)
+    anp.kwestia_sieciarzy()
+
+    data = anp.sieciarze.status_sieciarzy
 
     # print(data)
     # print(data == pop)

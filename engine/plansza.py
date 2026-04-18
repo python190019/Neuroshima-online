@@ -1,3 +1,4 @@
+from akcje_na_planszy import AkcjeNaPlanszy
 from sieciarze import Sieciarze
 from zeton import Zeton
 from variable import *
@@ -83,11 +84,14 @@ class Board:
     def is_valid_target(self, x, y, frakcja, czy_sztab=False):
         # if (not self.is_index_on_board(x, y)):
         #     return False
+
+        print(f"valid target: ({x},{y}), frakcja {frakcja}, frakcja2 {self.get_type(x, y)}, czy_sztab {czy_sztab}")
+
         if(not self.on_board(x, y)):
             return False
         if(self.is_empty(x, y)):
             return False
-        if(self.get_type(x, y) == frakcja):
+        if(self.board[x][y].frakcja == frakcja):
             return False
         if(czy_sztab and self.get_name(x, y) == "sztab"):
             return False
@@ -164,13 +168,6 @@ class Board:
                 else:
                     self.available_hexs[x][y] = function(x, y)
 
-    def boost_all(self):
-        for x in range(self.width):
-            for y in range(self.length):
-                if(self.is_empty(x, y)):
-                    continue
-                self.board[x][y].boost(self)
-
     def check_hex(self, x, y):
         if(self.board[x][y].is_empty()):
             return True
@@ -188,22 +185,13 @@ class Board:
         for inicjatywa in range(self.max_inicjatywa, -1, -1):
             print(f"--- Inicjatywa {inicjatywa} ---")
 
-            self.kwestia_sieciarzy()
-            self.boost_all()
+            anp = AkcjeNaPlanszy(self)
 
-            # self.print_board()
-
-            for x in range(self.width):
-                for y in range(self.length):
-                    if(self.is_empty(x, y)):
-                        continue
-                    self.board[x][y].activate(self, inicjatywa)
-            
+            anp.reset_all()
+            anp.kwestia_sieciarzy()
+            anp.boost_all()
+            anp.aktywacja(inicjatywa)
             self.zdejmij_trupy()
-    
-    def kwestia_sieciarzy(self):
-        self.sieciarze = Sieciarze()
-        self.sieciarze.kwestia_sieciarzy(self)
 
     def go(self, x, y, direction):
         return (x + self.roza[direction]["x"], y + self.roza[direction]["y"])
@@ -256,6 +244,9 @@ class Board:
                     ))
                     # row.append(akt.zeton_to_json())
             print(row)
+
+    def czy_w_planszy(self, x, y):
+        return (0 <= x < 5 and 0 <= y < 9)
 
     def wszystkie_jednostki(self):
         answer = []

@@ -26,6 +26,13 @@ class Attack:
     SHOOT = "shoot"
     GAUSS = "gauss"
 
+class Boost:
+    MELEE = "melee"
+    SHOOT = "shoot"
+    INITIATIVE = "initiative"
+    NEW_INITIATIVE = "new_initiative"
+    HEAL = "heal"
+
 class Token:
     TYPE = "type"
     X = "x"
@@ -54,6 +61,8 @@ class Token:
         WIRE = "siec"
         HP = "hp"
         ATTACKS = "ataki"
+        BOOSTS = "modul"
+        BOOST_TARGET = "boost_target"
         INITIATIVE = "inicjatywa"
 
 
