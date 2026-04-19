@@ -17,6 +17,7 @@ class TokenFactory():
 
 class Token(ABC):
 
-    def __init__(self, fraction, name):
+    def __init__(self, fraction, name, type):
         self.fraction = fraction
         self.name = name
+        self.type

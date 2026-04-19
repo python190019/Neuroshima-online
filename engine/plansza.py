@@ -29,23 +29,33 @@ class Board:
                     
         self.max_inicjatywa = 10
 
+    def get_tile(self, pos):
+        x, y = pos
+        if not self.on_board(x, y):
+            return None
+        return self.board[x][y]
+    
+    def assign_to_tile(self, pos, new_tile):
+        x, y = pos
+        self.board[x][y] = new_tile
 
-    def adjacent_hexes(self, x, y):
+    def adjacent_hexes(self, pos):
         adjacents = []
         for diretion in self.roza.keys():
-            nx, ny = self.go(x, y, diretion)
-            if(self.on_board(nx, ny)):
-               adjacents.append((nx, ny))
+            neighbor = self.go(pos, diretion)
+            if(self.on_board(neighbor)):
+               adjacents.append(neighbor)
         return adjacents 
 
-    def is_on_bound(self, x, y):
-        if(not self.on_board(x, y)):
+    def is_on_bound(self, pos):
+        x, y = pos
+        if(not self.on_board(pos)):
             return False
         cx, cy = self.CENTER
         return (abs(cx - x) > 1 or abs(cy - y) > 2)
 
-    def not_on_bound(self, x, y):
-        return (not self.is_on_bound(x, y))
+    def not_on_bound(self, pos):
+        return (not self.is_on_bound(pos))
 
     def find_zeton(self, nazwa, frakcja):
         for x in range(self.width):
@@ -57,37 +67,44 @@ class Board:
                     return self.board[x][y]
         return None
 
-    def not_is_hq(self, x, y):
+    def not_is_hq(self, pos):
+        return self.get_tile(pos).name != BoardType.HQ
         if(self.is_empty(x, y)):
             return True
         return (self.board[x][y].nazwa != Token.Type.Board.HQ)
 
-    def postaw_zeton(self, x, y, zeton):
+    def postaw_zeton(self, pos, zeton):
+        x, y = pos
         self.board[x][y] = Zeton(x, y, zeton)
         # self.rotation_phase = True
 
-    def zdejmij_zeton(self, x, y):
-        self.board[x][y] = None
+    # def zdejmij_zeton(self, pos):
+    #     x, y = pos
+    #     self.board[x][y] = None
 
-    def przenies(self, x, y, nx, ny):
-        if(x == nx and y == ny):
+    def przenies(self, old_pos, new_pos):
+        if(old_pos == new_pos):
             return
-        self.board[nx][ny] = self.board[x][y]
-        self.board[x][y] = None
+        self.assign_to_tile(new_pos, self.get_tile(old_pos))
+        self.assign_to_tile(old_pos, None)
+        # self.board[nx][ny] = self.board[x][y]
+        # self.board[x][y] = None
 
-    def rotate(self, x, y, rotacja):
+    def rotate(self, pos, rotacja):
+        x, y = pos
         self.board[x][y].rotate(rotacja)
 
-    def get_name(self, x, y):
-        if(self.is_empty(x, y)):
-            return None
-        return self.board[x][y].nazwa
+    def get_name(self, pos):
+        return self.get_tile(pos).name
+        # if(self.is_empty(x, y)):
+        #     return None
+        # return self.board[x][y].nazwa
 
     def is_valid_target(self, x, y, frakcja, czy_sztab=False):
         # if (not self.is_index_on_board(x, y)):
         #     return False
 
-        print(f"valid target: ({x},{y}), frakcja {frakcja}, frakcja2 {self.get_type(x, y)}, czy_sztab {czy_sztab}")
+        # print(f"valid target: ({x},{y}), frakcja {frakcja}, frakcja2 {self.get_type((x, y))}, czy_sztab {czy_sztab}")
 
         if(not self.on_board(x, y)):
             return False
@@ -99,18 +116,20 @@ class Board:
             return False
         return True
 
-    def is_empty(self, x, y):
-        return (self.board[x][y] == None)
+    def is_empty(self, pos):
+        return self.get_tile(pos) == None
 
     # def is_index_on_board(self, x, y):
     #     return (0 <= x < self.width and 0 <= y < self.length)
 
-    def deal_damage(self, x, y, damage):
-        if(self.is_empty(x, y)):
+    def deal_damage(self, pos, damage):
+        if(self.is_empty(pos)):
             return
+        x, y = pos
         self.board[x][y].dostan_rane(damage)
 
-    def on_board(self, x, y):
+    def on_board(self, pos):
+        x, y = pos
         if(not isinstance(x, int)):
             return False
         if(not isinstance(y, int)):
@@ -130,24 +149,38 @@ class Board:
         # print(x, y)
         return True
 
-    def get_type(self, x, y):
-        if(not self.on_board(x, y)):
+    def get_relation(self, pos, fraction):
+        # x, y = pos
+        if(not self.on_board(pos)):
             return None
-        if(self.board[x][y] is None):
-            return None
-        return self.board[x][y].frakcja
+        if(self.is_empty(pos)):
+            return Relation.EMPTY
+        
+        if(self.get_type(pos) == fraction):
+            return Relation.FRIENDLY
+        return Relation.ENEMY
 
-    def can_move(self, x, y):
-        if(not self.on_board(x, y)):
+    def get_type(self, pos):
+        if(not self.on_board(pos)):
+            return None
+        if(self.is_empty(pos)):
+            return self.EMPTY
+        return self.get_tile(pos).fraction
+
+    def can_move(self, pos):
+        # x, y = hex
+        if(not self.on_board(pos)):
             return False
-        if(self.is_empty(x, y)):
-            return False
-        if(self.board[x][y].czy_zasieciowany()):
+        if(self.is_empty(pos)):
             return False
         
-        for hex in self.adjacent_hexes(x, y):
-            nx, ny = hex
-            if(self.is_empty(nx, ny)):
+        tile = self.get_tile(pos)
+        if(tile.czy_zasieciowany()):
+            return False
+        
+        for neighbor in self.adjacent_hexes(pos):
+            # nx, ny = hex
+            if(self.is_empty(neighbor)):
                 return True
         return False
 
@@ -158,18 +191,17 @@ class Board:
                     continue
                 self.board[x][y].boost(self)
 
-    def check_hex(self, x, y):
-        if(self.board[x][y].is_empty()):
+    def check_hex(self, pos):
+        if(self.is_empty(pos)):
             return True
-        return self.board[x][y].is_alive()
+        return self.get_tile(pos).is_alive()
 
     def zdejmij_trupy(self):
-        for x in range(self.width):
-            for y in range(self.length):
-                if(self.is_empty(x, y)):
-                    continue
-                if(not self.board[x][y].is_alive()):
-                    self.zdejmij_zeton(x, y)
+        for pos in self.ALL_HEXES:
+            if(self.is_empty(pos)):
+                continue
+            if(not self.get_tile(pos).is_alive()):
+                self.zdejmij_zeton(pos)
 
     def bitwa(self):
         for inicjatywa in range(self.max_inicjatywa, -1, -1):
@@ -183,43 +215,50 @@ class Board:
             anp.aktywacja(inicjatywa)
             self.zdejmij_trupy()
 
-    def go(self, x, y, direction):
+    def go(self, pos, direction):
+        x, y = pos
         return (x + self.roza[direction]["x"], y + self.roza[direction]["y"])
     
-    def is_adjacent(self, x1, y1, x2, y2):
+    def is_adjacent(self, pos1, pos2):
+        x1, y1 = pos1
+        x2, y2 = pos2
         dist = abs(x1 - x2) + abs(y1 - y2)
         return dist == 2
 
-    def can_be_pushed(self, px, py, x, y):
-        if(self.is_empty(x, y)):
+    def can_be_pushed(self, pusher_pos, my_pos):
+        if(self.is_empty(my_pos)):
             return False
-        if(self.board[x][y].czy_zasieciowany()):
+        tile = self.get_tile(my_pos)
+        if(tile.czy_zasieciowany()):
             return False
         
-        pusher_adj = self.adjacent_hexes(px, py)
-        my_adj = self.adjacent_hexes(x, y)
-        for hex in my_adj:
+        pusher_adj = self.adjacent_hexes(pusher_pos)
+        for hex in self.adjacent_hexes(my_pos):
             if(hex not in pusher_adj):
                 return True
         return False
 
-    def can_push(self, x, y):
-        if(self.is_empty(x, y)):
+    def can_push(self, pos):
+        if(self.is_empty(pos)):
             return False
-        if(self.board[x][y].czy_zasieciowany()):
+        tile = self.get_tile(pos)
+        if(tile.czy_zasieciowany()):
             return False
         
-        for hex in self.adjacent_hexes(x, y):
-            nx, ny = hex
-            if(self.can_be_pushed(x, y, nx, ny)):
+        for neighbor in self.adjacent_hexes(pos):
+            # nx, ny = hex
+            if(self.can_be_pushed(pusher_pos=pos, my_pos=neighbor)):
                 return True
         return False
 
     def print_board(self):
+        # for pos in self.ALL_HEXES:
+
         for i in range(self.width):
             row = []
             for j in range(self.length):
-                if(not self.on_board(i, j)):
+                pos = (i, j)
+                if(not self.on_board(pos)):
                     continue
                 if(self.board[i][j] is None):
                     row.append(None)
@@ -242,7 +281,7 @@ class Board:
         answer = []
         for x in range(self.width):
             for y in range(self.length):
-                if(self.is_empty(x, y)):
+                if(self.is_empty((x, y))):
                     continue
                 answer.append([x, y, self.board[x][y].zeton_to_json()])
         return answer

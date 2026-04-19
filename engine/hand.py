@@ -24,7 +24,7 @@ class Hand():
     def add_token(self, token):
         self.tokens.append(token)
 
-    def discard_last(self):
+    def discard_active_token(self):
         self.tokens.pop(self.active_token)
         self.active_token = None
 
@@ -32,14 +32,14 @@ class Hand():
         token = self.get_active_token()
         if(name != token):
             return False
-        self.discard_last()
+        self.discard_active_token()
 
     def get_hand_limit(self, turn_type):
         return self.HAND_LIMITS.get(turn_type, self.DEFAULT_HAND_LIMIT)
 
     def draw_tokens(self, pile, turn_type):
         if(turn_type == Turn.Type.HQ_PLACEMENT):
-            drawn_token = Token.Type.Board.HQ
+            drawn_token = TokenType.Board.HQ
             pile.remove_token(drawn_token)
             self.add_token(drawn_token)
             return

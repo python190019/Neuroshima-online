@@ -11,10 +11,12 @@ class State:
 
 class Selected:
     SLOT = "slot"
+    POS = "pos"
     X = "x"
     Y = "y"
     PUSHER_X = "pusher_x"
     PUSHER_Y = "pusher_y"
+    PUSHER_POS = "pusher_pos"
     NAME = "name"
 
 
@@ -72,6 +74,7 @@ class Action:
         TYPE = "type"
         X = "x"
         Y = "y"
+        POS = "pos"
         SLOT = "slot"
         BOTTOM = "bottom"
         ROTATION = "rotation"
@@ -109,3 +112,8 @@ class Mode:
     USE = "use"
     RUN = "run"
     VALIDATE = "validate"
+
+class Relation:
+    EMPTY = "empty"
+    FRIENDLY = "friendly"
+    ENEMY = "enemy"

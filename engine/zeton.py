@@ -2,8 +2,9 @@ from copy import deepcopy
 import wszystkie_frakcje
 from variable import *
 from copy import deepcopy
+from token import Token
 
-class Zeton:
+class Zeton(Token):
     DEFAULT = {
         TokenKey.NAME : "default",
         TokenKey.FRACTION : "neutral",
@@ -13,6 +14,7 @@ class Zeton:
         TokenKey.Y : -1
         # Token.WIRED : False
     }
+    TYPE = "board"
 
     @classmethod
     def clear_token(cls, name, fraction):
@@ -27,7 +29,7 @@ class Zeton:
         # print("token.name:", Token.NAME)
         # self.frakcja = data[Token.FRACTION]
         # self.nazwa = data[Token.NAME]
-        super().__init__(name, fraction)
+        super().__init__(name, fraction, self.TYPE)
         self.rotacja = merged[TokenKey.ROTATION]
         self.rany = merged[TokenKey.DAMAGE]
         self.x = merged[TokenKey.X]

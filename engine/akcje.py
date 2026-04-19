@@ -94,7 +94,7 @@ class Actions:
         self.prepare_for_new_action(state)
         return True
 
-    def koniec_tury(self, state, check=False):
+    def koniec_tury(self, state):
         # print("check:", check)
         # print("next turns:", game.next_turns)
         next_turn = state.next_turns[0]
@@ -102,11 +102,11 @@ class Actions:
         typ = next_turn[Turn.TYPE]
         player = state.current_player
 
-        if(player.hand.is_full()):
-            return False
+        # if(player.hand.is_full()):
+        #     return False
         
-        if(check):
-            return True
+        # if(check):
+        #     return True
         
         state.next_turns.pop(0)
         state.next_turns.append({Turn.FRACTION : frakcja, Turn.TYPE : Turn.Type.STANDARD})
@@ -123,6 +123,11 @@ class Actions:
         print("INVALID MOVE")
         if(message):
             print(message)
+
+    def get_enemy(self, my_fraction, fractions):
+        for fraction in fractions:
+            if(my_fraction != fraction):
+                return fraction
 
     #############################################################################
     #   Validation functions       
@@ -197,11 +202,11 @@ class Actions:
     #############################################################################
     #   Handler functions      
     #############################################################################
-    def prepare_for_new_action(self, game):
-        self.kwestia_sieciarzy(game.board)
-        game.state = State.NO_SELECTION
-        game.selected = None
-        game.active_action = None
+    def prepare_for_new_action(self, state):
+        self.kwestia_sieciarzy(state.board)
+        state.state = State.NO_SELECTION
+        state.selected = None
+        state.active_action = None
 
     def handle_board(self, game, action):
         print("handle_board")
