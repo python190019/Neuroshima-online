@@ -1,6 +1,7 @@
 from variable import Selected, Phase
 from boardfilter import BoardFilter
 from contex import ActionContextContext
+from available_action_result import AvailableActionResult
 # from 
 
 class Bottom:
@@ -123,13 +124,25 @@ class AvailableActions():
         # name = game.active_action
         # InstantToken(name).resolve(game, Mode.AVAILABLE_ACTIONS)
 
+    def update_available_actions(self, actions : AvailableActionResult):
+        self.update_board_availability(actions.board_filter)
+        if(actions.can_cancel):
+            self.enable(Bottom.CANCEL)
+
+        if(actions.can_discard):
+            self.enable(Bottom.DISCARD)
+
+        if(actions.can_use):
+            self.enable(Bottom.USE)
+
     def user_available_actions(self, game):
         # print("Updating available actions...")
         # print("Current state:", game.state)
         token = self.ctx.player.hand.get_active_token()
 
         if(token is not None):
-            token.get_available_actions(self.ctx)
+            actions = token.get_available_actions(self.ctx)
+            self.update_available_actions(actions)
             # print("active action:", game.active_action)
             # self.instant_taken_available_actions(game)
             # return True

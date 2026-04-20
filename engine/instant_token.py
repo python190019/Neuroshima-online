@@ -93,23 +93,15 @@ class InstantToken(Token):
         if(state.state == State.SELECTED_HAND):
             return AvailableActionResult(
                 board_filter=BoardFilter(
-                    positions=[
-                        hex for hex in ctx.board.ALL_HEXES
-                        if ctx.board.can_move(hex)
-                        and ctx.board.get_relation(hex, ctx.fraction) == Relation.FRIENDLY
-                    ]
+                    positions= ctx.board.get_friendly(ctx.fraction),
+                    predicate= lambda ctx, tile : ctx.board.can_move(tile)
                 ),
                 can_discard=True,
                 can_cancel=True
             )
-            # game.board.update_available_hexs([game.current_frakcja], game.board.ALL_HEXES, game.board.can_move)
-            # available[UI.BOTTOM][Bottom.DISCARD] = True
-            # available[UI.BOTTOM][Bottom.CANCEL] = True
         
         if(state.state == State.MOVING):
             pos = state.selected[Selected.POS]
-            # x = state.selected[Selected.X]
-            # y = state.selected[Selected.Y]
             positions = [
                 hex for hex in ctx.board.adjacent_hexes(pos)
                 if ctx.board.is_empty(hex)
@@ -117,15 +109,7 @@ class InstantToken(Token):
             return AvailableActionResult(
                 positions = positions + [pos] 
             )
-            # adj = game.board.adjacent_hexes(x, y)
-            # # print(adj)
-            # game.board.update_available_hexs([None], adj, None)
-            # game.board.available_hexs[x][y] = True
-            # # print(game.board.available_hexs)
-            # available[UI.BOTTOM][Bottom.CANCEL] = True
-
-        # game.actions.update_available_actions(game, available)
-
+        
     def use_move(self, ctx):
         state = ctx.state
         action = state.action
@@ -171,8 +155,7 @@ class InstantToken(Token):
         # available = deepcopy(game.available_structure)
         return AvailableActionResult(
             board_filter=BoardFilter(
-                pos for pos in ctx.board.ALL_HEXES
-                if ctx.board.not_on_bound(pos)
+                predicate= lambda ctx, tile : ctx.board_not_on_bound(tile)
             ),
             can_discard=True,
             can_cancel=True
@@ -257,10 +240,8 @@ class InstantToken(Token):
         # available[UI.BOTTOM][Bottom.CANCEL] = True
         return AvailableActionResult(
             board_filter=BoardFilter(
-                positions=[
-                    hex for hex in ctx.board.ALL_HEXES
-                    if ctx.board.get_relation(hex, ctx.fraction) == Relation.ENEMY
-                ]
+                positions= ctx.board_get_enemies(ctx.fraction),
+                predicate=lambda ctx, tile : ctx.board.not_is_hq(tile)
             ),
             can_cancel=True,
             can_discard=True
@@ -292,10 +273,7 @@ class InstantToken(Token):
         #     # available[UI.BOTTOM][Bottom.CANCEL] = True
         return AvailableActionResult(
             board_filter= BoardFilter(
-                positions=[
-                    hex for hex in ctx.board.ALL_HEXES
-                    if ctx.board.can_push(hex)
-                ]
+                positions=lambda ctx, tile : ctx.board.can_push(tile)
             ),
             can_cancel=True,
             can_discard=True

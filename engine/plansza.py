@@ -100,6 +100,42 @@ class Board:
         #     return None
         # return self.board[x][y].nazwa
 
+    def is_enemy(self, pos, fraction):
+        type = self.get_type(pos)
+        if not type:
+            return False
+        return type != fraction
+    
+    def is_friendly(self, pos, fraction):
+        type = self.get_type(pos)
+        if not type:
+            return False
+        return type == fraction
+        
+    def get_tiles(self, ctx, predicate):
+        return [
+            pos for pos in self.ALL_HEXES
+            if predicate(ctx, pos)
+        ]
+    
+    def get_enemies(self, fraction):
+        return [
+            pos for pos in self.ALL_HEXES
+            if self.is_enemy(pos, fraction)
+        ]
+
+    def get_friends(self, fraction):
+        return [
+            pos for pos in self.ALL_HEXES
+            if self.is_friendly(pos, fraction)
+        ]
+
+    def get_empty(self):
+        return [
+            pos for pos in self.ALL_HEXES
+            if self.is_empty(pos)
+        ]
+
     def is_valid_target(self, x, y, frakcja, czy_sztab=False):
         # if (not self.is_index_on_board(x, y)):
         #     return False
@@ -184,13 +220,6 @@ class Board:
                 return True
         return False
 
-    def boost_all(self):
-        for x in range(self.width):
-            for y in range(self.length):
-                if(self.is_empty(x, y)):
-                    continue
-                self.board[x][y].boost(self)
-
     def check_hex(self, pos):
         if(self.is_empty(pos)):
             return True
@@ -273,10 +302,7 @@ class Board:
                     ))
                     # row.append(akt.zeton_to_json())
             print(row)
-
-    def czy_w_planszy(self, x, y):
-        return (0 <= x < 5 and 0 <= y < 9)
-
+            
     def wszystkie_jednostki(self):
         answer = []
         for x in range(self.width):

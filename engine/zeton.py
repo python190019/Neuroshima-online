@@ -3,6 +3,8 @@ import wszystkie_frakcje
 from variable import *
 from copy import deepcopy
 from token import Token
+from available_action_result import AvailableActionResult
+from boardfilter import BoardFilter
 
 class Zeton(Token):
     DEFAULT = {
@@ -49,7 +51,16 @@ class Zeton(Token):
     def __getitem__(self, key):
         # pozwala robis self["xd"] zamiast self.wlasciwosci["xd"]
         return self.wlasciwosci.get(key)
-    
+
+    def get_available_actions(self, ctx):
+        return AvailableActionResult(
+            board_filter=BoardFilter(
+                positions= ctx.board.get_enmpty()
+            ),
+            can_discard=self.name != BoardType.HQ,
+            can_cancel=True
+        )
+
     def zeton_to_json(self):
         json = {
             Token.FRACTION: self.frakcja,
