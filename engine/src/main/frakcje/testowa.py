@@ -1,4 +1,4 @@
-from variable import Token
+from main.utils.variable import TokenKey, TokenType, InstantType
 
 wlasciwosci = {
     "sieciarz": {
@@ -13,8 +13,8 @@ wlasciwosci = {
         "hp": 1,
         "siec": [0, 1]
     },
-    Token.Type.Instant.SNIPER : {
-        Token.TYPE : Token.Type.INSTANT,
-        Token.UNIT_COUNT : 1,
+    InstantType.SNIPER : {
+        TokenKey.TYPE : TokenType.INSTANT,
+        TokenKey.UNIT_COUNT : 1,
     }
 }

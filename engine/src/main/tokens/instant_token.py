@@ -1,16 +1,13 @@
-from variable import *
-from copy import deepcopy
-from variable import *
-from token import Token
-from boardfilter import BoardFilter
-from board_query import BoardQuery
-from available_action_result import AvailableActionResult
+from main.utils.variable import *
+from main.tokens.abstract_token import Token
+from main.board.board_query import BoardQuery
+from main.actions.available_action_result import AvailableActionResult
 
 class InstantToken(Token):
-    TYPE = "instant"
+    # TYPE = "instant"
 
-    def __init__(self, name, fraction=None):
-        super().__init__(name, fraction, self.TYPE)
+    def __init__(self, name, fraction):
+        super().__init__(name, fraction, TokenType.INSTANT)
         self.use_handlers = {
             TokenType.Instant.BITWA : self.use_bitwa,
             TokenType.Instant.MOVE : self.use_move,
@@ -27,6 +24,9 @@ class InstantToken(Token):
             TokenType.Instant.SNIPER : self.available_actions_sniper,
             TokenType.Instant.PUSH : self.available_actions_push,
         }
+
+    def export(self):
+        return self.name
 
     def get_available_actions(self, ctx):
         handler = self.available_actions_handlers.get(self.name, None)

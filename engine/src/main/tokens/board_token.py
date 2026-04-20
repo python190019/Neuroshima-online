@@ -1,12 +1,12 @@
 from copy import deepcopy
-import wszystkie_frakcje
-from variable import *
+import main.frakcje.wszystkie_frakcje as allfractions
+from main.utils.variable import *
 from copy import deepcopy
-from token import Token
-from available_action_result import AvailableActionResult
-from boardfilter import BoardFilter
+from main.tokens.abstract_token import Token
+from main.actions.available_action_result import AvailableActionResult
+from main.board.board_query import BoardQuery
 
-class Zeton(Token):
+class BoardToken(Token):
     DEFAULT = {
         TokenKey.NAME : "default",
         TokenKey.FRACTION : "neutral",
@@ -30,15 +30,15 @@ class Zeton(Token):
         # print(data)
         # print("token.name:", Token.NAME)
         # self.frakcja = data[Token.FRACTION]
-        # self.nazwa = data[Token.NAME]
-        super().__init__(name, fraction, self.TYPE)
+        # self.name = data[Token.NAME]
+        super().__init__(name, fraction, TokenType.BOARD)
         self.rotacja = merged[TokenKey.ROTATION]
         self.rany = merged[TokenKey.DAMAGE]
         self.x = merged[TokenKey.X]
         self.y = merged[TokenKey.Y]
-        self.wlasciwosci_pierwotne = wszystkie_frakcje.frakcje.get(
-            self.frakcja, {}
-        ).get(self.nazwa, {})
+        self.wlasciwosci_pierwotne = allfractions.frakcje.get(
+            self.fraction, {}
+        ).get(self.name, {})
         
         self.wlasciwosci = deepcopy(self.wlasciwosci_pierwotne)
         
@@ -53,18 +53,20 @@ class Zeton(Token):
         return self.wlasciwosci.get(key)
 
     def get_available_actions(self, ctx):
+        query = BoardQuery([ctx.rules.is_empty()])
         return AvailableActionResult(
-            board_filter=BoardFilter(
-                positions= ctx.board.get_enmpty()
-            ),
+            positions=query.apply(),
             can_discard=self.name != BoardType.HQ,
             can_cancel=True
         )
 
+    def export(self):
+        return self.name
+
     def zeton_to_json(self):
         json = {
-            Token.FRACTION: self.frakcja,
-            Token.NAME: self.nazwa,
+            Token.FRACTION: self.fraction,
+            Token.NAME: self.name,
             Token.ROTATION: self.rotacja,
             Token.DAMAGE: self.rany,
             Token.WIRED: self.zasiecowany
@@ -105,7 +107,7 @@ class Zeton(Token):
                 for i, (direction, power) in enumerate(attack_list):
                     attack_list[i] = (direction, power + 1)
 
-                # print(f"Jestem {self.nazwa}, mam boost {boost_type}, atak {attack_key}: {attack_list}")
+                # print(f"Jestem {self.name}, mam boost {boost_type}, atak {attack_key}: {attack_list}")
             return
 
         if boost_type == Boost.INITIATIVE:
@@ -133,10 +135,10 @@ class Zeton(Token):
     def dostan_rane(self, obrazenia):
         self.rany += obrazenia
         # kierunek -> skad przychodzi atak
-        # print("dostalem rane", self.frakcja, self.nazwa, obrazenia, kierunek, czy_blokowalny)
+        # print("dostalem rane", self.frakcja, self.name, obrazenia, kierunek, czy_blokowalny)
 
     def attacked(self, obrazenia, kierunek, czy_blokowalny=False):
-        print(f"{self.nazwa} atakowany, obrazenia {obrazenia}, kierunek {kierunek}, czy_blokowalny {czy_blokowalny}")
+        print(f"{self.name} atakowany, obrazenia {obrazenia}, kierunek {kierunek}, czy_blokowalny {czy_blokowalny}")
         kierunek2 = (kierunek - self.rotacja + 6) % 6
         pancerz = self.wlasciwosci.get(Token.Stats.ARMOR, {})
 

@@ -1,8 +1,9 @@
 from importlib import import_module
 from copy import deepcopy
+# import main.frakcje.moloch
 
 dostepne_frakcje = ["moloch", "borgo", "testowa"]
-path = "frakcje"
+path = "main.frakcje"
 frakcje = {}
 
 for frakcja in dostepne_frakcje:

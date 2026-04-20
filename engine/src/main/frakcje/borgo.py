@@ -1,0 +1,130 @@
+import json
+
+from main.utils.variable import Boost, TokenKey, TokenType, InstantType, Attack, TokenStats
+
+wlasciwosci = {
+    ############## wojownicy
+    "mutek": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 6,
+        TokenStats.HP: 1,
+        TokenStats.ATTACKS: {
+            Attack.MELEE: [[0, 1], [1, 1], [5, 1]],
+        },
+        TokenStats.INITIATIVE: [2]
+    },
+    "nożownik": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 4,
+        TokenStats.HP: 1,
+        TokenStats.ATTACKS: {
+            Attack.MELEE: [[4, 1], [5, 1]],
+        },
+        TokenStats.INITIATIVE: [3]
+    },
+    "sieciarz": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 2,
+        TokenStats.HP: 1,
+        TokenStats.ATTACKS: {
+            Attack.MELEE: [[2, 3]],
+        },
+        TokenStats.WIRE : [2],
+        TokenStats.INITIATIVE: [1]
+    },
+    "super-mutant": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 1,
+        TokenStats.HP: 2,
+        TokenStats.ATTACKS: {
+            Attack.MELEE: [[0, 2], [1, 1], [5, 1]],
+        },
+        "pancerz" : [0, 1, 5],
+        TokenStats.INITIATIVE: [2]
+    },
+    "siłacz": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 2,
+        TokenStats.HP: 1,
+        TokenStats.ATTACKS: {
+            Attack.MELEE: [[0, 2]],
+        },
+        TokenStats.INITIATIVE: [2]
+    },
+    "zabojca": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 2,
+        TokenStats.HP: 1,
+        TokenStats.ATTACKS: {
+            Attack.SHOOT: [[5, 1]],
+        },
+        "abilitki" : ["mobilność"],
+        TokenStats.INITIATIVE: [3]
+    },
+    ############## sztab
+    "sztab": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 1,
+        TokenStats.HP: 20,
+        TokenStats.ATTACKS: {
+            Attack.MELEE: [[0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1]],
+        },
+        TokenStats.BOOSTS: {
+            Boost.INITIATIVE: [0, 1, 2, 3, 4, 5]
+        },
+        TokenStats.BOOST_TARGET: "own",
+        TokenStats.INITIATIVE: [0]
+    },
+
+    ############## moduły
+    "medyk": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 1,
+        TokenStats.HP: 1,
+        TokenStats.BOOSTS: {
+            Boost.HEAL: [0, 1, 5]
+        },
+        TokenStats.BOOST_TARGET: "own"
+    },
+    "oficer": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 2,
+        TokenStats.HP: 1,
+        TokenStats.BOOSTS: {
+            Boost.MELEE: [0, 1, 5]
+        },
+        TokenStats.BOOST_TARGET: "own"
+    },
+    "super-oficer": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 1,
+        TokenStats.HP: 2,
+        TokenStats.BOOSTS: {
+            Boost.MELEE: [0, 1, 5]
+        },
+        TokenStats.BOOST_TARGET: "own"
+    },
+    "zwiadowca": {
+        TokenKey.TYPE: TokenType.BOARD,
+        TokenKey.UNIT_COUNT: 2,
+        TokenStats.HP: 1,
+        TokenStats.BOOSTS: {
+            Boost.INITIATIVE: [0, 1, 5]
+        },
+        TokenStats.BOOST_TARGET: "own"
+    },
+
+    ############# natychmiastowe
+    InstantType.BITWA: {
+        TokenKey.TYPE: TokenType.INSTANT,
+        TokenKey.UNIT_COUNT: 6,
+    },
+    InstantType.MOVE: {
+        TokenKey.TYPE: TokenType.INSTANT,
+        TokenKey.UNIT_COUNT: 4,
+    },
+    InstantType.GRENADE: {
+        TokenKey.TYPE: TokenType.INSTANT,
+        TokenKey.UNIT_COUNT: 1,
+    }
+}

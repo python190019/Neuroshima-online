@@ -1,4 +1,5 @@
-from variable import *
+from main.utils.variable import *
+from main.tokens.token_factory import TokenFactory
 
 class Hand():
     HAND_LIMITS = {
@@ -21,7 +22,10 @@ class Hand():
         self.active_token = place
         return self.tokens[place]
 
-    def add_token(self, token):
+    def import_token(self, name):
+        self.draw_token(TokenFactory().create(name, self.fraction))
+
+    def draw_token(self, token):
         self.tokens.append(token)
 
     def discard_active_token(self):
@@ -39,13 +43,12 @@ class Hand():
 
     def draw_tokens(self, pile, turn_type):
         if(turn_type == Turn.Type.HQ_PLACEMENT):
-            drawn_token = TokenType.Board.HQ
-            pile.remove_token(drawn_token)
-            self.add_token(drawn_token)
+            drawn_token = pile.remove_token(BoardType.HQ)
+            self.draw_token(drawn_token)
             return
 
         while(not self.is_full() and not pile.is_empty()):
-            drawn_token = pile.draw_token()
+            drawn_token = pile.remove_token()
             self.tokens.append(drawn_token)
 
     def get_active_token(self):
@@ -64,12 +67,12 @@ class Hand():
         self.tokens = []
         self.active_token = data.get(self.ACTIVE_TOKEN_KEY, None)
         for token in data.get(self.TOKENS_KEY, []):
-            self.add_token(token)
+            self.import_token(token)
 
     def to_dict(self):
         tokens = []
         for token in self.tokens:
-            tokens.append(token)
+            tokens.append(token.export())
         data = {self.ACTIVE_TOKEN_KEY : self.active_token, self.TOKENS_KEY : tokens}
         return data
     
