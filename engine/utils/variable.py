@@ -1,4 +1,6 @@
-class State:
+from enum import Enum
+
+class State(Enum):
     NO_SELECTION = "no_selection"
     SELECTED_HAND = "selected_hand"
     PLACING = "placing"
@@ -9,7 +11,7 @@ class State:
 
 
 
-class Selected:
+class Selected(Enum):
     SLOT = "slot"
     POS = "pos"
     X = "x"
@@ -20,19 +22,19 @@ class Selected:
     NAME = "name"
 
 
-class Attack:
+class Attack(Enum):
     MELEE = "melee"
     SHOOT = "shoot"
     GAUSS = "gauss"
 
-class Boost:
+class Boost(Enum):
     MELEE = "melee"
     SHOOT = "shoot"
     INITIATIVE = "initiative"
     NEW_INITIATIVE = "new_initiative"
     HEAL = "heal"
 
-class TokenKey:
+class TokenKey(Enum):
     TYPE = "type"
     X = "x"
     Y = "y"
@@ -43,11 +45,11 @@ class TokenKey:
     WIRED = "zasieciowany"
     UNIT_COUNT = "liczbajednostek"
 
-class TokenType:
+class TokenType(Enum):
     BOARD = "plansza"
     INSTANT = "natychmiastowy"
         
-class InstantType:
+class InstantType(Enum):
             BITWA = "bitwa"
             MOVE = "ruch"
             BOMB = "bomba"
@@ -55,10 +57,10 @@ class InstantType:
             SNIPER = "snajper"
             PUSH = "odepchniecie"
 
-class BoardType:
+class BoardType(Enum):
     HQ = "sztab"
 
-class TokenStats:
+class TokenStats(Enum):
     ARMOR = "pancerz"
     WIRE = "siec"
     HP = "hp"
@@ -68,9 +70,9 @@ class TokenStats:
     INITIATIVE = "inicjatywa"
 
 
-class Action:
+class Action(Enum):
 
-    class Key:
+    class Key(Enum):
         TYPE = "type"
         X = "x"
         Y = "y"
@@ -79,41 +81,49 @@ class Action:
         BOTTOM = "bottom"
         ROTATION = "rotation"
 
-    class Type:
+    class Type(Enum):
         BOARD = "board"
         HAND = "hand"
         ROTATE = "rotate"
         BOTTOM = "bottom"
 
-class Variable:
+class Variable(Enum):
     ALL = "all"
 
 # class Token_Type:
     
 
-class Phase:
+class Phase(Enum):
     HQ_PLACEMENT = "sztaby"
     GAME = "game"
     START_GAME = "newgame"
 
-class Turn:
+class Turn(Enum):
     BITWA = "bitwa"
     TYPE = "type"
     FRACTION = "frakcja"
-    class Type:
+    class Type(Enum):
         LAST = "ostatnia"
         FIRST = "pierwsza"
         SECOND = "druga"
         STANDARD = "tura"
         HQ_PLACEMENT = "wystaw_sztab"
 
-class Mode:
+class Mode(Enum):
     AVAILABLE_ACTIONS = "available_actions"
     USE = "use"
     RUN = "run"
     VALIDATE = "validate"
 
-class Relation:
+class Relation(Enum):
     EMPTY = "empty"
     FRIENDLY = "friendly"
     ENEMY = "enemy"
+
+class Bottom(Enum):
+    END_TURN = "end_turn"
+    DISCARD = "discard"
+    USE = "use"
+    CANCEL = "cancel"
+    YES = "yes"
+    NO = "no"

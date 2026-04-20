@@ -19,7 +19,7 @@ class Pile():
     def new_pile(self):
         self.tokens = []
         for name, data in wszystkie_frakcje.frakcje.get(self.fraction, {}).items():
-            for _ in range(data[Token.UNIT_COUNT]):
+            for _ in range(data[TokenKey.UNIT_COUNT]):
                 self.add_token(name)
         shuffle(self.tokens)
 

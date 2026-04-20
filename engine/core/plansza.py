@@ -39,6 +39,7 @@ class Board:
         x, y = pos
         self.board[x][y] = new_tile
 
+
     def adjacent_hexes(self, pos):
         adjacents = []
         for diretion in self.roza.keys():
@@ -47,15 +48,37 @@ class Board:
                adjacents.append(neighbor)
         return adjacents 
 
-    def is_on_bound(self, pos):
+    def is_wired(self, pos):
+        if(self.is_empty(pos)):
+            return False
+        return self.get_tile(pos).czy_zasiecowany()
+
+    def on_border(self, pos):
         x, y = pos
         if(not self.on_board(pos)):
             return False
         cx, cy = self.CENTER
         return (abs(cx - x) > 1 or abs(cy - y) > 2)
 
-    def not_on_bound(self, pos):
-        return (not self.is_on_bound(pos))
+    # def not_on_bound(self, pos):
+    #     return (not self.is_on_bound(pos))
+
+    def is_hq_wired(self, fraction):
+        tile = self.get_tile(self.get_token_position(BoardType.HQ, fraction))
+        return (tile and not tile.czy_zasieciowany())
+
+    def is_hq(self, pos):
+        return self.get_name(pos) == BoardType.HQ
+
+    def get_hq_pos(self, fraction):
+        return self.get_token_position(BoardType.HQ, fraction) 
+    
+    def get_token_position(self, name, fraction):
+        for pos in self.ALL_HEXES:
+            tile = self.get_tile(pos)
+            if tile and tile.name == name and tile.fraction == fraction:
+                return pos
+        return None
 
     def find_zeton(self, nazwa, frakcja):
         for x in range(self.width):
@@ -69,9 +92,6 @@ class Board:
 
     def not_is_hq(self, pos):
         return self.get_tile(pos).name != BoardType.HQ
-        if(self.is_empty(x, y)):
-            return True
-        return (self.board[x][y].nazwa != Token.Type.Board.HQ)
 
     def postaw_zeton(self, pos, zeton):
         x, y = pos
