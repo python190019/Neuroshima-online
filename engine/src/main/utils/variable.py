@@ -9,8 +9,6 @@ class State(Enum):
     SELECTED_PUSHER = "selected_pusher"
     PUSHING = "pushing"
 
-
-
 class Selected(Enum):
     SLOT = "slot"
     POS = "pos"

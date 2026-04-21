@@ -9,20 +9,20 @@ class InstantToken(Token):
     def __init__(self, name, fraction):
         super().__init__(name, fraction, TokenType.INSTANT)
         self.use_handlers = {
-            TokenType.Instant.BITWA : self.use_bitwa,
-            TokenType.Instant.MOVE : self.use_move,
-            TokenType.Instant.BOMB : self.use_bomb,
-            TokenType.Instant.GRENADE : self.use_grenade,
-            TokenType.Instant.SNIPER : self.use_sniper,
-            TokenType.Instant.PUSH : self.use_push,
+            InstantType.BITWA : self.use_bitwa,
+            InstantType.MOVE : self.use_move,
+            InstantType.BOMB : self.use_bomb,
+            InstantType.GRENADE : self.use_grenade,
+            InstantType.SNIPER : self.use_sniper,
+            InstantType.PUSH : self.use_push,
         }
         self.available_actions_handlers = {
-            TokenType.Instant.BITWA : self.available_actions_bitwa,
-            TokenType.Instant.MOVE : self.available_actions_move,
-            TokenType.Instant.BOMB : self.available_actions_bomb,
-            TokenType.Instant.GRENADE : self.available_actions_grenade,
-            TokenType.Instant.SNIPER : self.available_actions_sniper,
-            TokenType.Instant.PUSH : self.available_actions_push,
+            InstantType.BITWA : self.available_actions_bitwa,
+            InstantType.MOVE : self.available_actions_move,
+            InstantType.BOMB : self.available_actions_bomb,
+            InstantType.GRENADE : self.available_actions_grenade,
+            InstantType.SNIPER : self.available_actions_sniper,
+            InstantType.PUSH : self.available_actions_push,
         }
 
     def export(self):

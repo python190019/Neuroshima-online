@@ -1,7 +1,7 @@
 from random import shuffle
 import main.frakcje.wszystkie_frakcje as allfraction
 from main.utils.variable import *
-from main.tokens.token import TokenFactory
+from main.tokens.token_factory import TokenFactory
 
 class Pile():
     def __init__(self, fraction):
@@ -33,6 +33,7 @@ class Pile():
     def to_list(self):
         data = []
         for token in self.tokens:
+            print(token.name)
             data.append(token.export())
         return data
     
