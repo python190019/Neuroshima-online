@@ -1,22 +1,45 @@
 import pytest
 from main.tokens.hand import Hand
-
-# from hand import Hand
-# from pile import Pile
+from main.tokens.pile import Pile
 from main.utils.variable import *
 
 
 class Test_hand:
+    def setup_hand(self, fraction, tokens=None, active=None):
+        data = {
+            Hand.TOKENS_KEY : tokens or [],
+            Hand.ACTIVE_TOKEN_KEY : active
+        }
+        hand = Hand(fraction)
+        hand.from_dict(data)
 
-    # def test_draw_tokens(self):
-    #     hand = Hand("moloch")
-    #     hand.from_dict({Hand.TOKENS_KEY : ["sieciarz"]})
-    #     pile = Pile("moloch")
-    #     pile.from_list(["ruch", "klaun", "bloker"])
-    #     hand.draw_tokens(pile, "normal")
+        return hand
+    
+    def get_left_tokens(self, hand):
+        return hand.to_dict().get(Hand.TOKENS_KEY, [])
 
-    #     assert hand.tokens == ["sieciarz", "bloker", "klaun"]
-    #     assert pile.tokens == ["ruch"]
+    def test_from_dict(self):
+        hand =self.setup_hand(
+            "moloch", 
+            ["sieciarz", "bloker", "klaun"],
+            active=1
+            )
+        
+        output = hand.to_dict()
+        tokens = output[Hand.TOKENS_KEY]
+        assert tokens == ["sieciarz", "bloker", "klaun"]
+        assert output[Hand.ACTIVE_TOKEN_KEY] == 1
+
+    def test_draw_tokens(self):
+        hand = Hand("moloch")
+        hand.from_dict({Hand.TOKENS_KEY : ["sieciarz"]})
+        pile = Pile("moloch")
+        pile.from_list(["ruch", "klaun", "bloker"])
+        hand.draw_tokens(pile, Turn.Type.STANDARD)
+
+        left_tokens = hand.to_dict().get(Hand.TOKENS_KEY, None)
+        assert left_tokens == ["sieciarz", "bloker", "klaun"]
+        assert pile.tokens == ["ruch"]
 
     # def test_draw_tokens2(self):
     #     hand = Hand("moloch")
@@ -47,10 +70,3 @@ class Test_hand:
         left_tokens = hand.to_dict().get(Hand.TOKENS_KEY, None)
         assert (left_tokens == ["sieciarz", "klaun"])
         assert (hand.active_token == None)
-
-    # def test_odrzuc(self):
-    #     game = DummyGame()
-    #     actions = Actions(game)
-    #     hand = ["a", "b"]
-    #     actions.odrzuc(hand, "a")
-    #     assert hand == ["b"]
