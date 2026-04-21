@@ -1,11 +1,11 @@
 from copy import deepcopy
 
 from collections import defaultdict
-from variable import *
-from zeton import Zeton
-from sieciarze import Sieciarze
-from instant_token import InstantToken
-from battle import Battle
+from main.utils.variable import *
+# from zeton import Zeton
+from main.actions.sieciarze import Sieciarze
+from main.tokens.instant_token import InstantToken
+from main.battle.battle import Battle
 
 class Actions:
     def __init__(self, game):

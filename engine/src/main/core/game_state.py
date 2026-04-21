@@ -1,8 +1,8 @@
 from dataclasses import dataclass, fields, field, MISSING
 from typing import get_origin, get_args
-from variable import *
-from player_state import PlayerState
-from plansza import Board
+from main.utils.variable import *
+from main.core.player_state import PlayerState
+from main.core.plansza import Board
 
 def convert_value(value, target_type, key = None):
     # print(f"convert value: {value} to {target_type}")

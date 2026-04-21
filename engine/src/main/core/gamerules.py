@@ -1,5 +1,5 @@
-from variable import *
-from board_query import BoardQuery
+from main.utils.variable import *
+from main.board.board_query import BoardQuery
 
 class GameRules():
     def __init__(self, state):

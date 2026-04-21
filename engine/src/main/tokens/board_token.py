@@ -18,12 +18,12 @@ class BoardToken(Token):
     }
     TYPE = "board"
 
-    @classmethod
-    def clear_token(cls, name, fraction):
-        token = deepcopy(cls.default_token)
-        token[TokenKey.NAME] = name
-        token[TokenKey.FRACTION] = fraction
-        return token
+    # @classmethod
+    # def clear_token(cls, name, fraction):
+    #     token = deepcopy(cls.default_token)
+    #     token[TokenKey.NAME] = name
+    #     token[TokenKey.FRACTION] = fraction
+    #     return token
 
     def __init__(self, name, fraction, data):
         merged = {**self.DEFAULT, **data}
@@ -126,12 +126,8 @@ class BoardToken(Token):
         return (0 <= x < 5 and 0 <= y < 9)
 
     def rotate(self, rotacja):
-        if (self.zasiecowany):
-            return 0
-        
         self.rotacja = rotacja
-        return 1
-
+        
     def dostan_rane(self, obrazenia):
         self.rany += obrazenia
         # kierunek -> skad przychodzi atak

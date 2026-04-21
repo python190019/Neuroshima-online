@@ -102,7 +102,7 @@ class Board:
     #     x, y = pos
     #     self.board[x][y] = None
 
-    def przenies(self, old_pos, new_pos):
+    def move(self, old_pos, new_pos):
         if(old_pos == new_pos):
             return
         self.assign_to_tile(new_pos, self.get_tile(old_pos))
@@ -177,6 +177,15 @@ class Board:
 
     # def is_index_on_board(self, x, y):
     #     return (0 <= x < self.width and 0 <= y < self.length)
+
+    def deal_damage_effect(self, pos, damage, profile):
+        if self.is_hq(pos) and not profile.can_hit_hq:
+            return
+        self.board.get_tile(pos).attacked(
+            obrazenia=damage, 
+            kierunek=-1, 
+            czy_blokowalny=profile.ignore_armour
+        )
 
     def deal_damage(self, pos, damage):
         if(self.is_empty(pos)):

@@ -6,11 +6,11 @@ from main.utils.variable import *
 class TokenFactory():
     @staticmethod
     def create(name, fraction, data={}):
-        cos = allfractions.frakcje.get("moloch", {})
+        # cos = allfractions.frakcje.get("moloch", {})
         # print("cos:", cos)
-        print("name:", name)
+        # print("name:", name)
         stats = allfractions.frakcje.get(fraction, {}).get(name, {})
-        print(stats)
+        # print(stats)
         token_type = stats.get(TokenKey.TYPE)
         if(token_type == TokenType.INSTANT):
             return InstantToken(name, fraction)

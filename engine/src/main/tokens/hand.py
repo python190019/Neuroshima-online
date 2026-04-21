@@ -22,7 +22,7 @@ class Hand():
 
     def discard_token(self, name):
         token = self.get_active_token()
-        if(name != token):
+        if(name != token.name):
             return False
         self.discard_active_token()
 
@@ -45,7 +45,7 @@ class Hand():
             self.draw_token(drawn_token)
             return
 
-        while(not self.is_full() and not pile.is_empty()):
+        while(not self.is_full(turn_type) and not pile.is_empty()):
             drawn_token = pile.remove_token()
             self.tokens.append(drawn_token)
 
@@ -58,7 +58,7 @@ class Hand():
     def get_active_token(self):
         if(self.active_token is None):
             return None
-        return self.get_token(self.active_token)
+        return self.tokens[self.active_token]
 
     def import_token(self, name):
         self.draw_token(TokenFactory().create(name, self.fraction))

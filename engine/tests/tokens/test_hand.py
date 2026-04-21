@@ -34,22 +34,23 @@ class Test_hand:
         hand = Hand("moloch")
         hand.from_dict({Hand.TOKENS_KEY : ["sieciarz"]})
         pile = Pile("moloch")
-        pile.from_list(["ruch", "klaun", "bloker"])
+        pile.from_list([InstantType.MOVE, "klaun", "bloker"])
         hand.draw_tokens(pile, Turn.Type.STANDARD)
 
         left_tokens = hand.to_dict().get(Hand.TOKENS_KEY, None)
+        pile_tokens = pile.to_list()
         assert left_tokens == ["sieciarz", "bloker", "klaun"]
-        assert pile.tokens == ["ruch"]
+        assert pile_tokens == [InstantType.MOVE]
 
     # def test_draw_tokens2(self):
     #     hand = Hand("moloch")
     #     hand.from_dict({Hand.TOKENS_KEY : ["sieciarz"]})
     #     pile = Pile("moloch")
-    #     pile.from_list(["ruch", "klaun", "bloker"])
+    #     pile.from_list([InstantType.MOVE, "klaun", "bloker"])
     #     hand.draw_tokens(pile, Turn.Type.SECOND)
 
     #     assert hand.tokens == ["sieciarz", "bloker"]
-    #     assert pile.tokens == ["ruch", "klaun"]
+    #     assert pile.tokens == [InstantType.MOVE, "klaun"]
 
     def test_get_token(self):
         hand = Hand("moloch")

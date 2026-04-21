@@ -1,7 +1,7 @@
-from variable import State, Selected, Phase, Bottom
-from board_query import BoardQuery
-from contex import ActionContextContext
-from available_action_result import AvailableActionResult
+from main.utils.variable import State, Selected, Phase, Bottom
+from main.board.board_query import BoardQuery
+from main.actions.contex import ActionContextContext
+from main.actions.available_action_result import AvailableActionResult
 # from 
 
 class AvailableActions():
@@ -73,10 +73,6 @@ class AvailableActions():
     #############################################################################
     #   user_available_actions functions       
     #############################################################################
-    # def instant_taken_available_actions(self):
-    #     token = self.ctx.player.hand.get_active_token()
-    #     token.get_available_actions(self.ctx)
-
     def update_available_actions(self, actions : AvailableActionResult):
         self.update_board_availability(actions.positions)
         if(actions.can_cancel):
