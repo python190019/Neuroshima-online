@@ -1,11 +1,10 @@
-from akcje_na_planszy import AkcjeNaPlanszy
-from sieciarze import Sieciarze
-from zeton import Zeton
-from variable import *
+from main.actions.akcje_na_planszy import AkcjeNaPlanszy
+from main.tokens.board_token import BoardToken
+from main.utils.variable import *
 
 class Board:
     BOARD_KEY = "board"
-    # AVAILABLE_HEXES_KEY = "available_hexes"
+    AVAILABLE_HEXES_KEY = "available_hexes"
     length = 9
     width = 5
     roza = {
@@ -20,27 +19,29 @@ class Board:
 
     def __init__(self):
         self.board = [[None] * self.length for i in range(self.width)]
-        # self.available_hexs = [[False] * self.length for i in range(self.width)]
+        self.available_hexs = [[False] * self.length for i in range(self.width)]
         self.ALL_HEXES = []
         for x in range(self.width):
             for y in range(self.length):
-                if(self.on_board(x, y)):
+                if(self.on_board((x, y))):
                     self.ALL_HEXES.append((x, y))
                     
         self.max_inicjatywa = 10
 
     def get_tile(self, pos):
-        x, y = pos
-        if not self.on_board(x, y):
+        if not self.on_board(pos):
             return None
+        x, y = pos
         return self.board[x][y]
     
-    def assign_to_tile(self, pos, new_tile):
+    def assign_to_tile(self, pos, new_tile):    
         x, y = pos
         self.board[x][y] = new_tile
 
 
     def adjacent_hexes(self, pos):
+        if not self.on_board(pos):
+            return []
         adjacents = []
         for diretion in self.roza.keys():
             neighbor = self.go(pos, diretion)
@@ -68,15 +69,16 @@ class Board:
         return (tile and not tile.czy_zasieciowany())
 
     def is_hq(self, pos):
-        return self.get_name(pos) == BoardType.HQ
+        return self.get_name(pos) == BoardType.HQ.value
 
     def get_hq_pos(self, fraction):
         return self.get_token_position(BoardType.HQ, fraction) 
     
     def get_token_position(self, name, fraction):
+        expected_name = name.value if isinstance(name, BoardType) else name
         for pos in self.ALL_HEXES:
             tile = self.get_tile(pos)
-            if tile and tile.name == name and tile.fraction == fraction:
+            if tile and tile.name == expected_name and tile.fraction == fraction:
                 return pos
         return None
 
@@ -94,13 +96,20 @@ class Board:
         return self.get_tile(pos).name != BoardType.HQ
 
     def postaw_zeton(self, pos, zeton):
+        if not self.on_board(pos):
+            return
         x, y = pos
-        self.board[x][y] = Zeton(x, y, zeton)
+        name = zeton.get(Token.NAME)
+        fraction = zeton.get(Token.FRACTION)
+        data = {**zeton, Token.X: x, Token.Y: y}
+        self.board[x][y] = BoardToken(name, fraction, data)
         # self.rotation_phase = True
 
-    # def zdejmij_zeton(self, pos):
-    #     x, y = pos
-    #     self.board[x][y] = None
+    def zdejmij_zeton(self, pos):
+        if not self.on_board(pos):
+            return
+        x, y = pos
+        self.board[x][y] = None
 
     def move(self, old_pos, new_pos):
         if(old_pos == new_pos):
@@ -156,24 +165,24 @@ class Board:
             if self.is_empty(pos)
         ]
 
-    def is_valid_target(self, x, y, frakcja, czy_sztab=False):
+    def is_valid_target(self, pos, frakcja, czy_sztab=False):
         # if (not self.is_index_on_board(x, y)):
         #     return False
 
         # print(f"valid target: ({x},{y}), frakcja {frakcja}, frakcja2 {self.get_type((x, y))}, czy_sztab {czy_sztab}")
-
-        if(not self.on_board(x, y)):
+        if(not self.on_board(pos)):
             return False
-        if(self.is_empty(x, y)):
+        if(self.is_empty(pos)):
             return False
+        x, y = pos
         if(self.board[x][y].frakcja == frakcja):
             return False
-        if(czy_sztab and self.get_name(x, y) == "sztab"):
+        if(czy_sztab and self.get_name(pos) == "sztab"):
             return False
         return True
 
     def is_empty(self, pos):
-        return self.get_tile(pos) == None
+        return self.get_tile(pos) is None
 
     # def is_index_on_board(self, x, y):
     #     return (0 <= x < self.width and 0 <= y < self.length)
@@ -181,7 +190,7 @@ class Board:
     def deal_damage_effect(self, pos, damage, profile):
         if self.is_hq(pos) and not profile.can_hit_hq:
             return
-        self.board.get_tile(pos).attacked(
+        self.get_tile(pos).attacked(
             obrazenia=damage, 
             kierunek=-1, 
             czy_blokowalny=profile.ignore_armour
@@ -194,6 +203,8 @@ class Board:
         self.board[x][y].dostan_rane(damage)
 
     def on_board(self, pos):
+        if not isinstance(pos, tuple) or len(pos) != 2:
+            return False
         x, y = pos
         if(not isinstance(x, int)):
             return False
@@ -229,7 +240,7 @@ class Board:
         if(not self.on_board(pos)):
             return None
         if(self.is_empty(pos)):
-            return self.EMPTY
+            return None
         return self.get_tile(pos).fraction
 
     def can_move(self, pos):
@@ -348,7 +359,7 @@ class Board:
                 if(pole is None):
                     self.board[x][y] = None
                 else:
-                    self.postaw_zeton(x, y, pole) 
+                    self.postaw_zeton((x, y), pole) 
 
     def export_board(self):
         data = [[None] * self.length for i in range(self.width)]
@@ -372,3 +383,24 @@ class Board:
             self.AVAILABLE_HEXES_KEY : self.available_hexs
         }
         return data
+
+    def not_on_bound(self, pos):
+        if not self.on_board(pos):
+            return False
+        return not self.on_border(pos)
+
+    def czy_w_planszy(self, pos):
+        return self.on_board(pos)
+
+    def update_available_hexs(self, allowed_fractions, allowed_positions, condition):
+        allowed_positions = set(allowed_positions)
+        self.available_hexs = [[False] * self.length for _ in range(self.width)]
+        for pos in self.ALL_HEXES:
+            if pos not in allowed_positions:
+                continue
+            if condition is not None and not condition(pos):
+                continue
+            fraction = self.get_type(pos)
+            if fraction in allowed_fractions:
+                x, y = pos
+                self.available_hexs[x][y] = True

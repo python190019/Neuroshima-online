@@ -1,4 +1,4 @@
-from variable import *
+from main.utils.variable import *
 
 
 class Validate():
@@ -19,7 +19,7 @@ class Validate():
         x, y = pos
         if(not isinstance(x, int) or not isinstance(y, int)):
             return False
-        if(not state.board.on_board(x, y)):
+        if(not state.board.on_board(pos)):
             return False
         return True
         # return state.available_actions[UI.BOARD][x][y]

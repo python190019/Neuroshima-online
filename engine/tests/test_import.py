@@ -1,10 +1,7 @@
 import pytest
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from variable import * 
-from main import Game
+from main.utils.variable import * 
+from main.main import Game
 
 def test_start_game():
     data = {

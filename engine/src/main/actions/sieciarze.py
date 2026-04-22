@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+from main.utils.variable import Token
+
 class Sieciarze:
     def __init__(self, board):
         self.board = board
@@ -38,15 +40,15 @@ class Sieciarze:
                 self.graf_sieciarzy[(x, y)]
                 self.odwr_sieciarzy[(x, y)]
 
-                kierunki = akt["siec"]
+                kierunki = akt[Token.Stats.WIRE] or []
 
                 for kier in kierunki:
                     kier = (kier + akt.rotacja + 6) % 6
-                    nx, ny = self.board.go(x, y, kier)
+                    nx, ny = self.board.go((x, y), kier)
 
                     # print(f"Sieciarz ({x},{y}) frakcja {akt.frakcja} kierunek {kier} -> ({nx},{ny})")
 
-                    if not self.board.is_valid_target(nx, ny, akt.frakcja):
+                    if not self.board.is_valid_target((nx, ny), akt.frakcja):
                         continue
 
                     cel = self.board.board[nx][ny]
@@ -230,12 +232,12 @@ class Sieciarze:
                 akt.zasieciuj()    
                 continue
                 
-            for kier in akt["siec"]:
+            for kier in (akt[Token.Stats.WIRE] or []):
                 kier = (kier + akt.rotacja + 6) % 6
-                nx, ny = self.board.go(i[0], i[1], kier)
+                nx, ny = self.board.go(i, kier)
                 cel = self.board.board[nx][ny]
 
-                if (not self.board.is_valid_target(nx, ny, akt.frakcja)) or cel.czy_sieciarz() == True:
+                if (not self.board.is_valid_target((nx, ny), akt.frakcja)) or cel.czy_sieciarz() == True:
                     continue
 
                 cel.zasieciuj()
@@ -243,4 +245,3 @@ class Sieciarze:
         self.status_sieciarzy = dict(self.status_sieciarzy)
 
         # print("--------------------------------------------\n")
-

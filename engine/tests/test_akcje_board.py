@@ -1,14 +1,19 @@
 import pytest
-import os
-import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # from akcje import Actions
 # from main import Game
-from plansza import Board
-from variable import *
-from diff import Diff
-from zeton import Zeton
+from main.core.plansza import Board
+from main.utils.variable import *
+from main.utils.diff import Diff
+
+
+def clear_token(name, fraction):
+    return {
+        Token.NAME: name,
+        Token.FRACTION: fraction,
+        Token.ROTATION: 0,
+        Token.DAMAGE: 0,
+    }
 
 class DummyGame:
     MAX_HAND_SIZE = 3
@@ -23,53 +28,53 @@ class Test_board:
     
     def test_on_board(self):
         board = Board()
-        assert (board.on_board(0, 1) == False)
-        assert (board.on_board(0, 5) == False)
-        assert (board.on_board(0, 8) == False)
-        assert (board.on_board(0, 2) == True)
-        assert (board.on_board(0, 6) == True)
+        assert (board.on_board((0, 1)) == False)
+        assert (board.on_board((0, 5)) == False)
+        assert (board.on_board((0, 8)) == False)
+        assert (board.on_board((0, 2)) == True)
+        assert (board.on_board((0, 6)) == True)
 
-        assert (board.on_board(1, 1) == True)
-        assert (board.on_board(1, 7) == True)
-        assert (board.on_board(1, 4) == False)
-        assert (board.on_board(1, 9) == False)
+        assert (board.on_board((1, 1)) == True)
+        assert (board.on_board((1, 7)) == True)
+        assert (board.on_board((1, 4)) == False)
+        assert (board.on_board((1, 9)) == False)
 
-        assert (board.on_board(2, 0) == True)
-        assert (board.on_board(2, 4) == True)
-        assert (board.on_board(2, 8) == True)
-        assert (board.on_board(2, -1) == False)
-        assert (board.on_board(2, 5) == False)
-        assert (board.on_board(2, 10) == False)
+        assert (board.on_board((2, 0)) == True)
+        assert (board.on_board((2, 4)) == True)
+        assert (board.on_board((2, 8)) == True)
+        assert (board.on_board((2, -1)) == False)
+        assert (board.on_board((2, 5)) == False)
+        assert (board.on_board((2, 10)) == False)
 
-        assert (board.on_board(3, 3) == True)
-        assert (board.on_board(3, 5) == True)
-        assert (board.on_board(3, 4) == False)
-        assert (board.on_board(3, 0) == False)
+        assert (board.on_board((3, 3)) == True)
+        assert (board.on_board((3, 5)) == True)
+        assert (board.on_board((3, 4)) == False)
+        assert (board.on_board((3, 0)) == False)
 
-        assert (board.on_board(4, 1) == False)
-        assert (board.on_board(4, 5) == False)
-        assert (board.on_board(4, 8) == False)
-        assert (board.on_board(4, 2) == True)
-        assert (board.on_board(4, 6) == True)
+        assert (board.on_board((4, 1)) == False)
+        assert (board.on_board((4, 5)) == False)
+        assert (board.on_board((4, 8)) == False)
+        assert (board.on_board((4, 2)) == True)
+        assert (board.on_board((4, 6)) == True)
 
     def fill_board(self, board):
         # zeton = {Token.NAME : "klaun", Token.FRACTION : "moloch", Token.DAMAGE : 0, Token.ROTATION : 0}
-        board.postaw_zeton(2, 4, Zeton.clear_token("klaun", "moloch"))
+        board.postaw_zeton((2, 4), clear_token("klaun", "moloch"))
 
         # zeton = {"nazwa" : "szturmowiec", "frakcja" : "moloch", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(2, 2, Zeton.clear_token("szturmowiec", "moloch"))
+        board.postaw_zeton((2, 2), clear_token("szturmowiec", "moloch"))
 
         # zeton = {"nazwa" : "wartownik", "frakcja" : "moloch", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(0, 2, Zeton.clear_token("wartownik", "moloch"))
+        board.postaw_zeton((0, 2), clear_token("wartownik", "moloch"))
 
         # zeton = {"nazwa" : "mutek", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(1, 1, Zeton.clear_token("mutek", "borgo"))
+        board.postaw_zeton((1, 1), clear_token("mutek", "borgo"))
 
         # zeton = {"nazwa" : "mutek", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(4, 2, Zeton.clear_token("mutek", "borgo"))
+        board.postaw_zeton((4, 2), clear_token("mutek", "borgo"))
 
         # zeton = {"nazwa" : "sztab", "frakcja" : "borgo", "rany" : 0, "rotacja" : 0}
-        board.postaw_zeton(3, 3, Zeton.clear_token("sztab", "borgo"))
+        board.postaw_zeton((3, 3), clear_token("sztab", "borgo"))
 
 
     def test_available_hexes1(self):
@@ -90,7 +95,7 @@ class Test_board:
         self.fill_board(board)
 
         hq = board.find_zeton("sztab", "borgo")
-        board.update_available_hexs(["moloch"], board.adjacent_hexes(hq.x, hq.y), None)
+        board.update_available_hexs(["moloch"], board.adjacent_hexes((hq.x, hq.y)), None)
         # print(board.available_hexs)
         correct_output = self.filled_board(False)
         correct_output[2][2] = True

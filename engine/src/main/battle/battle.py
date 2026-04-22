@@ -1,4 +1,4 @@
-from akcje_na_planszy import AkcjeNaPlanszy
+from main.actions.akcje_na_planszy import AkcjeNaPlanszy
 
 class Battle:
     def __init__(self, game):

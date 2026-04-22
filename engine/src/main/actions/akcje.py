@@ -40,7 +40,7 @@ class Actions:
         state.active_action = {}
         
     def kwestia_sieciarzy(self, board):
-        Sieciarze().kwestia_sieciarzy(board)
+        Sieciarze(board)
 
     #############################################################################
     #   Turn functions       

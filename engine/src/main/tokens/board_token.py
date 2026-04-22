@@ -2,11 +2,11 @@ from copy import deepcopy
 import main.frakcje.wszystkie_frakcje as allfractions
 from main.utils.variable import *
 from copy import deepcopy
-from main.tokens.abstract_token import Token
+from main.tokens.abstract_token import Token as AbstractToken
 from main.actions.available_action_result import AvailableActionResult
 from main.board.board_query import BoardQuery
 
-class BoardToken(Token):
+class BoardToken(AbstractToken):
     DEFAULT = {
         TokenKey.NAME : "default",
         TokenKey.FRACTION : "neutral",
@@ -25,6 +25,29 @@ class BoardToken(Token):
     #     token[TokenKey.FRACTION] = fraction
     #     return token
 
+    @staticmethod
+    def _normalize_key(key):
+        if not isinstance(key, str):
+            return key
+        for enum_class in (TokenKey, TokenStats, Attack, Boost, InstantType, TokenType):
+            for member in enum_class:
+                if member.value == key:
+                    return member
+        return key
+
+    @classmethod
+    def _normalize_dict_keys(cls, data):
+        if not isinstance(data, dict):
+            return data
+        normalized = {}
+        for key, value in data.items():
+            normalized_key = cls._normalize_key(key)
+            if isinstance(value, dict):
+                normalized[normalized_key] = cls._normalize_dict_keys(value)
+            else:
+                normalized[normalized_key] = value
+        return normalized
+
     def __init__(self, name, fraction, data):
         merged = {**self.DEFAULT, **data}
         # print(data)
@@ -36,9 +59,10 @@ class BoardToken(Token):
         self.rany = merged[TokenKey.DAMAGE]
         self.x = merged[TokenKey.X]
         self.y = merged[TokenKey.Y]
-        self.wlasciwosci_pierwotne = allfractions.frakcje.get(
+        raw_wlasciwosci = allfractions.frakcje.get(
             self.fraction, {}
         ).get(self.name, {})
+        self.wlasciwosci_pierwotne = self._normalize_dict_keys(raw_wlasciwosci)
         
         self.wlasciwosci = deepcopy(self.wlasciwosci_pierwotne)
         
@@ -50,7 +74,20 @@ class BoardToken(Token):
 
     def __getitem__(self, key):
         # pozwala robis self["xd"] zamiast self.wlasciwosci["xd"]
+        if isinstance(key, str):
+            for stat in TokenStats:
+                if stat.value == key:
+                    key = stat
+                    break
         return self.wlasciwosci.get(key)
+
+    @property
+    def nazwa(self):
+        return self.name
+
+    @property
+    def frakcja(self):
+        return self.fraction
 
     def get_available_actions(self, ctx):
         query = BoardQuery([ctx.rules.is_empty()])

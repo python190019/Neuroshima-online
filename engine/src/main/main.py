@@ -1,12 +1,9 @@
-from copy import deepcopy
-from plansza import Board
-import wszystkie_frakcje
-from akcje import Actions
-from akcje import State
-from variable import *
-from player_state import PlayerState
-from game_state import GameState
 from random import shuffle
+
+from main.actions.akcje import Actions
+from main.core.game_state import GameState
+from main.core.player_state import PlayerState
+from main.utils.variable import *
 
 class Game:
     def __init__(self, data):
@@ -15,6 +12,7 @@ class Game:
             data['fractions'] = [fractions["player1"], fractions["player2"]]
         # print("data:", data)
         self.state = GameState.from_dict(data)
+        self.action = data.get("action")
         self.actions = Actions(self)
         self.actions.kwestia_sieciarzy(self.state.board)
         # self.board = Board()
@@ -24,10 +22,10 @@ class Game:
         # self.players = {}
         # self.game_over = False
 
-        if(self.state.phase == Phase.START_GAME):
+        if self.state.phase in (Phase.START_GAME, Phase.START_GAME.value):
             self.start_game()
 
-        else:
+        elif self.action is not None:
             if(not self.actions.handler(self)):
                 self.actions.invalid_move()
                 return
@@ -142,4 +140,3 @@ class Game:
     #             row.append(available_actions[UI.BOARD][x][y])
     #         print(row)
     #     print("Bottoms:", available_actions[UI.BOTTOM])
-

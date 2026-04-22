@@ -1,11 +1,7 @@
-import os
-import sys
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from collections import defaultdict
-from plansza import Board
-from variable import *
-from akcje_na_planszy import AkcjeNaPlanszy
+from main.core.plansza import Board
+from main.utils.variable import *
+from main.actions.akcje_na_planszy import AkcjeNaPlanszy
 
 # from plansza import Board
 
@@ -14,26 +10,28 @@ def print_printy(board):
     board.print_board()
 
     print("\nTestowanie kwestii sieciarzy...")
-    board.kwestia_sieciarzy()
+    anp = AkcjeNaPlanszy(board)
+    anp.kwestia_sieciarzy()
+    sieciarze = anp.sieciarze
 
     print("\nGraf sieciarzy:")
-    for k, v in board.graf_sieciarzy.items():
+    for k, v in sieciarze.graf_sieciarzy.items():
         print(f"{k} -> {v}")
 
     print("\nOdwrócony graf:")
-    for k, v in board.odwr_sieciarzy.items():
+    for k, v in sieciarze.odwr_sieciarzy.items():
         print(f"{k} -> {v}")
 
     print("\nKolory SCC:")
-    for siec, kolor in board.kolory.items():
+    for siec, kolor in sieciarze.kolory.items():
         print(f"{siec} -> kolor {kolor}")
 
     print("\nSieciarze w kolorach:")
-    for kolor, sieci in board.sieci_w_kolorze.items():
+    for kolor, sieci in sieciarze.sieci_w_kolorze.items():
         print(f"Kolor {kolor}: {sieci}")
 
     print("\nGraf między SCC:")
-    for k, v in board.graf_scc.items():
+    for k, v in sieciarze.graf_scc.items():
         print(f"SCC {k} -> {v}")
 
     print("----------------------------------\n")
@@ -43,14 +41,14 @@ def test_scc():
     board = Board()
 
     # [0, 5]
-    board.postaw_zeton(2, 4, { 
+    board.postaw_zeton((2, 4), { 
         Token.FRACTION: "moloch",
         Token.NAME: "sieciarz",
         Token.ROTATION: 1,
         Token.DAMAGE: 0
     })
 
-    board.postaw_zeton(0, 4, { 
+    board.postaw_zeton((0, 4), { 
         Token.FRACTION: "moloch",
         Token.NAME: "sieciarz",
         Token.ROTATION: 3,
@@ -58,21 +56,21 @@ def test_scc():
     })
 
     # [0]
-    board.postaw_zeton(1, 3, {
+    board.postaw_zeton((1, 3), {
         Token.FRACTION: "testowa",
         Token.NAME: "sieciarz",
         Token.ROTATION: 2,
         Token.DAMAGE: 0
     })
 
-    board.postaw_zeton(2, 6, {
+    board.postaw_zeton((2, 6), {
         Token.FRACTION: "testowa",
         Token.NAME: "sieciarz",
         Token.ROTATION: 0,
         Token.DAMAGE: 0
     })
 
-    board.postaw_zeton(1, 5, {
+    board.postaw_zeton((1, 5), {
         Token.FRACTION: "testowa",
         Token.NAME: "sieciarz",
         Token.ROTATION: 5,
@@ -92,7 +90,7 @@ def test_scc():
 
     assert (data == pop)
 
-    board.postaw_zeton(1, 1, { 
+    board.postaw_zeton((1, 1), { 
         Token.FRACTION: "moloch",
         Token.NAME: "sieciarz",
         Token.ROTATION: 1,

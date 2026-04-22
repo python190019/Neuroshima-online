@@ -68,8 +68,27 @@ class TokenStats(Enum):
     INITIATIVE = "inicjatywa"
 
 
-class Action(Enum):
+class Token:
+    TYPE = TokenKey.TYPE
+    X = TokenKey.X
+    Y = TokenKey.Y
+    NAME = TokenKey.NAME
+    ROTATION = TokenKey.ROTATION
+    DAMAGE = TokenKey.DAMAGE
+    FRACTION = TokenKey.FRACTION
+    WIRED = TokenKey.WIRED
 
+    class Stats:
+        ARMOR = TokenStats.ARMOR
+        WIRE = TokenStats.WIRE
+        HP = TokenStats.HP
+        ATTACKS = TokenStats.ATTACKS
+        BOOSTS = TokenStats.BOOSTS
+        BOOST_TARGET = TokenStats.BOOST_TARGET
+        INITIATIVE = TokenStats.INITIATIVE
+
+
+class Action:
     class Key(Enum):
         TYPE = "type"
         X = "x"
@@ -96,10 +115,11 @@ class Phase(Enum):
     GAME = "game"
     START_GAME = "newgame"
 
-class Turn(Enum):
+class Turn:
     BITWA = "bitwa"
     TYPE = "type"
     FRACTION = "frakcja"
+
     class Type(Enum):
         LAST = "ostatnia"
         FIRST = "pierwsza"

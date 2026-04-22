@@ -1,5 +1,5 @@
-from hand import Hand
-from pile import Pile
+from main.tokens.hand import Hand
+from main.tokens.pile import Pile
 
 class PlayerState:
     HAND_KEY = "hand"
