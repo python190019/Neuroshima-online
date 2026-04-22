@@ -19,7 +19,6 @@ class Selected(Enum):
     PUSHER_POS = "pusher_pos"
     NAME = "name"
 
-
 class Attack(Enum):
     MELEE = "melee"
     SHOOT = "shoot"
@@ -31,6 +30,7 @@ class Boost(Enum):
     INITIATIVE = "initiative"
     NEW_INITIATIVE = "new_initiative"
     HEAL = "heal"
+    STEAL_BOOST = "steal_boost"
 
 class TokenKey(Enum):
     TYPE = "type"

@@ -25,29 +25,6 @@ class BoardToken(AbstractToken):
     #     token[TokenKey.FRACTION] = fraction
     #     return token
 
-    @staticmethod
-    def _normalize_key(key):
-        if not isinstance(key, str):
-            return key
-        for enum_class in (TokenKey, TokenStats, Attack, Boost, InstantType, TokenType):
-            for member in enum_class:
-                if member.value == key:
-                    return member
-        return key
-
-    @classmethod
-    def _normalize_dict_keys(cls, data):
-        if not isinstance(data, dict):
-            return data
-        normalized = {}
-        for key, value in data.items():
-            normalized_key = cls._normalize_key(key)
-            if isinstance(value, dict):
-                normalized[normalized_key] = cls._normalize_dict_keys(value)
-            else:
-                normalized[normalized_key] = value
-        return normalized
-
     def __init__(self, name, fraction, data):
         merged = {**self.DEFAULT, **data}
         # print(data)
@@ -62,7 +39,7 @@ class BoardToken(AbstractToken):
         raw_wlasciwosci = allfractions.frakcje.get(
             self.fraction, {}
         ).get(self.name, {})
-        self.wlasciwosci_pierwotne = self._normalize_dict_keys(raw_wlasciwosci)
+        self.wlasciwosci_pierwotne = raw_wlasciwosci
         
         self.wlasciwosci = deepcopy(self.wlasciwosci_pierwotne)
         
@@ -131,6 +108,9 @@ class BoardToken(AbstractToken):
 
     def get_boosts(self):
         return self.wlasciwosci.get(Token.Stats.BOOSTS, {})
+    
+    def steal_boost(self):
+        self.wlasciwosci[Token.Stats.BOOST_TARGET] = "enemy"
 
     def boost_me(self, boost_type):
         if boost_type in self.boost_to_attack:

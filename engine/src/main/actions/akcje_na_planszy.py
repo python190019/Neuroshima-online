@@ -18,6 +18,32 @@ class AkcjeNaPlanszy:
             return frakcja1 == frakcja2
         else:
             return frakcja1 != frakcja2
+        
+    def stealing_boosts(self):
+        for x in range(self.board.width):
+            for y in range(self.board.length):
+                akt = self.board.board[x][y]
+
+                if (akt is None or akt.czy_zasieciowany() or akt.czy_modul() == False):
+                    continue
+
+                boosts = akt.get_boosts()
+
+                if Boost.STEAL_BOOST in boosts.keys():
+                    for direction in boosts[Boost.STEAL_BOOST]:
+                        nx, ny = self.board.go((x, y), direction)
+
+                        if (not self.board.on_board((nx, ny))):
+                            continue
+
+                        cel = self.board.board[nx][ny]
+
+                        if (cel is None or not self.czy_dobra_frakcja(akt.wlasciwosci.get(Token.Stats.BOOST_TARGET), akt.frakcja, cel.frakcja)):
+                            continue
+                        
+                        # print(f"Steal Boost: ({x},{y}) -> ({nx},{ny}), kierunek {direction}, boost {boost_type}")
+                        
+                        cel.steal_boost()
 
     def boost_all(self):
         for x in range(self.board.width):

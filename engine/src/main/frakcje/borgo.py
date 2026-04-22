@@ -39,7 +39,7 @@ wlasciwosci = {
         TokenStats.ATTACKS: {
             Attack.MELEE: [[0, 2], [1, 1], [5, 1]],
         },
-        "pancerz" : [0, 1, 5],
+        TokenStats.ARMOR: [0, 1, 5],
         TokenStats.INITIATIVE: [2]
     },
     "siłacz": {

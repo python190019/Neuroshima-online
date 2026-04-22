@@ -280,6 +280,7 @@ class Board:
 
             anp.reset_all()
             anp.kwestia_sieciarzy()
+            anp.stealing_boosts()
             anp.boost_all()
             anp.aktywacja(inicjatywa)
             self.zdejmij_trupy()
@@ -375,7 +376,6 @@ class Board:
         obj.import_board(data.get(cls.BOARD_KEY, obj.board))
         obj.available_hexs = data.get(cls.AVAILABLE_HEXES_KEY, obj.available_hexs)
         return obj
-
 
     def to_dict(self):
         data = {
