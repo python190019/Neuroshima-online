@@ -1,8 +1,10 @@
 from dataclasses import dataclass, fields, field, MISSING
 from typing import get_origin, get_args
 from main.utils.variable import *
-from main.core.player_state import PlayerState
-from main.core.plansza import Board
+from main.state.player_state import PlayerState
+from main.board.board import Board
+from main.state.selection import Selection
+from main.flows.flows import FlowEvent
 
 def convert_value(value, target_type, key = None):
     # print(f"convert value: {value} to {target_type}")
@@ -72,12 +74,13 @@ class GameState:
     phase : str
     fractions : list[str]
     interaction_state : str = State.NO_SELECTION
-    selected : dict = field(default_factory=dict)
+    selected : Selection = field(default_factory=Selection)
     active_action : dict = field(default_factory=dict)
     current_fraction : str = ""
     next_turns : list[dict] = field(default_factory=list)
     players : dict[str, PlayerState] = field(default_factory=dict)
     board : Board = field(default_factory=Board)
+    flow_queue : list[FlowEvent] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data):

@@ -2,6 +2,7 @@ from main.utils.variable import *
 from main.tokens.abstract_token import Token
 from main.board.board_query import BoardQuery
 from main.actions.available_action_result import AvailableActionResult
+from main.actions.action_result import ActionResult
 
 class InstantToken(Token):
     # TYPE = "instant"
@@ -66,7 +67,7 @@ class InstantToken(Token):
         state = ctx.state
         rules = ctx.rules
 
-        if(state.state == State.SELECTED_HAND):
+        if(state.interaction_state == State.SELECTED_HAND):
             query = BoardQuery([
                     rules.is_ally,
                     rules.can_move
@@ -77,8 +78,8 @@ class InstantToken(Token):
                 can_cancel=True
             )
         
-        if(state.state == State.MOVING):
-            pos = state.selected[Selected.POS]
+        if(state.interaction_state == State.MOVING):
+            pos = ctx.selected.unit_position
             query = BoardQuery([
                     rules.adjacent_to(pos),
                     rules.is_empty
@@ -91,20 +92,21 @@ class InstantToken(Token):
     def use_move(self, ctx):
         state = ctx.state
         action = state.action
-        if(state.state == State.SELECTED_HAND):
+        if(state.interaction_state == State.SELECTED_HAND):
             pos = action[Action.Key.POS]
-            state.state = State.MOVING
-            state.selected = {
-                Selected.POS : pos, 
-                Selected.NAME : ctx.board.get_name(pos)
-            }
+            state.interaction_state = State.MOVING
+            state.selected.unit_position = pos
+            # state.selected = {
+            #     Selected.POS : pos, 
+            #     Selected.NAME : ctx.board.get_name(pos)
+            # }
 
-        if(state.state == State.MOVING):
-            old_pos = state.selected[Selected.POS]
+        if(state.interaction_state == State.MOVING):
+            old_pos = state.selected.unit_position
             new_pos = action[Action.Key.POS]
             ctx.board.przenies(old_pos, new_pos)
-            state.state = State.ROTATE
-            state.selected[Selected.POS] = new_pos
+            state.interaction_state = State.ROTATE
+            state.selected.unit_position = new_pos
             player = state.current_player
             player.hand.discard_active_token()
           
@@ -203,7 +205,7 @@ class InstantToken(Token):
         )
 
     def _push_selected_pusher(self, ctx):
-        pusher_pos = ctx.selected[Selected.POS]
+        pusher_pos = ctx.selected.unit_position
         rules = ctx.rules
         query = BoardQuery([
             rules.adjacent_to(pusher_pos),
@@ -217,8 +219,8 @@ class InstantToken(Token):
         )
 
     def _push_selected_pushing(self, ctx):
-        my_pos = ctx.selected[Selected.POS]
-        pusher_pos = ctx.selected[Selected.PUSHER_POS]
+        my_pos = ctx.selected.target_position
+        pusher_pos = ctx.selected.unit_position
         rules = ctx.rules
         query = BoardQuery([
             rules.adjacent_to(my_pos),
@@ -228,12 +230,12 @@ class InstantToken(Token):
         return AvailableActionResult(positions=query.apply())
 
     def available_actions_push(self, ctx):
-        state = ctx.state.state
+        state = ctx.state.interaction_state
 
         handler = {
             State.SELECTED_HAND: self._push_selected_hand,
             State.SELECTED_PUSHER: self._push_selected_pusher,
-            State.PUSHING: self._push_pushing,
+            # State.PUSHING: self._push_pushing,
         }.get(state)
 
         if handler:
@@ -242,30 +244,32 @@ class InstantToken(Token):
         return AvailableActionResult()
 
     def use_push(self, ctx):
-        if(ctx.state.state == State.SELECTED_HAND):
-            ctx.state.state = State.SELECTED_PUSHER
+        if(ctx.state.interaction_state == State.SELECTED_HAND):
+            ctx.state.interaction_state = State.SELECTED_PUSHER
             pos = ctx.state.action[Action.Key.POS]
-            ctx.state.selected = {
-                Selected.POS : pos, 
-                Selected.NAME : ctx.board.get_name(pos)
-            }
+            # ctx.state.selected = {
+            #     Selected.POS : pos, 
+            #     Selected.NAME : ctx.board.get_name(pos)
+            # }
+            ctx.state.selected.unit_position = pos
             ctx.active_action = InstantType.PUSH
         
-        elif(ctx.state.state == State.SELECTED_PUSHER):
+        elif(ctx.state.interaction_state== State.SELECTED_PUSHER):
             pos = ctx.state.action[Action.Key.POS]
-            pusher_pos = ctx.selected[Selected.POS]
-            ctx.state.selected={
-                Selected.POS : pos,
-                Selected.NAME : ctx.board.get_name(pos),
-                Selected.PUSHER_POS : pusher_pos
-            }
-            ctx.state.state = State.PUSHING
+            pusher_pos = ctx.selected.unit_position
+            # ctx.state.selected={
+            #     Selected.POS : pos,
+            #     Selected.NAME : ctx.board.get_name(pos),
+            #     Selected.PUSHER_POS : pusher_pos
+            # }
+            ctx.selected.target_position = pos
+            ctx.state.interaction_state = State.PUSHING
             ctx.state.active_action = InstantType.PUSH
             ctx.state.current_frakcja = ctx.state.get_enemy(ctx.fraction, ctx.state.fractions)
             
 
-        elif(ctx.state.state == State.PUSHING):
-            target_pos = ctx.selected[Selected.POS]
+        elif(ctx.state.interaction_state == State.PUSHING):
+            target_pos = ctx.selected.target_position
             new_pos = ctx.state.action[Action.Key.POS]
             ctx.board.przenies(target_pos, new_pos)
             ctx.state.current_frakcja = ctx.state.get_enemy(ctx.fraction, ctx.state.fractions)

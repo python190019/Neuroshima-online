@@ -2,9 +2,10 @@ from main.utils.variable import *
 from main.board.board_query import BoardQuery
 
 class GameRules():
-    def __init__(self, state):
-        self.state = state
-        self.player = state.current_player
+    def __init__(self):
+        pass
+        # self.state = state
+        # self.player = state.current_player
 
     #############################################################################
     #   lowlevel functions       
@@ -76,8 +77,8 @@ class GameRules():
     #   Other useful functions       
     #############################################################################
 
-    def can_end_turn(self):
-        return not self.player.hand.is_full()
+    def can_end_turn(self, ctx):
+        return not ctx.state.player.hand.is_full()
 
     def is_hq_not_wired(self, ctx):
         return not ctx.board.is_wired(ctx, ctx.board.get_hq_pos(ctx.fraction))

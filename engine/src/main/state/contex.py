@@ -1,6 +1,6 @@
 
 class ActionContext():
-    def __init__(self, state, actions, rules):
+    def __init__(self, state):
         self.state = state.state
         
         #shortcuts

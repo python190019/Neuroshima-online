@@ -3,9 +3,9 @@ from copy import deepcopy
 from collections import defaultdict
 from main.utils.variable import *
 # from zeton import Zeton
-from main.actions.sieciarze import Sieciarze
-from main.tokens.instant_token import InstantToken
-from main.battle.battle import Battle
+# from main.sys.sieciarze import Sieciarze
+# from main.tokens.instant_token import InstantToken
+# from main.battle.battle import Battle
 
 class Actions:
     def __init__(self, game):
@@ -39,47 +39,47 @@ class Actions:
         state.selected = {Selected.POS : pos, Selected.NAME : token.name}
         state.active_action = {}
         
-    def kwestia_sieciarzy(self, board):
-        Sieciarze(board)
+    # def kwestia_sieciarzy(self, board):
+    #     Sieciarze(board)
 
     #############################################################################
     #   Turn functions       
     #############################################################################
-    def poczatek_tury(self, state):
-        if(state.current_frakcja != None):
-            return False
-        fraction = state.next_turns[0][Turn.FRACTION]
-        type = state.next_turns[0][Turn.TYPE]
-        state.current_frakcja = fraction
+    # def poczatek_tury(self, state):
+    #     if(state.current_frakcja != None):
+    #         return False
+    #     fraction = state.next_turns[0][Turn.FRACTION]
+    #     type = state.next_turns[0][Turn.TYPE]
+    #     state.current_frakcja = fraction
         
-        if(fraction == Turn.BITWA):
-            Battle(state)
-            return True
+    #     if(fraction == Turn.BITWA):
+    #         Battle(state)
+    #         return True
 
-        if(type == Turn.Type.HQ_PLACEMENT):
-            state.phase = Phase.HQ_PLACEMENT
-            # self.dobierz(game.hand[frakcja], game.pile[frakcja], "sztab")
+    #     if(type == Turn.Type.HQ_PLACEMENT):
+    #         state.phase = Phase.HQ_PLACEMENT
+    #         # self.dobierz(game.hand[frakcja], game.pile[frakcja], "sztab")
 
-        else:
-            state.phase = Phase.GAME
+    #     else:
+    #         state.phase = Phase.GAME
         
-        player = state.current_player
-        player.draw_tokens(type)
+    #     player = state.current_player
+    #     player.draw_tokens(type)
 
-        if(player.pile.is_empty()):
-            state.next_turns.append({Turn.FRACTION : Turn.BITWA, Turn.TYPE : Turn.Type.LAST})
+    #     if(player.pile.is_empty()):
+    #         state.next_turns.append({Turn.FRACTION : Turn.BITWA, Turn.TYPE : Turn.Type.LAST})
 
-        self.prepare_for_new_action(state)
-        return True
+    #     self.prepare_for_new_action(state)
+    #     return True
 
-    def koniec_tury(self, state):
-        # print("next turns:", game.next_turns)
-        next_turn = state.next_turns[0]
-        fraction = next_turn[Turn.FRACTION]
+    # def koniec_tury(self, state):
+    #     # print("next turns:", game.next_turns)
+    #     next_turn = state.next_turns[0]
+    #     fraction = next_turn[Turn.FRACTION]
         
-        state.next_turns.pop(0)
-        state.next_turns.append({Turn.FRACTION : fraction, Turn.TYPE : Turn.Type.STANDARD})
-        state.current_fraction = None
+    #     state.next_turns.pop(0)
+    #     state.next_turns.append({Turn.FRACTION : fraction, Turn.TYPE : Turn.Type.STANDARD})
+    #     state.current_fraction = None
 
     #############################################################################
     #   General functions       
