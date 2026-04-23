@@ -8,14 +8,6 @@ class AvailableActions():
     BOTTOM_KEY = "bottom"
     HAND_KEY = "hand"
     BOARD_KEY = "board"
-    # all_bottoms = [
-    #     Bottom.END_TURN, 
-    #     Bottom.DISCARD, 
-    #     Bottom.USE, 
-    #     Bottom.CANCEL, 
-    #     Bottom.YES, 
-    #     Bottom.NO
-    # ]
     def __init__(self, ctx):
         self.ctx = ctx
         self.state = ctx.state
@@ -84,13 +76,13 @@ class AvailableActions():
         if(actions.can_use):
             self.enable(Bottom.USE)
 
-    def user_available_actions(self, game):
+    def user_available_actions(self, ctx):
         token = self.ctx.player.hand.get_active_token()
 
         if token:
             actions = token.get_available_actions(self.ctx)
             self.update_available_actions(actions)
 
-        function = self.state_handlers.get(game.state, None)
+        function = self.state_handlers.get(ctx.state, None)
         if not (function is None):
-            function(game)
+            function(ctx)

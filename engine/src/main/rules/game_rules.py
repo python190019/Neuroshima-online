@@ -69,6 +69,9 @@ class GameRules():
     def is_hq(self, ctx, pos):
         return ctx.board.is_hq(pos)
 
+    def can_push(self, ctx, pusher_pos):
+        return self._can_push(ctx, pusher_pos)
+    
     #############################################################################
     #   Other useful functions       
     #############################################################################
@@ -76,9 +79,12 @@ class GameRules():
     def can_end_turn(self):
         return not self.player.hand.is_full()
 
-    def can_push(self, ctx, pusher_pos):
-        return self._can_push(ctx, pusher_pos)
-
+    def is_hq_not_wired(self, ctx):
+        return not ctx.board.is_wired(ctx, ctx.board.get_hq_pos(ctx.fraction))
+    
+    #############################################################################
+    #   Predicate makers       
+    #############################################################################
     def can_be_pushed_by(self, pusher_pos):
         def prediacte(ctx, pos):
             return self._can_be_pushed_by(ctx, pos, pusher_pos)
@@ -94,5 +100,3 @@ class GameRules():
             return pos not in ctx.board.adjacent_hexes(my_pos)
         return predicate
     
-    def is_hq_not_wired(self, ctx):
-        return not ctx.board.is_wired(ctx, ctx.board.get_hq_pos(ctx.fraction))

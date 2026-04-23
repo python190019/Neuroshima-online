@@ -12,7 +12,7 @@ def convert_value(value, target_type, key = None):
         if target_type is PlayerState and key is not None:
             return PlayerState.from_dict(key, value)
         return target_type.from_dict(value)
-    
+
     if origin is dict and isinstance(value, dict):
         key_type, value_type = get_args(target_type)
         return {
@@ -71,7 +71,7 @@ def print_obj(obj, deepth):
 class GameState:
     phase : str
     fractions : list[str]
-    state : str = State.NO_SELECTION
+    interaction_state : str = State.NO_SELECTION
     selected : dict = field(default_factory=dict)
     active_action : dict = field(default_factory=dict)
     current_fraction : str = ""

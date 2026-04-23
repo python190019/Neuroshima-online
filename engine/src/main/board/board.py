@@ -19,7 +19,6 @@ class Board:
 
     def __init__(self):
         self.board = [[None] * self.length for i in range(self.width)]
-        self.available_hexs = [[False] * self.length for i in range(self.width)]
         self.ALL_HEXES = []
         for x in range(self.width):
             for y in range(self.length):
@@ -60,9 +59,6 @@ class Board:
             return False
         cx, cy = self.CENTER
         return (abs(cx - x) > 1 or abs(cy - y) > 2)
-
-    # def not_on_bound(self, pos):
-    #     return (not self.is_on_bound(pos))
 
     def is_hq_wired(self, fraction):
         tile = self.get_tile(self.get_token_position(BoardType.HQ, fraction))
@@ -116,8 +112,6 @@ class Board:
             return
         self.assign_to_tile(new_pos, self.get_tile(old_pos))
         self.assign_to_tile(old_pos, None)
-        # self.board[nx][ny] = self.board[x][y]
-        # self.board[x][y] = None
 
     def rotate(self, pos, rotacja):
         x, y = pos
@@ -125,46 +119,7 @@ class Board:
 
     def get_name(self, pos):
         return self.get_tile(pos).name
-        # if(self.is_empty(x, y)):
-        #     return None
-        # return self.board[x][y].nazwa
-
-    def is_enemy(self, pos, fraction):
-        type = self.get_type(pos)
-        if not type:
-            return False
-        return type != fraction
     
-    def is_friendly(self, pos, fraction):
-        type = self.get_type(pos)
-        if not type:
-            return False
-        return type == fraction
-        
-    def get_tiles(self, ctx, predicate):
-        return [
-            pos for pos in self.ALL_HEXES
-            if predicate(ctx, pos)
-        ]
-    
-    def get_enemies(self, fraction):
-        return [
-            pos for pos in self.ALL_HEXES
-            if self.is_enemy(pos, fraction)
-        ]
-
-    def get_friends(self, fraction):
-        return [
-            pos for pos in self.ALL_HEXES
-            if self.is_friendly(pos, fraction)
-        ]
-
-    def get_empty(self):
-        return [
-            pos for pos in self.ALL_HEXES
-            if self.is_empty(pos)
-        ]
-
     def is_valid_target(self, pos, frakcja, czy_sztab=False):
         # if (not self.is_index_on_board(x, y)):
         #     return False
@@ -183,9 +138,6 @@ class Board:
 
     def is_empty(self, pos):
         return self.get_tile(pos) is None
-
-    # def is_index_on_board(self, x, y):
-    #     return (0 <= x < self.width and 0 <= y < self.length)
 
     def deal_damage_effect(self, pos, damage, profile):
         if self.is_hq(pos) and not profile.can_hit_hq:
@@ -221,49 +173,14 @@ class Board:
         if(d % 2 or d > 4):
             return False
         
-        # print("on board")
-        # print(x, y)
         return True
-
-    def get_relation(self, pos, fraction):
-        # x, y = pos
-        if(not self.on_board(pos)):
-            return None
-        if(self.is_empty(pos)):
-            return Relation.EMPTY
-        
-        if(self.get_type(pos) == fraction):
-            return Relation.FRIENDLY
-        return Relation.ENEMY
-
+    
     def get_type(self, pos):
         if(not self.on_board(pos)):
             return None
         if(self.is_empty(pos)):
             return None
         return self.get_tile(pos).fraction
-
-    def can_move(self, pos):
-        # x, y = hex
-        if(not self.on_board(pos)):
-            return False
-        if(self.is_empty(pos)):
-            return False
-        
-        tile = self.get_tile(pos)
-        if(tile.czy_zasieciowany()):
-            return False
-        
-        for neighbor in self.adjacent_hexes(pos):
-            # nx, ny = hex
-            if(self.is_empty(neighbor)):
-                return True
-        return False
-
-    def check_hex(self, pos):
-        if(self.is_empty(pos)):
-            return True
-        return self.get_tile(pos).is_alive()
 
     def zdejmij_trupy(self):
         for pos in self.ALL_HEXES:
@@ -294,32 +211,6 @@ class Board:
         x2, y2 = pos2
         dist = abs(x1 - x2) + abs(y1 - y2)
         return dist == 2
-
-    def can_be_pushed(self, pusher_pos, my_pos):
-        if(self.is_empty(my_pos)):
-            return False
-        tile = self.get_tile(my_pos)
-        if(tile.czy_zasieciowany()):
-            return False
-        
-        pusher_adj = self.adjacent_hexes(pusher_pos)
-        for hex in self.adjacent_hexes(my_pos):
-            if(hex not in pusher_adj):
-                return True
-        return False
-
-    def can_push(self, pos):
-        if(self.is_empty(pos)):
-            return False
-        tile = self.get_tile(pos)
-        if(tile.czy_zasieciowany()):
-            return False
-        
-        for neighbor in self.adjacent_hexes(pos):
-            # nx, ny = hex
-            if(self.can_be_pushed(pusher_pos=pos, my_pos=neighbor)):
-                return True
-        return False
 
     def print_board(self):
         # for pos in self.ALL_HEXES:
@@ -374,13 +265,11 @@ class Board:
     def from_dict(cls, data):
         obj = cls()
         obj.import_board(data.get(cls.BOARD_KEY, obj.board))
-        obj.available_hexs = data.get(cls.AVAILABLE_HEXES_KEY, obj.available_hexs)
         return obj
 
     def to_dict(self):
         data = {
             self.BOARD_KEY : self.export_board(),
-            self.AVAILABLE_HEXES_KEY : self.available_hexs
         }
         return data
 
@@ -391,16 +280,3 @@ class Board:
 
     def czy_w_planszy(self, pos):
         return self.on_board(pos)
-
-    def update_available_hexs(self, allowed_fractions, allowed_positions, condition):
-        allowed_positions = set(allowed_positions)
-        self.available_hexs = [[False] * self.length for _ in range(self.width)]
-        for pos in self.ALL_HEXES:
-            if pos not in allowed_positions:
-                continue
-            if condition is not None and not condition(pos):
-                continue
-            fraction = self.get_type(pos)
-            if fraction in allowed_fractions:
-                x, y = pos
-                self.available_hexs[x][y] = True

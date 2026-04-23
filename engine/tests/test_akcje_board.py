@@ -77,45 +77,45 @@ class Test_board:
         board.postaw_zeton((3, 3), clear_token("sztab", "borgo"))
 
 
-    def test_available_hexes1(self):
-        board = Board()
-        self.fill_board(board)
+    # def test_available_hexes1(self):
+    #     board = Board()
+    #     self.fill_board(board)
 
-        board.update_available_hexs([None, "moloch"], board.ALL_HEXES, None)
-        correct_output = self.filled_board(False)
-        for (x, y) in board.ALL_HEXES:
-            correct_output[x][y] = True
-        correct_output[1][1] = False
-        correct_output[4][2] = False
-        correct_output[3][3] = False
-        assert(Diff().compare(board.available_hexs, correct_output))
+    #     board.update_available_hexs([None, "moloch"], board.ALL_HEXES, None)
+    #     correct_output = self.filled_board(False)
+    #     for (x, y) in board.ALL_HEXES:
+    #         correct_output[x][y] = True
+    #     correct_output[1][1] = False
+    #     correct_output[4][2] = False
+    #     correct_output[3][3] = False
+    #     assert(Diff().compare(board.available_hexs, correct_output))
 
-    def test_available_hexes2(self):
-        board = Board()
-        self.fill_board(board)
+    # def test_available_hexes2(self):
+    #     board = Board()
+    #     self.fill_board(board)
 
-        hq = board.find_zeton("sztab", "borgo")
-        board.update_available_hexs(["moloch"], board.adjacent_hexes((hq.x, hq.y)), None)
-        # print(board.available_hexs)
-        correct_output = self.filled_board(False)
-        correct_output[2][2] = True
-        correct_output[2][4] = True
-        assert(Diff().compare(board.available_hexs, correct_output))
+    #     hq = board.find_zeton("sztab", "borgo")
+    #     board.update_available_hexs(["moloch"], board.adjacent_hexes((hq.x, hq.y)), None)
+    #     # print(board.available_hexs)
+    #     correct_output = self.filled_board(False)
+    #     correct_output[2][2] = True
+    #     correct_output[2][4] = True
+    #     assert(Diff().compare(board.available_hexs, correct_output))
 
-    def test_available_hexes3(self):
-        board = Board()
-        self.fill_board(board)
-        board.update_available_hexs(["moloch", "borgo", None], board.ALL_HEXES, board.not_on_bound)        
+    # def test_available_hexes3(self):
+    #     board = Board()
+    #     self.fill_board(board)
+    #     board.update_available_hexs(["moloch", "borgo", None], board.ALL_HEXES, board.not_on_bound)        
     
-        correct_output = [[False] * board.length for i in range(board.width)]
-        correct_output[1][3] = True
-        correct_output[1][5] = True
-        correct_output[2][2] = True
-        correct_output[2][4] = True
-        correct_output[2][6] = True
-        correct_output[3][3] = True
-        correct_output[3][5] = True
-        assert(Diff().compare(board.available_hexs, correct_output))
+    #     correct_output = [[False] * board.length for i in range(board.width)]
+    #     correct_output[1][3] = True
+    #     correct_output[1][5] = True
+    #     correct_output[2][2] = True
+    #     correct_output[2][4] = True
+    #     correct_output[2][6] = True
+    #     correct_output[3][3] = True
+    #     correct_output[3][5] = True
+    #     assert(Diff().compare(board.available_hexs, correct_output))
 
 
     # def test_start(self):
