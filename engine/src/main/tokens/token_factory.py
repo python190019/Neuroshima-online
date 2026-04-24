@@ -17,4 +17,4 @@ class TokenFactory():
         elif(token_type == TokenType.BOARD):
             return BoardToken(name, fraction, data)
         # print("")
-        raise ValueError(f"nie znaleziono żetionu o nazwie {name} z frakcji {fraction}")
+        raise ValueError(f"nie znaleziono żetonu o nazwie {name} z frakcji {fraction}")

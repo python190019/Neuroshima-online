@@ -34,7 +34,7 @@ class Hand():
         return self.HAND_LIMITS.get(turn_type, self.DEFAULT_HAND_LIMIT)
 
     def is_full(self, turn_type):
-        return self.size == self.get_hand_limit(turn_type)
+        return self.size >= self.get_hand_limit(turn_type)
 
     def draw_token(self, token):
         self.tokens.append(token)

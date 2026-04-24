@@ -1,7 +1,7 @@
-class StateChangeEngine:
+class StateChangesEngine:
     def __init__(self):
         pass
 
-    def process(self, ctx, changes):
+    def apply(self, ctx, changes):
         for change in changes:
             change.apply(ctx)

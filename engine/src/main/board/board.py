@@ -154,15 +154,15 @@ class Board:
         x, y = pos
         self.board[x][y].dostan_rane(damage)
 
-    def on_board(self, pos):
-        if not isinstance(pos, tuple) or len(pos) != 2:
-            return False
-        x, y = pos
-        if(not isinstance(x, int)):
-            return False
-        if(not isinstance(y, int)):
-            return False
+    def on_board(self, pos : tuple[int, int]):
+        # if not isinstance(pos, tuple) or len(pos) != 2:
+        #     return False
+        # if(not isinstance(x, int)):
+        #     return False
+        # if(not isinstance(y, int)):
+            # return False
         
+        x, y = pos
         cx, cy = self.CENTER
         dx = abs(x - cx)
         dy = abs(y - cy)

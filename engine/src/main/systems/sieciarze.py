@@ -5,7 +5,11 @@ from main.utils.variable import Token
 class Sieciarze:
     def __init__(self, board):
         self.board = board
-        self.kwestia_sieciarzy()
+        # self.kwestia_sieciarzy()
+
+    @classmethod
+    def compute(cls, board):
+        cls(board).kwestia_sieciarzy()
 
     def dfs1(self, akt):
         self.odw.add(akt)

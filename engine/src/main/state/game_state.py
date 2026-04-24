@@ -110,3 +110,7 @@ class GameState:
     @property
     def current_player(self):
         return self.players[self.current_fraction]
+    
+    @property
+    def active_token(self):
+        return self.current_player.hand.get_active_token()

@@ -2,11 +2,19 @@
 class ActionContext():
     def __init__(self, state):
         self.state = state.state
-        
-        #shortcuts
-        self.selected = state.selected
-        self.fraction = state.current_fraction
-        self.board = state.board
-        self.player = state.current_player
-        # self.actions = actions
-        # self.rules = rules
+
+    #shortcuts
+    @property
+    def selected(self):
+        return self.state.selected
+    
+    @property
+    def fraction(self):
+        return self.state.current_fraction
+    
+    @property
+    def board(self):
+        return self.state.board
+
+    def player(self):
+        return self.state.current_player

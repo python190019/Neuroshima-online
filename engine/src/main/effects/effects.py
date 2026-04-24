@@ -16,19 +16,19 @@ class DiscardEffect():
     def apply(self, ctx):
         ctx.player.hand.discard_active_token()
     
-class ChangeStateEffect():
-    def __init__(self, new_state=State.NO_SELECTION):
-        self.new_state = new_state
+# class ChangeStateEffect():
+#     def __init__(self, new_state=State.NO_SELECTION):
+#         self.new_state = new_state
 
-    def apply(self, ctx):
-        ctx.state.state = self.new_state
+#     def apply(self, ctx):
+#         ctx.state.state = self.new_state
 
-class SetSelectedEffect():
-    def __init__(self, new_selected=None):
-        self.new_selected = new_selected or {}
+# class SetSelectedEffect():
+#     def __init__(self, new_selected=None):
+#         self.new_selected = new_selected or {}
     
-    def apply(self, ctx):
-        ctx.state.selected = self.new_selected
+#     def apply(self, ctx):
+#         ctx.state.selected = self.new_selected
 
 class DamageProfile:
     def __init__(

@@ -1,16 +1,16 @@
 from main.utils.variable import *
 
 
-class Validate():
+class FormatValidator():
     def __init__(self):
         self.validate_handlers = {
-            Action.Type.BOARD : self.validate_board_action,
-            Action.Type.HAND : self.validate_hand_action,
-            Action.Type.BOTTOM : self.validate_bottom_action,
-            Action.Type.ROTATE : self.validate_rotate_action
+            Action.Type.BOARD : self.validate_board_format,
+            Action.Type.HAND : self.validate_hand_format,
+            Action.Type.BOTTOM : self.validate_bottom_format,
+            Action.Type.ROTATE : self.validate_rotate_format
         }
 
-    def validate_board_action(self, state, action):
+    def validate_board_format(self, state, action):
         pos = action[Action.Key.POS]
         if(not isinstance(pos, tuple)):
             return False
@@ -19,27 +19,23 @@ class Validate():
         x, y = pos
         if(not isinstance(x, int) or not isinstance(y, int)):
             return False
-        if(not state.board.on_board(pos)):
-            return False
         return True
         # return state.available_actions[UI.BOARD][x][y]
 
-    def validate_hand_action(self, state, action):
+    def validate_hand_format(self, state, action):
         slot = action.get(Action.Key.SLOT, None)
         if(not isinstance(slot, int)):
             return False
         
-        if(state.current_player.hand.get_token(slot) is None):
-            return False
         return True
         # return game.available_actions[UI.HAND][game.current_frakcja][slot]
 
-    def validate_bottom_action(self, state, action):
+    def validate_bottom_format(self, state, action):
         name = action.get(Action.Key.BOTTOM, None)
         return name in Bottom
         # return game.available_actions[UI.BOTTOM][name]
 
-    def validate_rotate_action(self, state, action):
+    def validate_rotate_format(self, state, action):
         rotation = action.get(Action.Key.ROTATION, None)
         return isinstance(rotation, int)
 
