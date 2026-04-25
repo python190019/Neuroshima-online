@@ -3,7 +3,7 @@ from typing import get_origin, get_args
 from main.utils.variable import *
 from main.state.player_state import PlayerState
 from main.board.board import Board
-from main.state.selection import Selection
+from main.state.selection import Selected
 from main.flows.flows import FlowEvent
 
 def convert_value(value, target_type, key = None):
@@ -72,15 +72,15 @@ def print_obj(obj, deepth):
 @dataclass
 class GameState:
     phase : str
-    fractions : list[str]
-    interaction_state : str = State.NO_SELECTION
-    selected : Selection = field(default_factory=Selection)
-    active_action : dict = field(default_factory=dict)
-    current_fraction : str = ""
-    next_turns : list[dict] = field(default_factory=list)
-    players : dict[str, PlayerState] = field(default_factory=dict)
-    board : Board = field(default_factory=Board)
-    flow_queue : list[FlowEvent] = field(default_factory=list)
+    fractions           : list[str]
+    interaction_state   : str = State.NO_SELECTION
+    selected            : Selected = field(default_factory=Selected)
+    active_action       : dict = field(default_factory=dict)
+    current_fraction    : str = ""
+    next_turns          : list[dict] = field(default_factory=list)
+    players             : dict[str, PlayerState] = field(default_factory=dict)
+    board               : Board = field(default_factory=Board)
+    flow_queue          : list[FlowEvent] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data):
@@ -105,12 +105,3 @@ class GameState:
 
     def print_game_state(self):
         print_obj(self.to_dict(), 0)
-
-
-    @property
-    def current_player(self):
-        return self.players[self.current_fraction]
-    
-    @property
-    def active_token(self):
-        return self.current_player.hand.get_active_token()

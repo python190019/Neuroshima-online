@@ -1,21 +1,25 @@
 from main.utils.variable import *
 from main.tokens.abstract_token import Token
 from main.board.board_query import BoardQuery
-from main.actions.available_action_result import AvailableActionResult
-from main.actions.action_result import ActionResult
+from main.actions.available_actions.available_action_result import AvailableActionResult
+from main.actions.exeute_actions.action_result import ActionResult
+from main.effects.effects import *
+from main.flows.flows import StartBattleEvent, SwapPlayerEvent
+from main.state.changes import SetInteractionState, SetSelected, ResetInteraction
+from main.state.selection import Selected
 
 class InstantToken(Token):
     # TYPE = "instant"
 
-    def __init__(self, name, fraction):
-        super().__init__(name, fraction, TokenType.INSTANT)
-        self.use_handlers = {
-            InstantType.BITWA : self.use_bitwa,
-            InstantType.MOVE : self.use_move,
-            InstantType.BOMB : self.use_bomb,
-            InstantType.GRENADE : self.use_grenade,
-            InstantType.SNIPER : self.use_sniper,
-            InstantType.PUSH : self.use_push,
+    def __init__(self, rules, name, fraction):
+        super().__init__(rules, name, fraction, TokenType.INSTANT)
+        self.execute_handlers = {
+            InstantType.BITWA : self.execute_bitwa,
+            InstantType.MOVE : self.execute_move,
+            InstantType.BOMB : self.execute_bomb,
+            InstantType.GRENADE : self.execute_grenade,
+            InstantType.SNIPER : self.execute_sniper,
+            InstantType.PUSH : self.execute_push,
         }
         self.available_actions_handlers = {
             InstantType.BITWA : self.available_actions_bitwa,
@@ -26,8 +30,10 @@ class InstantToken(Token):
             InstantType.PUSH : self.available_actions_push,
         }
 
+
     def export(self):
         return self.name
+
 
     def get_available_actions(self, ctx):
         handler = self.available_actions_handlers.get(self.name, None)
@@ -35,103 +41,142 @@ class InstantToken(Token):
             return handler(ctx)
         return AvailableActionResult()
     
-    def use(self, ctx):
-        handler = self.use_handlers.get(self.name, None)
+    def execute(self, ctx, action):
+        handler = self.execute_handlers.get(self.name, None)
         if handler:
-            return handler(ctx)
+            return handler(ctx, action)
+    
+    def default_bottoms(self, ctx):
+        wanted_bottoms = [Bottom.DISCARD, Bottom.CANCEL]
+        return self.get_availabe_bottoms(ctx, wanted_bottoms)
+    
+    def get_availabe_bottoms(self, ctx, wanted):
+        return self.rules.get_available_bottoms(ctx, wanted)
     #############################################################################
     #   Bitwa functions       
     #############################################################################
 
     def available_actions_bitwa(self, ctx):
+        wanted_bootoms = [Bottom.USE, Bottom.DISCARD, Bottom.CANCEL]
         return AvailableActionResult(
-            can_use=ctx.rules.can_end_turn(),
-            can_discard=True
+            bottoms=self.get_availabe_bottoms(ctx, wanted_bootoms)
         )
 
-    def use_bitwa(self, ctx):
-        actions = ctx.actions
-        state = ctx.state
+    def execute_bitwa(self, ctx, action):
+        return ActionResult(
+            effects=[DiscardActiveTokenEffect()],
+            flow_events=[StartBattleEvent()]
+        )
+        # actions = ctx.actions
+        # state = ctx.state
 
-        ctx.player.hand.discard_active_token()
-        actions.koniec_tury(state)
-        state.next_turns.insert(0, {Turn.FRACTION : Turn.BITWA, Turn.TYPE : None})
-        actions.poczatek_tury(state)
+        # ctx.player.hand.discard_active_token()
+        # actions.koniec_tury(state)
+        # state.next_turns.insert(0, {Turn.FRACTION : Turn.BITWA, Turn.TYPE : None})
+        # actions.poczatek_tury(state)
 
     #############################################################################
     #   Move functions       
     #############################################################################
-    
 
     def available_actions_move(self, ctx):
-        state = ctx.state
-        rules = ctx.rules
-
-        if(state.interaction_state == State.SELECTED_HAND):
+        if(ctx.ui_state == State.SELECTED_HAND):
             query = BoardQuery([
-                    rules.is_ally,
-                    rules.can_move
+                    self.rules.is_ally,
+                    self.rules.can_move
                 ])
             return AvailableActionResult(
                 positions=query.apply(),
-                can_discard=True,
-                can_cancel=True
+                bottoms=self.default_bottoms(ctx)
             )
         
-        if(state.interaction_state == State.MOVING):
+        if(ctx.ui_state == State.MOVING):
             pos = ctx.selected.unit_position
             query = BoardQuery([
-                    rules.adjacent_to(pos),
-                    rules.is_empty
+                    self.rules.adjacent_to(pos),
+                    self.rules.is_empty
                 ])
             return AvailableActionResult(
                 positions = query.apply() + [pos],
-                can_cancel=True 
+                bottoms=self.default_bottoms(ctx)
             )
         
-    def use_move(self, ctx):
-        state = ctx.state
-        action = state.action
-        if(state.interaction_state == State.SELECTED_HAND):
+    def execute_move(self, ctx, action):
+        # state = ctx.state
+        # action = state.action
+        if(ctx.ui_state == State.SELECTED_HAND):
             pos = action[Action.Key.POS]
-            state.interaction_state = State.MOVING
-            state.selected.unit_position = pos
+            return ActionResult(
+                interaction_state_changes=[
+                    SetInteractionState(State.MOVING),
+                    SetSelected(Selected(pos))
+                ]
+            )
+            # state.interaction_state = State.MOVING
+            # state.selected.unit_position = pos
             # state.selected = {
             #     Selected.POS : pos, 
             #     Selected.NAME : ctx.board.get_name(pos)
             # }
 
-        if(state.interaction_state == State.MOVING):
-            old_pos = state.selected.unit_position
+        if(ctx.ui_state == State.MOVING):
+            old_pos = ctx.selected.unit_position
             new_pos = action[Action.Key.POS]
-            ctx.board.przenies(old_pos, new_pos)
-            state.interaction_state = State.ROTATE
-            state.selected.unit_position = new_pos
-            player = state.current_player
-            player.hand.discard_active_token()
+            return ActionResult(
+                effects=[
+                    MoveEffect(old_pos, new_pos),
+                    DiscardActiveTokenEffect()
+                ],
+                interaction_state_changes=[
+                    SetInteractionState(State.ROTATE),
+                    SetSelected(Selected(new_pos))
+                ]
+            )
+            # ctx.board.przenies(old_pos, new_pos)
+            # state.interaction_state = State.ROTATE
+            # state.selected.unit_position = new_pos
+            # player = state.current_player
+            # player.hand.discard_active_token()
           
     #############################################################################
     #   Bomb functions       
     #############################################################################
 
     def available_actions_bomb(self, ctx):
-        query = BoardQuery([ctx.rules.not_on_border])
+        query = BoardQuery([self.rules.not_on_border])
+        wanted_bottoms = [Bottom.DISCARD, Bottom.CANCEL, Bottom.USE]
         return AvailableActionResult(
             positions=query.apply(),
-            can_discard=True,
-            can_cancel=True
+            bottoms=self.get_availabe_bottoms(ctx, wanted_bottoms)
         )
     
-    def use_bomb(self, ctx):
-        pos = ctx.state.action[Action.Key.POS]
-        targets = [pos] + ctx.board.adjacent_hexes(pos)
-        for target in targets:
-            if(ctx.board.is_not_hq(target)):
-                ctx.board.deal_damage(pos, 1)
+    def execute_bomb(self, ctx, action):
+        pos = action[Action.Key.POS]
+        targets = [
+            pos, 
+            *ctx.board.adjacent_hexes(pos)
+            ]
+        profile = DamageProfile(
+            can_hit_hq=False, 
+            ignore_armor=True
+        )
+
+        return ActionResult(
+            effects=[
+                DamageEffect(pos = target, power = 1, profile = profile)
+                for target in targets
+            ] + [DiscardActiveTokenEffect()],
+            interaction_state_changes=[
+                ResetInteraction()
+            ]
+        )
+        # for target in targets:
+        #     if(ctx.board.is_not_hq(target)):
+        #         ctx.board.deal_damage(pos, 1)
         
-        ctx.board.zdejmij_trupy()
-        ctx.player.hand.discard_active_token()
-        ctx.actions.prepare_for_new_action(ctx.state)
+        # ctx.board.zdejmij_trupy()
+        # ctx.player.hand.discard_active_token()
+        # ctx.actions.prepare_for_new_action(ctx.state)
     
     #############################################################################
     #   Grenade functions       
@@ -139,139 +184,178 @@ class InstantToken(Token):
 
     def available_actions_grenade(self, ctx):
         positions = []
-        rules = ctx.rules
         # pos = ctx.board.find_zeton(BoardType.HQ, ctx.fraction)
         # tile = ctx.board.get_tile(pos)
         pos = ctx.board.get_hq_pos(ctx.fraction)
-        if rules.is_hq_not_wired(ctx.fraction):
+        if self.rules.is_hq_not_wired(ctx.fraction):
             query = BoardQuery([
-                rules.adjacent_to(pos),
-                rules.is_enemy,
-                rules.not_hq
+                self.rules.adjacent_to(pos),
+                self.rules.is_enemy,
+                self.rules.not_hq
             ])
-            
 
         return AvailableActionResult(
             positions = query.apply(),
-            can_cancel=True,
-            can_discard=True
+            bottoms = self.default_bottoms(ctx)
         )
 
-    def use_grenade(self, ctx):
-        pos = ctx.state.action[Action.Key.POS]
-        ctx.board.deal_damage(pos, 100)
-        ctx.board.zdejmij_trupy()
-        ctx.player.hand.discard_active_token()
-        ctx.actions.prepare_for_new_action(ctx.state)
+    def execute_grenade(self, ctx, action):
+        pos = action[Action.Key.POS]
+        profile = DamageProfile(can_hit_hq=False, ignore_armor=True)
+        return ActionResult(
+            effects=[
+                DamageEffect(
+                    pos = pos,
+                    power=100,
+                    profile=profile
+                ),
+                DiscardActiveTokenEffect()
+            ],
+            interaction_state_changes=[
+                ResetInteraction()
+            ]
+        )
+        # ctx.board.deal_damage(pos, 100)
+        # ctx.board.zdejmij_trupy()
+        # ctx.player.hand.discard_active_token()
+        # ctx.actions.prepare_for_new_action(ctx.state)
 
     #############################################################################
     #   Sniper functions       
     #############################################################################
 
     def available_actions_sniper(self, ctx):
-        rules = ctx.rules
+        # rules = ctx.rules
         query = BoardQuery([
-            rules.is_enemy,
-            rules.not_hq
+            self.rules.is_enemy,
+            self.rules.not_hq
         ])
         return AvailableActionResult(
             positions=query.apply(),  
-            can_cancel=True,
-            can_discard=True
+            bottoms = self.default_bottoms(ctx)
         )
 
     
-    def use_sniper(self, ctx):
-        pos = ctx.state.action[Action.Key.POS]
-        ctx.board.deal_damage(pos, 1)
-        ctx.board.zdejmij_trupy()
-        ctx.player.hand.discard_active_token()
+    def execute_sniper(self, ctx, action):
+        pos = action[Action.Key.POS]
+        profile = DamageProfile(can_hit_hq=False, ignore_armor=True)
+        return ActionResult(
+            effects=[
+                DamageEffect(
+                    pos = pos,
+                    power = 1,
+                    profile=profile
+                ),
+                DiscardActiveTokenEffect()
+            ],
+            interaction_state_changes=[
+                ResetInteraction()
+            ]
+        )
+        # ctx.board.deal_damage(pos, 1)
+        # ctx.board.zdejmij_trupy()
+        # ctx.player.hand.discard_active_token()
 
-        ctx.actions.prepare_for_new_action(ctx.state)
+        # ctx.actions.prepare_for_new_action(ctx.state)
 
     #############################################################################
     #   Push functions       
     #############################################################################
     def _push_selected_hand(self, ctx):
-        rules = ctx.rules
         query = BoardQuery([
-            rules.can_push,
-            rules.is_ally
+            self.rules.can_push,
+            self.rules.is_ally
         ])
         return AvailableActionResult(
             positions=query.apply(),
-            can_cancel=True,
-            can_discard=True
+            bottoms = self.default_bottoms(ctx)
         )
 
     def _push_selected_pusher(self, ctx):
         pusher_pos = ctx.selected.unit_position
-        rules = ctx.rules
         query = BoardQuery([
-            rules.adjacent_to(pusher_pos),
-            rules.is_enemy,
-            rules.can_be_pushed_by(pusher_pos)
+            self.rules.adjacent_to(pusher_pos),
+            self.rules.is_enemy_at,
+            self.rules.can_be_pushed_by(pusher_pos)
         ])
+
         return AvailableActionResult(
             positions=query.apply(),
-            can_discard=True,
-            can_cancel=True
+            bottoms=self.default_bottoms(ctx)
         )
 
     def _push_selected_pushing(self, ctx):
         my_pos = ctx.selected.target_position
         pusher_pos = ctx.selected.unit_position
-        rules = ctx.rules
+        # rules = ctx.rules
         query = BoardQuery([
-            rules.adjacent_to(my_pos),
-            rules.is_empty,
-            rules.not_adjacent_to(pusher_pos)
+            self.rules.adjacent_to(my_pos),
+            self.rules.is_empty_at,
+            self.rules.not_adjacent_to(pusher_pos)
         ])
         return AvailableActionResult(positions=query.apply())
 
     def available_actions_push(self, ctx):
-        state = ctx.state.interaction_state
+        # state = ctx.state.interaction_state
 
         handler = {
             State.SELECTED_HAND: self._push_selected_hand,
             State.SELECTED_PUSHER: self._push_selected_pusher,
             # State.PUSHING: self._push_pushing,
-        }.get(state)
+        }.get(ctx.ui_state)
 
         if handler:
             return handler(ctx)
 
         return AvailableActionResult()
 
-    def use_push(self, ctx):
-        if(ctx.state.interaction_state == State.SELECTED_HAND):
-            ctx.state.interaction_state = State.SELECTED_PUSHER
-            pos = ctx.state.action[Action.Key.POS]
-            # ctx.state.selected = {
-            #     Selected.POS : pos, 
-            #     Selected.NAME : ctx.board.get_name(pos)
-            # }
-            ctx.state.selected.unit_position = pos
-            ctx.active_action = InstantType.PUSH
+    def execute_push(self, ctx, action):
+        if(ctx.ui_state == State.SELECTED_HAND):
+            pos = action[Action.Key.POS]
+            return ActionResult(
+                interaction_state_changes=[
+                    SetInteractionState(State.SELECTED_PUSHER),
+                    SetSelected(pos)
+                ]
+            )
+            # ctx.state.interaction_state = State.SELECTED_PUSHER
+            # ctx.state.selected.unit_position = pos
+            # ctx.active_action = InstantType.PUSH
         
-        elif(ctx.state.interaction_state== State.SELECTED_PUSHER):
-            pos = ctx.state.action[Action.Key.POS]
+        elif(ctx.state.interaction_state == State.SELECTED_PUSHER):
+            pos = action[Action.Key.POS]
             pusher_pos = ctx.selected.unit_position
-            # ctx.state.selected={
-            #     Selected.POS : pos,
-            #     Selected.NAME : ctx.board.get_name(pos),
-            #     Selected.PUSHER_POS : pusher_pos
-            # }
-            ctx.selected.target_position = pos
-            ctx.state.interaction_state = State.PUSHING
-            ctx.state.active_action = InstantType.PUSH
-            ctx.state.current_frakcja = ctx.state.get_enemy(ctx.fraction, ctx.state.fractions)
+            return ActionResult(
+                interaction_state_changes=[
+                    SetInteractionState(State.PUSHING),
+                    SetSelected(SetSelected(pusher_pos, pos))
+                ],
+                flow_events=[
+                    SwapPlayerEvent(),
+                ]
+            )
+            # ctx.selected.target_position = pos
+            # ctx.state.interaction_state = State.PUSHING
+            # ctx.state.active_action = InstantType.PUSH
+            # ctx.state.current_frakcja = ctx.state.get_enemy(ctx.fraction, ctx.state.fractions)
             
 
         elif(ctx.state.interaction_state == State.PUSHING):
             target_pos = ctx.selected.target_position
-            new_pos = ctx.state.action[Action.Key.POS]
-            ctx.board.przenies(target_pos, new_pos)
-            ctx.state.current_frakcja = ctx.state.get_enemy(ctx.fraction, ctx.state.fractions)
-            ctx.player.hand.discard_active_token()
-            ctx.actions.prepare_for_new_action(ctx.state)
+            new_pos = action[Action.Key.POS]
+            return ActionResult(
+                effects=[
+                    MoveEffect(target_pos, new_pos),
+                    DiscardActiveTokenEffect()
+                ],
+                interaction_state_changes=[
+                    ResetInteraction()
+                ],
+                flow_events=[
+                    SwapPlayerEvent()
+                ]
+            )
+            # ctx.board.przenies(target_pos, new_pos)
+            # ctx.state.current_frakcja = ctx.state.get_enemy(ctx.fraction, ctx.state.fractions)
+            # ctx.player.hand.discard_active_token()
+            # ctx.actions.prepare_for_new_action(ctx.state)

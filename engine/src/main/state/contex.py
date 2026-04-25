@@ -16,5 +16,18 @@ class ActionContext():
     def board(self):
         return self.state.board
 
+    @property
     def player(self):
         return self.state.current_player
+    
+    @property
+    def active_token(self):
+        token = self.player.hand.get_active_token()
+        if token:
+            return token
+        else:
+            return self.board.get_tile(self.selected.unit_position)
+
+    @property
+    def ui_state(self):
+        return self.state.interaction_state

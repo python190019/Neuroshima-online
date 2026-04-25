@@ -9,3 +9,9 @@ class BeginTurnEvent(FlowEvent):
 
 class StartBattleEvent(FlowEvent):
     pass
+
+class SetupBattleEvent(FlowEvent):
+    pass
+
+class SwapPlayerEvent(FlowEvent):
+    pass

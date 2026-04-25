@@ -8,8 +8,16 @@ class MoveEffect():
     def apply(self, ctx):
         ctx.board.move(self.from_pos, self.to_pos)
 
+class PlaceEffect():
+    def __init__(self, pos, unit):
+        self.pos = pos
+        self.unit = unit
+    
+    def apply(self, ctx):
+        ctx.board.assign_to_tile(pos=self.pos, unit = self.unit)
 
-class DiscardEffect():
+
+class DiscardActiveTokenEffect():
     def __init__(self):
         pass
 
@@ -41,7 +49,7 @@ class DamageProfile:
 
 class DamageEffect():
     def __init__(self, pos, power, profile=None):
-        self.pos = pos,
+        self.pos = pos
         self.power = power
         self.profile = profile or DamageProfile()
     

@@ -1,5 +1,5 @@
 
-class Selection():
+class Selected():
     UNIT_KEY = "unit"
     TARGET_KEY = "target"
     def __init__(self, unit_position=None, target_position=None):
@@ -16,5 +16,5 @@ class Selection():
     def to_dict(self):
         return {
             self.UNIT_KEY : self.unit_position,
-            self.target_position : self.target_position
+            self.TARGET_KEY : self.target_position
         }

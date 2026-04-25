@@ -2,18 +2,22 @@ from copy import deepcopy
 import main.frakcje.wszystkie_frakcje as allfractions
 from main.utils.variable import *
 from copy import deepcopy
-from main.tokens.abstract_token import Token as AbstractToken
-from main.actions.available_action_result import AvailableActionResult
+from main.tokens.abstract_token import Token
+from main.actions.available_actions.available_action_result import AvailableActionResult
+from main.actions.exeute_actions.action_result import ActionResult
 from main.board.board_query import BoardQuery
+from main.effects.effects import DiscardActiveTokenEffect, PlaceEffect
+from main.state.changes import SetInteractionState, SetSelected
+from main.state.selection import Selected
 
-class BoardToken(AbstractToken):
+class BoardToken(Token):
     DEFAULT = {
         TokenKey.NAME : "default",
         TokenKey.FRACTION : "neutral",
         TokenKey.ROTATION : 0,
         TokenKey.DAMAGE : 0,
-        TokenKey.X : -1,
-        TokenKey.Y : -1
+        # TokenKey.X : -1,
+        # TokenKey.Y : -1
         # Token.WIRED : False
     }
     TYPE = "board"
@@ -25,17 +29,17 @@ class BoardToken(AbstractToken):
     #     token[TokenKey.FRACTION] = fraction
     #     return token
 
-    def __init__(self, name, fraction, data):
+    def __init__(self, rules, name, fraction, data):
         merged = {**self.DEFAULT, **data}
         # print(data)
         # print("token.name:", Token.NAME)
         # self.frakcja = data[Token.FRACTION]
         # self.name = data[Token.NAME]
-        super().__init__(name, fraction, TokenType.BOARD)
+        super().__init__(rules, name, fraction, TokenType.BOARD)
         self.rotacja = merged[TokenKey.ROTATION]
         self.rany = merged[TokenKey.DAMAGE]
-        self.x = merged[TokenKey.X]
-        self.y = merged[TokenKey.Y]
+        # self.x = merged[TokenKey.X]
+        # self.y = merged[TokenKey.Y]
         raw_wlasciwosci = allfractions.frakcje.get(
             self.fraction, {}
         ).get(self.name, {})
@@ -73,6 +77,33 @@ class BoardToken(AbstractToken):
             can_discard=self.name != BoardType.HQ,
             can_cancel=True
         )
+
+    def execute_placing(self, pos):
+        # pos = action[Action.Key.POS]
+        return ActionResult(
+            effects=[
+                PlaceEffect(pos=pos, unit=self),
+                DiscardActiveTokenEffect()
+            ],
+            interaction_state_changes=[
+                SetInteractionState(State.ROTATE),
+                SetSelected(Selected(pos))
+            ]
+        )
+
+    def execute_selecting(self):
+        return ActionResult(
+            interaction_state_changes=[
+                SetInteractionState(State.SELECTED_HAND)
+            ]
+        )
+
+    def execute(self, ctx, action):
+        if(ctx.state.interaction_state == State.NO_SELECTION):
+            return self.execute_selecting()
+        if(ctx.state.insteraction_state == State.SELECTED_HAND):
+            return self.execute_placing(action[Action.Key.POS])
+
 
     def export(self):
         return self.name
@@ -147,10 +178,10 @@ class BoardToken(AbstractToken):
         
     def dostan_rane(self, obrazenia):
         self.rany += obrazenia
-        # kierunek -> skad przychodzi atak
-        # print("dostalem rane", self.frakcja, self.name, obrazenia, kierunek, czy_blokowalny)
 
     def attacked(self, obrazenia, kierunek, czy_blokowalny=False):
+        # kierunek -> skad przychodzi atak
+        # print("dostalem rane", self.frakcja, self.name, obrazenia, kierunek, czy_blokowalny)
         print(f"{self.name} atakowany, obrazenia {obrazenia}, kierunek {kierunek}, czy_blokowalny {czy_blokowalny}")
         kierunek2 = (kierunek - self.rotacja + 6) % 6
         pancerz = self.wlasciwosci.get(Token.Stats.ARMOR, {})
@@ -166,8 +197,17 @@ class BoardToken(AbstractToken):
         #     # wywolaj_medyka()
         #     self.board[self.x][self.y] = None
 
+    def get_stat(self, stat_key):
+        return self.wlasciwosci.get(stat_key, None)
+
+    def can_activate(self, initiative):
+        initiatives = self.get_stat(Token.Stats.INITIATIVE)
+        if initiatives:
+            return initiative in initiative
+        return False
+
     def daj_ataki(self, inicjatywa):
-        if (inicjatywa not in self.wlasciwosci.get(Token.Stats.INITIATIVE, [])):
+        if not self.can_activate():
             return {}
 
         attacks = self.wlasciwosci.get(Token.Stats.ATTACKS, {})

@@ -49,6 +49,9 @@ class Hand():
             drawn_token = pile.remove_token()
             self.tokens.append(drawn_token)
 
+    def reset_active_token(self):
+        self.active_token = None
+
     def get_token(self, place):
         if(place < 0 or place >= len(self.tokens)):
             return None

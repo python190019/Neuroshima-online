@@ -1,7 +1,11 @@
 from main.flows.flows import EndTurnEvent
 from main.flows.flows import BeginTurnEvent
 from main.flows.flows import StartBattleEvent
-from main.utils.variable import Turn
+from main.flows.flows import SetupBattleEvent
+from main.utils.variable import Turn, Phase
+from main.actions.exeute_actions.action_result import ActionResult
+from main.state.changes import ResetInteraction
+from main.battle.battle import Battle
 
 class FlowProcessor():
     def __init__(self):
@@ -14,11 +18,11 @@ class FlowProcessor():
     def process(self, ctx):
         while ctx.state.flow_queue:
             event = ctx.state.flow_queue.pop(0)
-            function = self.handler.get(event)
+            function = self.handler.get(type(event))
             if function:
                 function(ctx)
             else:
-                raise ValueError("No such event\n")
+                raise ValueError(f"No such event {event}\n")
 
      #############################################################################
     #   Turn functions       
@@ -62,12 +66,35 @@ class FlowProcessor():
     def end_turn(self, ctx):
         next_turn = ctx.state.next_turns[0]
         fraction = next_turn[Turn.FRACTION]
-        
+
         ctx.state.next_turns.pop(0)
-        ctx.state.next_turns.append({Turn.FRACTION : fraction, Turn.TYPE : Turn.Type.STANDARD})
+        ctx.state.next_turns.append({
+            Turn.FRACTION : fraction, 
+            Turn.TYPE : Turn.Type.STANDARD
+        })
+
+        return ActionResult(interaction_state_changes=[ResetInteraction()])
 
     def begin_turn(self, ctx):
-        pass
+        fraction = ctx.state.next_turns[0][Turn.FRACTION]
+        type = ctx.state.next_turns[0][Turn.TYPE]
+        ctx.state.current_frakcja = fraction
+        
+        if(type == Turn.Type.HQ_PLACEMENT):
+            ctx.state.phase = Phase.HQ_PLACEMENT
+        else:
+            ctx.state.phase = Phase.GAME
+
+        ctx.player.draw_tokens(type)
+        return ActionResult()
+
+    def setup_battle(self, ctx):
+        Battle().run()
+        ctx.flow_queue.append(BeginTurnEvent())
 
     def start_battle(self, ctx):
-        pass
+        ctx.phase = Phase.BATTLE
+        ctx.flow_queue.append(EndTurnEvent())
+        ctx.flow_queue.append(SetupBattleEvent())
+        
+        

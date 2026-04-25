@@ -1,8 +1,9 @@
 from random import shuffle
 
-from main.actions.akcje import Actions
-from main.core.game_state import GameState
-from main.core.player_state import PlayerState
+from main.systems.sieciarze import Sieciarze as Actions
+from main.state.game_state import GameState
+from main.state.player_state import PlayerState
+from main.rules.game_rules import GameRules
 from main.utils.variable import *
 
 class Game:
@@ -12,8 +13,9 @@ class Game:
             data['fractions'] = [fractions["player1"], fractions["player2"]]
         # print("data:", data)
         self.state = GameState.from_dict(data)
+        self.rules = GameRules()
         self.action = data.get("action")
-        self.actions = Actions(self)
+        self.actions = Actions(self.rules)
         self.actions.kwestia_sieciarzy(self.state.board)
         # self.board = Board()
         # self.faza = data["faza"]

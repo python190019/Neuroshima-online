@@ -5,7 +5,7 @@ from main.utils.variable import *
 
 class TokenFactory():
     @staticmethod
-    def create(name, fraction, data={}):
+    def create(rules, name, fraction, data={}):
         # cos = allfractions.frakcje.get("moloch", {})
         # print("cos:", cos)
         # print("name:", name)
@@ -13,8 +13,8 @@ class TokenFactory():
         # print(stats)
         token_type = stats.get(TokenKey.TYPE)
         if(token_type == TokenType.INSTANT):
-            return InstantToken(name, fraction)
+            return InstantToken(rules, name, fraction)
         elif(token_type == TokenType.BOARD):
-            return BoardToken(name, fraction, data)
+            return BoardToken(rules, name, fraction, data)
         # print("")
         raise ValueError(f"nie znaleziono żetonu o nazwie {name} z frakcji {fraction}")

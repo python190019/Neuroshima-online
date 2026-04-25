@@ -7,7 +7,7 @@ class GameRules():
     #   bottom validation functions       
     #############################################################################
     def can_execute_use(self, ctx):
-        if(ctx.interaction_phase != State.SELECTED_HAND):
+        if(ctx.ui_state != State.SELECTED_HAND):
             return False
         
         if(ctx.state.active_token.name != InstantType.BITWA):
@@ -19,7 +19,7 @@ class GameRules():
         return self.can_end_turn(ctx)
     
     def can_execute_discard(self, ctx):
-        if(ctx.interaction_phase != State.SELECTED_HAND):
+        if(ctx.ui_state != State.SELECTED_HAND):
             return False
             
         return not self.is_token_hq(ctx.state.active_token)
@@ -45,7 +45,9 @@ class GameRules():
             if self.can_use_bottom(ctx=ctx, bottom=bottom)
         ]
 
-    def get_available_from_hand(self, hand):
+    def get_available_from_hand(self, ctx, hand):
+        if(hand.fraction != ctx.fraction):
+            return []
         return [i for i in range(hand.size)]
 
     #############################################################################

@@ -32,9 +32,12 @@ class GameEngine:
         #     return False
 
         result = self.actions.execute_action(ctx, action)
+        
         self.state_engine.apply(ctx, result.interaction_state_changes)
         self.effect_engine.apply(ctx, result.effects)
-        self.flow_engine.apply(ctx, result.flow_events)
+        
+        flow_result = self.flow_engine.apply(ctx, result.flow_events)
+        self.state_engine.apply(ctx, flow_result.interaction_state_changes)
 
         self.passive_system.compute(ctx)
         return self.available_actions.get_available_actions()

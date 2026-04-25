@@ -1,5 +1,5 @@
 from main.utils.variable import State
-from main.state.selection import Selection
+from main.state.selection import Selected
 
 class StateChange:
     pass
@@ -18,7 +18,7 @@ class SetSelected(StateChange):
         self.selected = selected
 
     def apply(self, ctx):
-        ctx.selectdc = self.selected
+        ctx.selected = self.selected
 
 class ResetInteraction(StateChange):
     def __init__(self):
@@ -26,5 +26,6 @@ class ResetInteraction(StateChange):
         pass
 
     def apply(self, ctx):
-        SetSelected(Selection()).apply(ctx)
+        ctx.player.hand.reset_active_token()
+        SetSelected(Selected()).apply(ctx)
         SetInteractionState().apply(ctx)

@@ -121,10 +121,6 @@ class Board:
         return self.get_tile(pos).name
     
     def is_valid_target(self, pos, frakcja, czy_sztab=False):
-        # if (not self.is_index_on_board(x, y)):
-        #     return False
-
-        # print(f"valid target: ({x},{y}), frakcja {frakcja}, frakcja2 {self.get_type((x, y))}, czy_sztab {czy_sztab}")
         if(not self.on_board(pos)):
             return False
         if(self.is_empty(pos)):
@@ -155,13 +151,6 @@ class Board:
         self.board[x][y].dostan_rane(damage)
 
     def on_board(self, pos : tuple[int, int]):
-        # if not isinstance(pos, tuple) or len(pos) != 2:
-        #     return False
-        # if(not isinstance(x, int)):
-        #     return False
-        # if(not isinstance(y, int)):
-            # return False
-        
         x, y = pos
         cx, cy = self.CENTER
         dx = abs(x - cx)
