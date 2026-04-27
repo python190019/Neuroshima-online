@@ -105,3 +105,8 @@ class GameState:
 
     def print_game_state(self):
         print_obj(self.to_dict(), 0)
+
+    def add_player(self, fraction):
+        player = PlayerState(fraction)
+        player.new_game()
+        self.state.players[fraction] = player

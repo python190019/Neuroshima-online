@@ -1,6 +1,7 @@
+from main.state.game_state import GameState
 
 class ActionContext():
-    def __init__(self, state):
+    def __init__(self, state : GameState):
         self.state = state.state
 
     #shortcuts

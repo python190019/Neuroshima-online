@@ -13,7 +13,7 @@ class FlowProcessor():
         self.rules = rules
         self.handler = {
             EndTurnEvent : self.end_turn,
-            BeginTurnEvent : self.begin_turn,
+            BeginTurnEvent : self.start_turn,
             StartBattleEvent : self.start_battle,
             SetupBattleEvent : self.setup_battle, 
             SwapPlayerEvent : self.swap_player,
@@ -79,7 +79,7 @@ class FlowProcessor():
 
         return ActionResult(interaction_state_changes=[ResetInteraction()])
 
-    def begin_turn(self, ctx):
+    def start_turn(self, ctx):
         fraction = ctx.state.next_turns[0][Turn.FRACTION]
         type = ctx.state.next_turns[0][Turn.TYPE]
         ctx.state.current_frakcja = fraction
