@@ -10,7 +10,7 @@ class GameRules():
         if(ctx.ui_state != State.SELECTED_HAND):
             return False
         
-        if(ctx.state.active_token.name != InstantType.BITWA):
+        if(ctx.active_token.name != InstantType.BITWA):
             return True
         
         if(self.is_hand_full(ctx.state.player.hand)):
@@ -22,7 +22,10 @@ class GameRules():
         if(ctx.ui_state != State.SELECTED_HAND):
             return False
             
-        return not self.is_token_hq(ctx.state.active_token)
+        return not self.is_token_hq(ctx.active_token)
+
+    def can_end_turn(self, ctx):
+        return not ctx.state.player.hand.is_full()
 
     def can_use_bottom(self, ctx, bottom):
         if(bottom == Bottom.USE):
@@ -110,26 +113,37 @@ class GameRules():
     def is_hq_at(self, ctx, pos):
         return ctx.board.is_hq(pos)
     
+    def not_hq_at(self, ctx, pos):
+        return not self.is_hq_at(ctx, pos)
+    
+    def can_move(self, ctx, pos):
+        return self._can_move(ctx, pos)
+
     def can_move_from(self, ctx, pos):
         return self._can_move(ctx, pos)
 
     def can_push_from(self, ctx, pusher_pos):
         return self._can_push(ctx, pusher_pos)
     
+    def can_push(self, ctx, pos):
+        return self._can_push(ctx, pos)
+
     #############################################################################
     #   Other useful functions       
     #############################################################################
     def is_hand_full(self, hand):
         return hand.is_full()
 
-    def can_end_turn(self, ctx):
-        return not ctx.state.player.hand.is_full()
-
     def is_hq_not_wired(self, ctx):
         return not ctx.board.is_wired(ctx, ctx.board.get_hq_pos(ctx.fraction))
     
     def is_token_hq(self, token):
         return token.name == BoardType.HQ
+
+    def get_enemy(self, ctx, my_fraction):
+        for fraction in ctx.state.fractions:
+            if(fraction != my_fraction):
+                return fraction
 
     #############################################################################
     #   Predicate makers       

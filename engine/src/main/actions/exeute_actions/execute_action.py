@@ -68,7 +68,7 @@ class Actions:
     def handle_board(self, ctx, action):
         pos = action[Action.Key.POS]
         if ctx.board.is_empty(pos):
-            return ctx.active.token.execute(ctx, action)
+            return ctx.active_token.execute(ctx, action)
         
         return ctx.board.get_tile(pos).execute(ctx, action)
 

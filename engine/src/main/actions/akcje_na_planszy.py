@@ -1,4 +1,4 @@
-from main.actions.sieciarze import Sieciarze
+from main.systems.sieciarze import Sieciarze
 from main.utils.variable import *
 
 class AkcjeNaPlanszy:

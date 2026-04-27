@@ -2,17 +2,21 @@ from main.flows.flows import EndTurnEvent
 from main.flows.flows import BeginTurnEvent
 from main.flows.flows import StartBattleEvent
 from main.flows.flows import SetupBattleEvent
+from main.flows.flows import SwapPlayerEvent
 from main.utils.variable import Turn, Phase
 from main.actions.exeute_actions.action_result import ActionResult
 from main.state.changes import ResetInteraction
 from main.battle.battle import Battle
 
 class FlowProcessor():
-    def __init__(self):
+    def __init__(self, rules):
+        self.rules = rules
         self.handler = {
             EndTurnEvent : self.end_turn,
             BeginTurnEvent : self.begin_turn,
-            StartBattleEvent : self.start_battle 
+            StartBattleEvent : self.start_battle,
+            SetupBattleEvent : self.setup_battle, 
+            SwapPlayerEvent : self.swap_player,
         }
 
     def process(self, ctx):
@@ -88,6 +92,9 @@ class FlowProcessor():
         ctx.player.draw_tokens(type)
         return ActionResult()
 
+    def swap_player(self, ctx):
+        ctx.state.current_fraction = self.rules.get_enemy(ctx, ctx.fraction)
+
     def setup_battle(self, ctx):
         Battle().run()
         ctx.flow_queue.append(BeginTurnEvent())
@@ -96,5 +103,3 @@ class FlowProcessor():
         ctx.phase = Phase.BATTLE
         ctx.flow_queue.append(EndTurnEvent())
         ctx.flow_queue.append(SetupBattleEvent())
-        
-        

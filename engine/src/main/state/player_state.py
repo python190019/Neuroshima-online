@@ -31,4 +31,4 @@ class PlayerState:
         self.pile.new_pile()
 
     def draw_tokens(self, turn_type):
-        self.hand.draw_tokens(self.piel, turn_type)
+        self.hand.draw_tokens(self.pile, turn_type)

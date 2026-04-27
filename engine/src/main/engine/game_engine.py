@@ -20,7 +20,7 @@ class GameEngine:
 
         self.effect_engine      = effect_engine
         self.state_engine       = state_changes_engine
-        self.flow_engine     = flow_engine
+        self.flow_engine        = flow_engine
         
         self.passive_system     = passive_system
 
@@ -36,7 +36,8 @@ class GameEngine:
         self.state_engine.apply(ctx, result.interaction_state_changes)
         self.effect_engine.apply(ctx, result.effects)
         
-        flow_result = self.flow_engine.apply(ctx, result.flow_events)
+        ctx.state.flow_queue.extend(result.flow_events)
+        flow_result = self.flow_engine.apply(ctx)
         self.state_engine.apply(ctx, flow_result.interaction_state_changes)
 
         self.passive_system.compute(ctx)

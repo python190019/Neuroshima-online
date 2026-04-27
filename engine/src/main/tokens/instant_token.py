@@ -34,7 +34,6 @@ class InstantToken(Token):
     def export(self):
         return self.name
 
-
     def get_available_actions(self, ctx):
         handler = self.available_actions_handlers.get(self.name, None)
         if handler:
@@ -82,11 +81,11 @@ class InstantToken(Token):
     def available_actions_move(self, ctx):
         if(ctx.ui_state == State.SELECTED_HAND):
             query = BoardQuery([
-                    self.rules.is_ally,
+                    self.rules.is_ally_at,
                     self.rules.can_move
                 ])
             return AvailableActionResult(
-                positions=query.apply(),
+                positions=query.apply(ctx),
                 bottoms=self.default_bottoms(ctx)
             )
         
@@ -94,10 +93,10 @@ class InstantToken(Token):
             pos = ctx.selected.unit_position
             query = BoardQuery([
                     self.rules.adjacent_to(pos),
-                    self.rules.is_empty
+                    self.rules.is_empty_at
                 ])
             return AvailableActionResult(
-                positions = query.apply() + [pos],
+                positions = query.apply(ctx) + [pos],
                 bottoms=self.default_bottoms(ctx)
             )
         
@@ -143,11 +142,10 @@ class InstantToken(Token):
     #############################################################################
 
     def available_actions_bomb(self, ctx):
-        query = BoardQuery([self.rules.not_on_border])
-        wanted_bottoms = [Bottom.DISCARD, Bottom.CANCEL, Bottom.USE]
+        query = BoardQuery([self.rules.is_not_on_border])
         return AvailableActionResult(
-            positions=query.apply(),
-            bottoms=self.get_availabe_bottoms(ctx, wanted_bottoms)
+            positions=query.apply(ctx),
+            bottoms=self.default_bottoms(ctx)      
         )
     
     def execute_bomb(self, ctx, action):
@@ -190,12 +188,12 @@ class InstantToken(Token):
         if self.rules.is_hq_not_wired(ctx.fraction):
             query = BoardQuery([
                 self.rules.adjacent_to(pos),
-                self.rules.is_enemy,
-                self.rules.not_hq
+                self.rules.is_enemy_at,
+                self.rules.not_hq_at
             ])
 
         return AvailableActionResult(
-            positions = query.apply(),
+            positions = query.apply(ctx),
             bottoms = self.default_bottoms(ctx)
         )
 
@@ -227,11 +225,11 @@ class InstantToken(Token):
     def available_actions_sniper(self, ctx):
         # rules = ctx.rules
         query = BoardQuery([
-            self.rules.is_enemy,
-            self.rules.not_hq
+            self.rules.is_enemy_at,
+            self.rules.not_hq_at
         ])
         return AvailableActionResult(
-            positions=query.apply(),  
+            positions=query.apply(ctx),  
             bottoms = self.default_bottoms(ctx)
         )
 
@@ -264,10 +262,10 @@ class InstantToken(Token):
     def _push_selected_hand(self, ctx):
         query = BoardQuery([
             self.rules.can_push,
-            self.rules.is_ally
+            self.rules.is_ally_at
         ])
         return AvailableActionResult(
-            positions=query.apply(),
+            positions=query.apply(ctx),
             bottoms = self.default_bottoms(ctx)
         )
 
@@ -279,9 +277,10 @@ class InstantToken(Token):
             self.rules.can_be_pushed_by(pusher_pos)
         ])
 
+        wanted_bottoms = [Bottom.CANCEL]
         return AvailableActionResult(
-            positions=query.apply(),
-            bottoms=self.default_bottoms(ctx)
+            positions=query.apply(ctx),
+            bottoms=self.get_availabe_bottoms(ctx, wanted_bottoms)
         )
 
     def _push_selected_pushing(self, ctx):
@@ -293,7 +292,7 @@ class InstantToken(Token):
             self.rules.is_empty_at,
             self.rules.not_adjacent_to(pusher_pos)
         ])
-        return AvailableActionResult(positions=query.apply())
+        return AvailableActionResult(positions=query.apply(ctx))
 
     def available_actions_push(self, ctx):
         # state = ctx.state.interaction_state
@@ -301,7 +300,7 @@ class InstantToken(Token):
         handler = {
             State.SELECTED_HAND: self._push_selected_hand,
             State.SELECTED_PUSHER: self._push_selected_pusher,
-            # State.PUSHING: self._push_pushing,
+            State.PUSHING: self._push_selected_pushing,
         }.get(ctx.ui_state)
 
         if handler:
