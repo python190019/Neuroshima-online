@@ -1,21 +1,9 @@
+import { useState } from "react";
+import LoginScreen from "./Loginscreen";
 function App() {
+  const [name, setName] = useState("");
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
-      <div
-        style={{
-          width: 150,
-          height: 150,
-          backgroundColor: "royalblue",
-        }}
-      />
-    </div>
+    LoginScreen()
   );
 }
 
