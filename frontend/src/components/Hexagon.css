@@ -1,0 +1,40 @@
+.hexagon {
+  position: absolute;
+
+  aspect-ratio: 1 / 0.866; /* width : height = 1 : sqrt(3)/2 */
+
+  clip-path: polygon(
+    25% 0%,
+    75% 0%,
+    100% 50%,
+    75% 100%,
+    25% 100%,
+    0% 50%
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: transform 0.2s;
+}
+
+.hexagon.rotated {
+  transform: rotate(30deg);
+}
+
+.hexagon.rotated:hover {
+  transform: rotate(30deg) scale(1.05);
+}
+
+/* keep text readable */
+.hexagon-content {
+  pointer-events: none;
+}
+
+.hexagon.rotated .hexagon-content {
+  transform: rotate(-30deg);
+}
