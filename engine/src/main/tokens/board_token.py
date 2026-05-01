@@ -6,8 +6,8 @@ from main.tokens.abstract_token import Token
 from main.actions.available_actions.available_action_result import AvailableActionResult
 from main.actions.exeute_actions.action_result import ActionResult
 from main.board.board_query import BoardQuery
-from main.effects.effects import DiscardActiveTokenEffect, PlaceEffect
-from main.state.changes import SetInteractionState, SetSelected
+from main.effects.board_effects import DiscardActiveTokenEffect, PlaceEffect
+from main.effects.ui_change_effects  import SetInteractionState, SetSelected
 from main.state.selection import Selected
 
 class BoardToken(Token):
@@ -21,13 +21,6 @@ class BoardToken(Token):
         # Token.WIRED : False
     }
     TYPE = "board"
-
-    # @classmethod
-    # def clear_token(cls, name, fraction):
-    #     token = deepcopy(cls.default_token)
-    #     token[TokenKey.NAME] = name
-    #     token[TokenKey.FRACTION] = fraction
-    #     return token
 
     def __init__(self, rules, name, fraction, data):
         merged = {**self.DEFAULT, **data}

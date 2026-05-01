@@ -1,8 +1,10 @@
 from main.state.game_state import GameState
+from main.rules.game_rules import GameRules
 
 class ActionContext():
-    def __init__(self, state : GameState):
-        self.state = state.state
+    def __init__(self, state : GameState, rules : GameRules):
+        self.state = state
+        self.rules = rules
 
     #shortcuts
     @property

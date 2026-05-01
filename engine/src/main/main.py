@@ -1,14 +1,12 @@
 from main.state.game_state import GameState
 from main.state.contex import ActionContext
-from main.state.state_changes_engine import StateChangesEngine
 
 from main.rules.game_rules import GameRules
 from main.rules.validator import FormatValidator
 
-from main.engine.flow_engine import FlowProcessor
 from main.engine.game_engine import GameEngine
+from main.engine.resolver import Resolver
 
-from main.effects.engine import EffectEngine
 from main.systems.passive_system import PassiveSystem
 
 from main.actions.exeute_actions.execute_action import Actions
@@ -24,8 +22,8 @@ class Game:
             data['fractions'] = [fractions["player1"], fractions["player2"]]
         
         self.state = GameState.from_dict(data)
-        self.ctx = ActionContext(self.state)
         self.build_game_engine()
+        self.ctx = ActionContext(self.state, self.rules)
 
         if self.state.phase in (Phase.START_GAME, Phase.START_GAME.value):
             self.available_actions = self.engine.start_game(self.ctx)
@@ -42,13 +40,11 @@ class Game:
         
         self.engine = GameEngine(
             rules                   = self.rules,
-            effect_engine           = EffectEngine(),
-            passive_system          = PassiveSystem(self.rules),
-            state_changes_engine    = StateChangesEngine(),
-            flow_engine             = FlowProcessor(self.rules),
+            resolver                = Resolver(),
+            passive_system          = PassiveSystem(),
             validator               = FormatValidator(),
-            actions                 = Actions(self.rules),
-            available_actions       = AvailableActions(self.rules)
+            actions                 = Actions(),
+            available_actions       = AvailableActions()
         )
 
     def export(self):

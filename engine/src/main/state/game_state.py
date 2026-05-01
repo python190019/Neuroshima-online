@@ -4,7 +4,8 @@ from main.utils.variable import *
 from main.state.player_state import PlayerState
 from main.board.board import Board
 from main.state.selection import Selected
-from main.flows.flows import FlowEvent
+from main.effects.flow_effects import FlowEvent
+from collections import deque
 
 def convert_value(value, target_type, key = None):
     # print(f"convert value: {value} to {target_type}")
@@ -34,7 +35,7 @@ def auto_to_dict(obj):
             k : auto_to_dict(v)
             for k, v in obj.items()
         }
-    if(isinstance(obj, list)):
+    if(isinstance(obj, list) or isinstance(obj, deque)):
         return [auto_to_dict(v) for v in obj]
     
     return obj
@@ -80,7 +81,7 @@ class GameState:
     next_turns          : list[dict] = field(default_factory=list)
     players             : dict[str, PlayerState] = field(default_factory=dict)
     board               : Board = field(default_factory=Board)
-    flow_queue          : list[FlowEvent] = field(default_factory=list)
+    flow_queue          : deque[FlowEvent] = field(default_factory=deque)
 
     @classmethod
     def from_dict(cls, data):
@@ -109,4 +110,4 @@ class GameState:
     def add_player(self, fraction):
         player = PlayerState(fraction)
         player.new_game()
-        self.state.players[fraction] = player
+        self.players[fraction] = player

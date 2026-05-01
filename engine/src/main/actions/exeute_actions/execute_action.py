@@ -2,13 +2,12 @@ from copy import deepcopy
 
 from main.utils.variable import *
 from main.actions.exeute_actions.action_result import ActionResult
-from main.effects.effects import DiscardActiveTokenEffect, RotateEffect, PlaceEffect
-from main.state.changes import ResetInteraction
-from main.flows.flows import EndTurnEvent, BeginTurnEvent
+from main.effects.board_effects import DiscardActiveTokenEffect, RotateEffect, PlaceEffect
+from main.effects.ui_change_effects import ResetInteraction
+from main.effects.flow_effects import EndTurnEvent, BeginTurnEvent
 
 class Actions:
-    def __init__(self, rules):
-        self.rules = rules
+    def __init__(self):
         self.bottom_handlers = {
             Bottom.END_TURN : self.handle_end_turn,
             Bottom.DISCARD : self.handle_discard,

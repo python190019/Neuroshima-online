@@ -28,7 +28,7 @@ class FormatValidator():
             return False
         
         return True
-        # return game.available_actions[UI.HAND][game.current_frakcja][slot]
+        # return game.available_actions[UI.HAND][game.current_fraction][slot]
 
     def validate_bottom_format(self, state, action):
         name = action.get(Action.Key.BOTTOM, None)
