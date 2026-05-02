@@ -56,72 +56,11 @@ class GameRules():
     #############################################################################
     #   lowlevel functions       
     #############################################################################
-
-    def _can_move_to(self, ctx, pos, new_pos):
-        if self.is_wired_at(ctx, pos) or not self.is_empty_at(ctx, new_pos):
-            return False
-        
-        return ctx.board.is_adjacent(pos, new_pos)
-
-    def _can_move(self, ctx, pos):
-        if self.is_wired_at(ctx, pos):
-            return False
-        
-        for hex in ctx.board.adjacent_hexes(pos):
-            if self.is_empty_at(ctx, hex):
-                return True
-        return False
-
-    def _can_be_pushed_by(self, ctx, pos, pusher_pos):
-        if self.is_wired_at(ctx, pos) or not self.is_enemy_at(ctx, pos):
-            return False
-        
-        for hex in ctx.board.adjacent_hexes(pos):
-            if not self._can_move_to(ctx, pos, hex):
-                continue
-            if not ctx.board.is_adjacent(hex, pusher_pos):
-                return True
-        return False
-            
-    def _can_push(self, ctx, pos):
-        if self.is_wired_at(ctx, pos):
-            return False
-        for hex in ctx.board.adjacent_hexes(pos):
-            if self._can_be_pushed_by(ctx, hex, pos):
-                return True
-        return False
+   
 
     #############################################################################
     #   BoardQuery predicators (can only takes context and position as arguments)     
     #############################################################################
-         
-    def is_ally_at(self, ctx, pos):
-        return ctx.board.get_fraction(pos) == ctx.fraction
-
-    def is_enemy_at(self, ctx, pos):
-        return ctx.board.get_fraction(pos) != ctx.fraction
-
-    def is_empty_at(self, ctx, pos):
-        return ctx.board.is_empty(pos)
-
-    def is_not_on_border(self, ctx, pos):
-        return not ctx.board.on_border(pos)
-
-    def is_wired_at(self, ctx, pos):
-        return ctx.board.is_wired(pos)
-
-    def is_hq_at(self, ctx, pos):
-        return ctx.board.is_hq(pos)
-    
-    def not_hq_at(self, ctx, pos):
-        return not self.is_hq_at(ctx, pos)
-    
-    def can_move(self, ctx, pos):
-        return self._can_move(ctx, pos)
-
-    def can_move_from(self, ctx, pos):
-        return self._can_move(ctx, pos)
-
     def can_push_from(self, ctx, pusher_pos):
         return self._can_push(ctx, pusher_pos)
     
@@ -148,18 +87,7 @@ class GameRules():
     #############################################################################
     #   Predicate makers       
     #############################################################################
-    def can_be_pushed_by(self, pusher_pos):
-        def prediacte(ctx, pos):
-            return self._can_be_pushed_by(ctx, pos, pusher_pos)
-        return prediacte
     
-    def adjacent_to(self, my_pos):
-        def predicate(ctx, pos):
-            return pos in ctx.board.adjacent_hexes(my_pos)
-        return predicate
     
-    def not_adjacent_to(self, my_pos):
-        def predicate(ctx, pos):
-            return pos not in ctx.board.adjacent_hexes(my_pos)
-        return predicate
+    
     

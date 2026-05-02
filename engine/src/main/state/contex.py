@@ -1,10 +1,17 @@
 from main.state.game_state import GameState
 from main.rules.game_rules import GameRules
+from main.workflows.workflow_data import WorkflowData
 
 class ActionContext():
-    def __init__(self, state : GameState, rules : GameRules):
+    def __init__(
+            self, 
+            state : GameState, 
+            rules : GameRules, 
+            workflow_data : WorkflowData
+        ):
         self.state = state
         self.rules = rules
+        self.workflow_data = workflow_data
 
     #shortcuts
     @property
