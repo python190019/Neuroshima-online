@@ -1,3 +1,6 @@
+import styles from "./modules/Button.module.css";
+// import type { ReactNode } from "react";
+
 type WlasPrzycisku = {
     zawartosc : React.ReactNode;
     onClick? : () => void;
@@ -10,7 +13,7 @@ export default function Button({zawartosc,
     type = "button", 
     variant = "primary",
 }:WlasPrzycisku){
-    return <button type={type} onClick={onClick}>
+    return <button className={styles.primaryButton} type={type} onClick={onClick}>
         {zawartosc}
     </button>
 }

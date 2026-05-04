@@ -1,6 +1,4 @@
-import { useState } from "react";
-
-async function register(username : string, password : string, url : string) {
+export async function Register(username : string, password : string, url : string) {
     const response = await fetch(url, {
         method : "POST",
         headers : {

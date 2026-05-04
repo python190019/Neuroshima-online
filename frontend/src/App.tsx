@@ -5,7 +5,7 @@ import HexTest from "./HexTest";
 export default function App() {
   const [name, setName] = useState("");
   return (
-    // LoginScreen()
-    HexTest()
+    LoginScreen()
+    // HexTest()
   );
 }

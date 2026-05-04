@@ -1,5 +1,5 @@
-import { app, BrowserWindow } from "electron";
-
+import { app, BrowserWindow, screen } from "electron";
+import path from "path";
 // // app.disableHardwareAcceleration();
 
 // // app.commandLine.appendSwitch("disable-gpu");
@@ -24,9 +24,17 @@ import { app, BrowserWindow } from "electron";
 let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 700,
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+
+  const mainWindow = new BrowserWindow({
+    width,
+    height,
+    minWidth: 800,
+    minHeight: 600,
+    // webPreferences: {
+    //   preload: path.join(__dirname, "preload.js"),
+    // },
   });
 
   mainWindow.loadURL("http://localhost:5173");
