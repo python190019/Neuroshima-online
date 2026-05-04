@@ -1,11 +1,23 @@
 import { useState } from "react";
 import LoginScreen from "./Loginscreen";
-import HexTest from "./HexTest";
+import RegisterScreen from "./Registerscreen";
 
 export default function App() {
-  const [name, setName] = useState("");
+  const [screen, setScreen] = useState<"login" | "register">("login");
+  function SwitchToLogin(){
+    setScreen("login");
+  }
+  function SwitchToRegister(){
+    setScreen("register");
+  }
+
   return (
-    LoginScreen()
-    // HexTest()
+    <div>
+      {screen === "login" ? (
+      <LoginScreen onSwitchToRegister={SwitchToRegister} />
+    ) : (
+      <RegisterScreen onSwitchToLogin={SwitchToLogin} />
+    )}
+    </div>
   );
 }

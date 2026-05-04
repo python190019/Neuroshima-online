@@ -1,5 +1,4 @@
-export async function Login(username:string, password:string) {
-    let url = "http://localhost:8080/api/auth/login";
+export async function Login(username:string, password:string, url:string) {
     const response = await fetch(url, {
         method : "POST",
         headers : {

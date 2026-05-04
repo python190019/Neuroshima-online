@@ -2,13 +2,13 @@ import { useState } from "react";
 import Button from "./components/Button";
 import TextInput from "./components/TekstInput";
 import DisplayText from "./components/DisplayText";
-import { Login } from "./features/auth/Login";
+import { Register } from "./features/auth/Register";
 
-type LoginScreenProps = {
-    onSwitchToRegister: () => void;
+type RegisterScreenProps = {
+    onSwitchToLogin: () => void;
 };
 
-export default function LoginScreen({onSwitchToRegister} : LoginScreenProps){
+export default function RegisterScreen({onSwitchToLogin} : RegisterScreenProps){
     let url = "http://localhost:5173";
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
@@ -16,14 +16,15 @@ export default function LoginScreen({onSwitchToRegister} : LoginScreenProps){
         <div>
             {/* <form>
                 <input type="text">Login</input>
+
             </form> */}
             <DisplayText zawartosc="Username"></DisplayText>
             <TextInput value={name} onChange={setName} placeholder="Enter Username" ></TextInput>
             <DisplayText zawartosc="Password"></DisplayText>
             <TextInput value={password} onChange={setPassword} placeholder="Enter Password"></TextInput>
-            <Button onClick={() => Login(name, password, url)} zawartosc="Login"></Button>
-            <DisplayText zawartosc="You don't have an account?"></DisplayText>
-            <Button onClick={onSwitchToRegister} zawartosc="Register"></Button>
+            <Button onClick={() => Register(name, password, url)} zawartosc="Register"></Button>
+            <DisplayText zawartosc="Already have an account?"></DisplayText>
+            <Button onClick={onSwitchToLogin} zawartosc="Login"></Button>
         </div>
     )
 }
