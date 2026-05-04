@@ -8,7 +8,6 @@ async function cos(name : string) {
   console.log(name);
 }
 
-
 export default function LoginScreen(){
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
