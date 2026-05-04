@@ -8,7 +8,8 @@ type WlasPrzycisku = {
     variant? : "primary";
 };
 
-export default function Button({zawartosc, 
+export default function Button({
+    zawartosc, 
     onClick, 
     type = "button", 
     variant = "primary",

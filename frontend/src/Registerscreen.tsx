@@ -9,7 +9,7 @@ type RegisterScreenProps = {
 };
 
 export default function RegisterScreen({onSwitchToLogin} : RegisterScreenProps){
-    let url = "http://localhost:5173";
+    let url = "http://localhost:8080/api/auth/register";
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     return(

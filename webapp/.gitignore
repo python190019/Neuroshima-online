@@ -48,3 +48,5 @@ bin/
 ### Moje ###
 /doc/prompty/
 /logs/
+
+users.txt

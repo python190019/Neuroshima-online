@@ -9,7 +9,7 @@ type LoginScreenProps = {
 };
 
 export default function LoginScreen({onSwitchToRegister} : LoginScreenProps){
-    let url = "http://localhost:5173";
+    let url = "http://localhost:8080/api/auth/login";
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     return(
