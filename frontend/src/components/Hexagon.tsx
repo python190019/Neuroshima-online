@@ -4,6 +4,8 @@ import "./Hexagon.css";
 type HexagonProps = {
     x: number;
     y: number;
+    poz1?: number;
+    poz2?: number;
     size?: number;
     color?: string;
     rotation?: number;
@@ -14,6 +16,8 @@ type HexagonProps = {
 const Hexagon: React.FC<HexagonProps> = ({
     x,
     y,
+    poz1,
+    poz2,
     size = 100,
     color = "#4CAF50",
     rotation = 0,
@@ -26,7 +30,7 @@ const Hexagon: React.FC<HexagonProps> = ({
         <div
             className="hexagon"
             // onClick={onClick}
-            onClick={() => console.log("Clicked hex:", { x, y })}
+            onClick={() => console.log("Clicked hex:", { poz1, poz2 })}
         style={{
             width: size,
             height: height,

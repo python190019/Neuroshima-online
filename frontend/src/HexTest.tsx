@@ -30,8 +30,9 @@ export default function HexTest(){
             const FinalX = X + CenterX;
             const FinalY = Y + CenterY;
             Items.push(
-            <Hexagon x={X} y={Y} size={Size * 2 - 5} rotation={30} color="#2196F3" />     // w razie czego do
-            )                                                                               // zamiany na Final
+            // <Hexagon x={X} y={Y} poz1={q} poz2={r} size={Size * 2 - 5} rotation={30} color="#2196F3" />
+            <Hexagon x={X} y={Y} poz1={q} poz2={r} size={Size * 2 - 5} rotation={30} color="#2196F3"> {q}, {r} </Hexagon>
+            )                                                                              
         }
     }
 
