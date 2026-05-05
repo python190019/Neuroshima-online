@@ -34,9 +34,10 @@ const Hexagon: React.FC<HexagonProps> = ({
             position: "absolute",
             left: x,
             top: y,
-            transform: `rotate(${rotation}deg) scale(1)`,
-         }}
-    >
+            transform: `rotate(${rotation}deg) scale(1) translate(350%, 50%)`,    // potem do zmiany w celu
+         }}                                                                       // wysrodkowania, na razie
+                                                                                 // dopasowane do consoli
+        >
         < div className="hexagon-content">{children}</div>
          </div>
     );
