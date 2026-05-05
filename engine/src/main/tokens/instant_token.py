@@ -55,11 +55,11 @@ class InstantToken(Token):
     #   Bitwa functions       
     #############################################################################
 
-    def available_actions_bitwa(self, ctx):
-        wanted_bootoms = [Bottom.USE, Bottom.DISCARD, Bottom.CANCEL]
-        return AvailableActionResult(
-            bottoms=self.get_availabe_bottoms(ctx, wanted_bootoms)
-        )
+    # def available_actions_bitwa(self, ctx):
+    #     wanted_bootoms = [Bottom.USE, Bottom.DISCARD, Bottom.CANCEL]
+    #     return AvailableActionResult(
+    #         bottoms=self.get_availabe_bottoms(ctx, wanted_bootoms)
+    #     )
 
     def execute_bitwa(self, ctx, action):
         return ActionResult(
@@ -78,28 +78,7 @@ class InstantToken(Token):
     #   Move functions       
     #############################################################################
 
-    def available_actions_move(self, ctx):
-        if(ctx.ui_state == State.SELECTED_HAND):
-            query = BoardQuery([
-                    ctx.rules.is_ally_at,
-                    ctx.rules.can_move
-                ])
-            return AvailableActionResult(
-                positions=query.apply(ctx),
-                bottoms=self.default_bottoms(ctx)
-            )
-        
-        if(ctx.ui_state == State.MOVING):
-            pos = ctx.selected.unit_position
-            query = BoardQuery([
-                    ctx.rules.adjacent_to(pos),
-                    ctx.rules.is_empty_at
-                ])
-            return AvailableActionResult(
-                positions = query.apply(ctx) + [pos],
-                bottoms=self.default_bottoms(ctx)
-            )
-        
+    
     def execute_move(self, ctx, action):
         # state = ctx.state
         # action = state.action
@@ -141,12 +120,12 @@ class InstantToken(Token):
     #   Bomb functions       
     #############################################################################
 
-    def available_actions_bomb(self, ctx):
-        query = BoardQuery([ctx.rules.is_not_on_border])
-        return AvailableActionResult(
-            positions=query.apply(ctx),
-            bottoms=self.default_bottoms(ctx)      
-        )
+    # def available_actions_bomb(self, ctx):
+    #     query = BoardQuery([ctx.rules.is_not_on_border])
+    #     return AvailableActionResult(
+    #         positions=query.apply(ctx),
+    #         bottoms=self.default_bottoms(ctx)      
+    #     )
     
     def execute_bomb(self, ctx, action):
         pos = action[Action.Key.POS]
@@ -180,22 +159,22 @@ class InstantToken(Token):
     #   Grenade functions       
     #############################################################################
 
-    def available_actions_grenade(self, ctx):
-        positions = []
-        # pos = ctx.board.find_zeton(BoardType.HQ, ctx.fraction)
-        # tile = ctx.board.get_tile(pos)
-        pos = ctx.board.get_hq_pos(ctx.fraction)
-        if ctx.rules.is_hq_not_wired(ctx.fraction):
-            query = BoardQuery([
-                ctx.rules.adjacent_to(pos),
-                ctx.rules.is_enemy_at,
-                ctx.rules.not_hq_at
-            ])
+    # def available_actions_grenade(self, ctx):
+    #     positions = []
+    #     # pos = ctx.board.find_zeton(BoardType.HQ, ctx.fraction)
+    #     # tile = ctx.board.get_tile(pos)
+    #     pos = ctx.board.get_hq_pos(ctx.fraction)
+    #     if ctx.rules.is_hq_not_wired(ctx.fraction):
+    #         query = BoardQuery([
+    #             ctx.rules.adjacent_to(pos),
+    #             ctx.rules.is_enemy_at,
+    #             ctx.rules.not_hq_at
+    #         ])
 
-        return AvailableActionResult(
-            positions = query.apply(ctx),
-            bottoms = self.default_bottoms(ctx)
-        )
+    #     return AvailableActionResult(
+    #         positions = query.apply(ctx),
+    #         bottoms = self.default_bottoms(ctx)
+    #     )
 
     def execute_grenade(self, ctx, action):
         pos = action[Action.Key.POS]
@@ -222,16 +201,16 @@ class InstantToken(Token):
     #   Sniper functions       
     #############################################################################
 
-    def available_actions_sniper(self, ctx):
-        # rules = ctx.rules
-        query = BoardQuery([
-            ctx.rules.is_enemy_at,
-            ctx.rules.not_hq_at
-        ])
-        return AvailableActionResult(
-            positions=query.apply(ctx),  
-            bottoms = self.default_bottoms(ctx)
-        )
+    # def available_actions_sniper(self, ctx):
+    #     # rules = ctx.rules
+    #     query = BoardQuery([
+    #         ctx.rules.is_enemy_at,
+    #         ctx.rules.not_hq_at
+    #     ])
+    #     return AvailableActionResult(
+    #         positions=query.apply(ctx),  
+    #         bottoms = self.default_bottoms(ctx)
+    #     )
 
     
     def execute_sniper(self, ctx, action):
@@ -259,54 +238,21 @@ class InstantToken(Token):
     #############################################################################
     #   Push functions       
     #############################################################################
-    def _push_selected_hand(self, ctx):
-        query = BoardQuery([
-            ctx.rules.can_push,
-            ctx.rules.is_ally_at
-        ])
-        return AvailableActionResult(
-            positions=query.apply(ctx),
-            bottoms = self.default_bottoms(ctx)
-        )
+  
 
-    def _push_selected_pusher(self, ctx):
-        pusher_pos = ctx.selected.unit_position
-        query = BoardQuery([
-            ctx.rules.adjacent_to(pusher_pos),
-            ctx.rules.is_enemy_at,
-            ctx.rules.can_be_pushed_by(pusher_pos)
-        ])
+    # def available_actions_push(self, ctx):
+    #     # state = ctx.state.interaction_state
 
-        wanted_bottoms = [Bottom.CANCEL]
-        return AvailableActionResult(
-            positions=query.apply(ctx),
-            bottoms=self.get_availabe_bottoms(ctx, wanted_bottoms)
-        )
+    #     handler = {
+    #         State.SELECTED_HAND: self._push_selected_hand,
+    #         State.SELECTED_PUSHER: self._push_selected_pusher,
+    #         State.PUSHING: self._push_selected_pushing,
+    #     }.get(ctx.ui_state)
 
-    def _push_selected_pushing(self, ctx):
-        my_pos = ctx.selected.target_position
-        pusher_pos = ctx.selected.unit_position
-        # rules = ctx.rules
-        query = BoardQuery([
-            ctx.rules.adjacent_to(my_pos),
-            ctx.rules.is_empty_at,
-            ctx.rules.not_adjacent_to(pusher_pos)
-        ])
-        return AvailableActionResult(positions=query.apply(ctx))
+    #     if handler:
+    #         return handler(ctx)
 
-    def available_actions_push(self, ctx):
-        # state = ctx.state.interaction_state
-
-        handler = {
-            State.SELECTED_HAND: self._push_selected_hand,
-            State.SELECTED_PUSHER: self._push_selected_pusher,
-            State.PUSHING: self._push_selected_pushing,
-        }.get(ctx.ui_state)
-
-        if handler:
-            return handler(ctx)
-
-        return AvailableActionResult()
+    #     return AvailableActionResult()
 
     def execute_push(self, ctx, action):
         if(ctx.ui_state == State.SELECTED_HAND):

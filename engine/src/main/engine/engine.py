@@ -18,7 +18,7 @@ class GameEngine:
         self.actions            = actions
         self.available_actions  = available_actions
 
-        self.resolver = resolver
+        self.resolver           = resolver
         
         self.passive_system     = passive_system
 
@@ -29,6 +29,9 @@ class GameEngine:
         #     return False
 
         result = self.actions.execute_action(ctx, action)
+        self.resolver.resolve(ctx, result)
+
+        result = ctx.workflow.advance(ctx)
         self.resolver.resolve(ctx, result)
 
         self.passive_system.compute(ctx)

@@ -17,10 +17,9 @@ class MoveRules:
         ]).apply(ctx)
         return [p for p in candiates if self.can_move(ctx, p)]
 
-    def get_available_destinations(self, ctx : ActionContext):
-        pos = ctx.workflow_data.unit_pos
+    def get_available_destinations(self, ctx : ActionContext, unit_pos):
         result = BoardQuery([
             pr.is_empty_at,
-            pr.adjacent_to(pos)
+            pr.adjacent_to(unit_pos)
         ]).apply(ctx)
-        return result + [pos]
+        return result + [unit_pos]

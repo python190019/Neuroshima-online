@@ -1,44 +1,12 @@
 from dataclasses import dataclass, fields, field, MISSING
-from typing import get_origin, get_args
 from main.utils.variable import *
 from main.state.player_state import PlayerState
 from main.board.board import Board
 from main.state.selection import Selected
 from main.effects.flow_effects import FlowEvent
 from collections import deque
-
-def convert_value(value, target_type, key = None):
-    # print(f"convert value: {value} to {target_type}")
-    origin = get_origin(target_type) # typ tego co chcemy dostać
-
-    if hasattr(target_type, "from_dict") and isinstance(value, dict):
-        if target_type is PlayerState and key is not None:
-            return PlayerState.from_dict(key, value)
-        return target_type.from_dict(value)
-
-    if origin is dict and isinstance(value, dict):
-        key_type, value_type = get_args(target_type)
-        return {
-            k : convert_value(v, value_type, key=k)
-            for k, v in value.items()
-        }
-    
-    return value
-
-def auto_to_dict(obj):
-    if(hasattr(obj, "to_dict")):
-        return obj.to_dict()
-    if(hasattr(obj, "to_list")):
-        return obj.to_list()
-    if(isinstance(obj, dict)):
-        return{
-            k : auto_to_dict(v)
-            for k, v in obj.items()
-        }
-    if(isinstance(obj, list) or isinstance(obj, deque)):
-        return [auto_to_dict(v) for v in obj]
-    
-    return obj
+from main.workflows.data import WorkflowData
+from main.state.serialization import convert_value, auto_to_dict
 
 def print_obj(obj, deepth):
     base_s = "\n" + "   " * deepth
@@ -54,6 +22,7 @@ def print_obj(obj, deepth):
         if(deepth > 0):
             print(pre_s + "#####",end='')
         return True
+    
     if(isinstance(obj, list)):
         if(deepth > 0):
             print(pre_s + "||||", end='')
@@ -66,6 +35,7 @@ def print_obj(obj, deepth):
         
         return True
 
+    
     
     print(" ", obj, end='')
     return False
@@ -82,6 +52,7 @@ class GameState:
     players             : dict[str, PlayerState] = field(default_factory=dict)
     board               : Board = field(default_factory=Board)
     flow_queue          : deque[FlowEvent] = field(default_factory=deque)
+    workflow_data       : WorkflowData = field(default_factory=WorkflowData)
 
     @classmethod
     def from_dict(cls, data):

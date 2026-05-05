@@ -3,6 +3,8 @@ from main.utils.variable import Turn, Phase
 from main.actions.exeute_actions.action_result import ActionResult
 from main.effects.ui_change_effects import ResetInteraction
 from main.battle.battle import Battle
+from main.workflows.data import WorkflowSource
+from main.workflows.data import WorkflowFactory
 
 class FlowEvent:
     pass
@@ -53,3 +55,11 @@ class ResolveBattleEvent(FlowEvent):
 class SwapPlayerEvent(FlowEvent):
     def apply(self, ctx : ActionContext):
         ctx.state.current_fraction = ctx.rules.get_enemy(ctx, ctx.fraction)
+
+class StartWorkflow(FlowEvent):
+    def __init__(self, source : WorkflowSource | None = None):
+        super().__init__()
+        self.source = source
+    
+    def apply(self, ctx : ActionContext):
+        ctx.workflow = 
